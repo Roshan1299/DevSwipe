@@ -12,7 +12,20 @@
           "package_name": "com.first.projectswipe"
         }
       },
-      "oauth_client": [],
+      "oauth_client": [
+        {
+          "client_id": "999976668971-uo9i1nv7i178394ljr5jtq77b9igdrns.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.first.projectswipe",
+            "certificate_hash": "8ec1a9b92faf933806bc7c05a1851e7b662875cc"
+          }
+        },
+        {
+          "client_id": "999976668971-5ajruog1v3fak5rkn2ssngtto9sa5qsa.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
       "api_key": [
         {
           "current_key": "AIzaSyCRKbtVNLJXhRR5ITMMm1fxIyMvUb8JVio"
@@ -20,7 +33,12 @@
       ],
       "services": {
         "appinvite_service": {
-          "other_platform_oauth_client": []
+          "other_platform_oauth_client": [
+            {
+              "client_id": "999976668971-5ajruog1v3fak5rkn2ssngtto9sa5qsa.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
         }
       }
     }
