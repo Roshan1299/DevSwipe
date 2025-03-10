@@ -1,6 +1,7 @@
 plugins {
     alias(libs.plugins.android.application)
     alias(libs.plugins.kotlin.android)
+    alias(libs.plugins.google.services) // Add this line
 }
 
 android {
@@ -39,7 +40,6 @@ android {
 }
 
 dependencies {
-
     implementation(libs.androidx.core.ktx)
     implementation(libs.androidx.appcompat)
     implementation(libs.material)
@@ -49,7 +49,9 @@ dependencies {
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)
     androidTestImplementation(libs.androidx.espresso.core)
-    implementation(platform("com.google.firebase:firebase-bom:32.3.1"))// Firebase BoM
+
+    // Firebase
+    implementation(platform("com.google.firebase:firebase-bom:32.3.1")) // Firebase BoM
     implementation("com.google.firebase:firebase-auth-ktx") // Firebase Auth
     implementation("com.google.android.gms:play-services-auth:20.7.0") // Google Sign-In
 }

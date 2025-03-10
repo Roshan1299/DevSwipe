@@ -10,6 +10,7 @@ material = "1.12.0"
 constraintlayout = "2.2.1"
 navigationFragmentKtx = "2.8.8"
 navigationUiKtx = "2.8.8"
+google-services = "4.3.15" # Add this line
 
 [libraries]
 androidx-core-ktx = { group = "androidx.core", name = "core-ktx", version.ref = "coreKtx" }
@@ -23,6 +24,7 @@ androidx-navigation-fragment-ktx = { group = "androidx.navigation", name = "navi
 androidx-navigation-ui-ktx = { group = "androidx.navigation", name = "navigation-ui-ktx", version.ref = "navigationUiKtx" }
 
 [plugins]
+google-services = { id = "com.google.gms.google-services", version.ref = "google-services" } # Add this line
 android-application = { id = "com.android.application", version.ref = "agp" }
 kotlin-android = { id = "org.jetbrains.kotlin.android", version.ref = "kotlin" }
 
