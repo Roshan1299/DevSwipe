@@ -9,7 +9,6 @@
     <fragment
         android:id="@+id/loginFragment"
         android:name="com.first.projectswipe.LoginFragment"
-        android:label="Login"
         tools:layout="@layout/fragment_login">
         <action
             android:id="@+id/action_loginFragment_to_registerFragment"
@@ -24,7 +23,6 @@
     <fragment
         android:id="@+id/registerFragment"
         android:name="com.first.projectswipe.RegisterFragment"
-        android:label="Register"
         tools:layout="@layout/fragment_register">
         <action
             android:id="@+id/action_registerFragment_to_loginFragment"
@@ -39,7 +37,6 @@
     <fragment
         android:id="@+id/FirstFragment"
         android:name="com.first.projectswipe.FirstFragment"
-        android:label="@string/first_fragment_label"
         tools:layout="@layout/fragment_first">
         <action
             android:id="@+id/action_FirstFragment_to_SecondFragment"
@@ -50,7 +47,6 @@
     <fragment
         android:id="@+id/SecondFragment"
         android:name="com.first.projectswipe.SecondFragment"
-        android:label="@string/second_fragment_label"
         tools:layout="@layout/fragment_second">
         <action
             android:id="@+id/action_SecondFragment_to_FirstFragment"
