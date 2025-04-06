@@ -22,14 +22,14 @@ class MainActivity : AppCompatActivity() {
         setContentView(binding.root)
 
         // Set the toolbar as the action bar
-        setSupportActionBar(binding.toolbar)
+//        setSupportActionBar(binding.toolbar)
 
         // Set up NavController
         val navHostFragment = supportFragmentManager.findFragmentById(R.id.nav_host_fragment_content_main) as NavHostFragment
         navController = navHostFragment.navController
 
         // Set up ActionBar with NavController
-        setupActionBarWithNavController(navController)
+//        setupActionBarWithNavController(navController)
     }
 
     // Handle the "Up" button in the ActionBar
