@@ -19,7 +19,8 @@ class RegisterFragment : Fragment() {
     private lateinit var auth: FirebaseAuth
 
     override fun onCreateView(
-        inflater: LayoutInflater, container: ViewGroup?,
+        inflater: LayoutInflater,
+        container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View {
         _binding = FragmentRegisterBinding.inflate(inflater, container, false)
@@ -30,7 +31,10 @@ class RegisterFragment : Fragment() {
         super.onViewCreated(view, savedInstanceState)
         auth = Firebase.auth
 
-        // Handle register button click
+        setupClickListeners()
+    }
+
+    private fun setupClickListeners() {
         binding.registerButton.setOnClickListener {
             val firstName = binding.firstNameInput.text.toString()
             val lastName = binding.lastNameInput.text.toString()
@@ -45,7 +49,6 @@ class RegisterFragment : Fragment() {
             }
         }
 
-        // Navigate back to Login screen
         binding.loginPrompt.setOnClickListener {
             findNavController().navigate(R.id.action_registerFragment_to_loginFragment)
         }
@@ -59,12 +62,17 @@ class RegisterFragment : Fragment() {
         password: String,
         confirmPassword: String
     ): Boolean {
-        if (firstName.isEmpty() || lastName.isEmpty() || username.isEmpty() || email.isEmpty() || password.isEmpty() || confirmPassword.isEmpty()) {
+        if (firstName.isEmpty() || lastName.isEmpty() || username.isEmpty() ||
+            email.isEmpty() || password.isEmpty() || confirmPassword.isEmpty()) {
             Toast.makeText(context, "All fields are required", Toast.LENGTH_SHORT).show()
             return false
         }
         if (password != confirmPassword) {
             Toast.makeText(context, "Passwords do not match", Toast.LENGTH_SHORT).show()
+            return false
+        }
+        if (!android.util.Patterns.EMAIL_ADDRESS.matcher(email).matches()) {
+            Toast.makeText(context, "Please enter a valid email", Toast.LENGTH_SHORT).show()
             return false
         }
         return true
@@ -75,11 +83,18 @@ class RegisterFragment : Fragment() {
             .addOnCompleteListener { task ->
                 binding.progressIndicator.visibility = View.GONE
                 if (task.isSuccessful) {
-                    // Navigate to LoginFragment after successful registration
+                    Toast.makeText(
+                        context,
+                        "Registration successful!",
+                        Toast.LENGTH_SHORT
+                    ).show()
                     findNavController().navigate(R.id.action_registerFragment_to_loginFragment)
                 } else {
-                    // Show error message
-                    Toast.makeText(context, "Registration failed: ${task.exception?.message}", Toast.LENGTH_SHORT).show()
+                    Toast.makeText(
+                        context,
+                        "Registration failed: ${task.exception?.message}",
+                        Toast.LENGTH_SHORT
+                    ).show()
                 }
             }
     }
