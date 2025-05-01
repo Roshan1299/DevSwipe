@@ -7,6 +7,7 @@ import android.view.ViewGroup
 import androidx.fragment.app.Fragment
 import com.first.projectswipe.databinding.FragmentHomeBinding
 import com.google.android.material.tabs.TabLayoutMediator
+import androidx.appcompat.app.AppCompatActivity
 
 class HomeFragment : Fragment() {
 
@@ -19,6 +20,9 @@ class HomeFragment : Fragment() {
         savedInstanceState: Bundle?
     ): View {
         _binding = FragmentHomeBinding.inflate(inflater, container, false)
+
+        (requireActivity() as AppCompatActivity).setSupportActionBar(binding.toolbar)
+
 
         binding.viewPager.adapter = HomePagerAdapter(requireActivity())
 
