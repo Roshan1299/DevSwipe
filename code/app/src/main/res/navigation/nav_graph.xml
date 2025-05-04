@@ -8,7 +8,7 @@
     <!-- Login Fragment -->
     <fragment
         android:id="@+id/loginFragment"
-        android:name="com.first.projectswipe.LoginFragment"
+        android:name="com.first.projectswipe.auth.LoginFragment"
         tools:layout="@layout/fragment_login">
         <action
             android:id="@+id/action_loginFragment_to_registerFragment"
@@ -21,7 +21,7 @@
     <!-- Register Fragment -->
     <fragment
         android:id="@+id/registerFragment"
-        android:name="com.first.projectswipe.RegisterFragment"
+        android:name="com.first.projectswipe.auth.RegisterFragment"
         tools:layout="@layout/fragment_register">
         <action
             android:id="@+id/action_registerFragment_to_loginFragment"
@@ -34,6 +34,6 @@
     <!-- Home Fragment (Main Page with Tabs) -->
     <fragment
         android:id="@+id/homeFragment"
-        android:name="com.first.projectswipe.HomeFragment"
+        android:name="com.first.projectswipe.home.HomeFragment"
         tools:layout="@layout/fragment_home" />
 </navigation>
