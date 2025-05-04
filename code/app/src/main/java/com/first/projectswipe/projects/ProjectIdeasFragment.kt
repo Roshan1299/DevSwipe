@@ -1,5 +1,6 @@
-package com.first.projectswipe
+package com.first.projectswipe.projects
 
+import android.R
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
@@ -14,6 +15,6 @@ class ProjectIdeasFragment : Fragment() {
         savedInstanceState: Bundle?
     ): View? {
         // Temporary layout — replace with your own
-        return inflater.inflate(android.R.layout.simple_list_item_1, container, false)
+        return inflater.inflate(R.layout.simple_list_item_1, container, false)
     }
 }
