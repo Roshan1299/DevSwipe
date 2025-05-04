@@ -1,13 +1,14 @@
-package com.first.projectswipe
+package com.first.projectswipe.home
 
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.appcompat.app.AppCompatActivity
 import androidx.fragment.app.Fragment
+import com.first.projectswipe.home.HomePagerAdapter
 import com.first.projectswipe.databinding.FragmentHomeBinding
 import com.google.android.material.tabs.TabLayoutMediator
-import androidx.appcompat.app.AppCompatActivity
 
 class HomeFragment : Fragment() {
 
