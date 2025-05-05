@@ -9,6 +9,8 @@ import androidx.fragment.app.Fragment
 import com.first.projectswipe.home.HomePagerAdapter
 import com.first.projectswipe.databinding.FragmentHomeBinding
 import com.google.android.material.tabs.TabLayoutMediator
+import androidx.navigation.fragment.findNavController
+import com.first.projectswipe.R
 
 class HomeFragment : Fragment() {
 
@@ -26,6 +28,10 @@ class HomeFragment : Fragment() {
 
 
         binding.viewPager.adapter = HomePagerAdapter(requireActivity())
+        binding.fabCreateProject.setOnClickListener {
+            findNavController().navigate(R.id.action_homeFragment_to_createProjectIdeaFragment)
+        }
+
 
         TabLayoutMediator(binding.tabs, binding.viewPager) { tab, position ->
             tab.text = tabTitles[position]
