@@ -5,12 +5,15 @@ import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.*
+import android.widget.Button
+import android.widget.EditText
+import android.widget.Toast
 import androidx.fragment.app.Fragment
-import com.google.firebase.auth.FirebaseAuth
-import com.google.firebase.firestore.FirebaseFirestore
+import androidx.navigation.fragment.findNavController
 import com.first.projectswipe.R
 import com.first.projectswipe.models.ProjectIdea
+import com.google.firebase.auth.FirebaseAuth
+import com.google.firebase.firestore.FirebaseFirestore
 
 class CreateProjectIdeaFragment : Fragment() {
 
@@ -68,9 +71,7 @@ class CreateProjectIdeaFragment : Fragment() {
         newDocRef.set(project)
             .addOnSuccessListener {
                 Toast.makeText(context, "Project saved!", Toast.LENGTH_SHORT).show()
-                titleEditText.text.clear()
-                descriptionEditText.text.clear()
-                tagsEditText.text.clear()
+                findNavController().popBackStack()
             }
             .addOnFailureListener { e ->
                 Log.e("CreateProject", "Error saving project", e)
