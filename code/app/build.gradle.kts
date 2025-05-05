@@ -51,6 +51,7 @@ dependencies {
     androidTestImplementation(libs.androidx.espresso.core)
 
     // Firebase
+    implementation(("com.google.firebase:firebase-firestore-ktx:24.9.0"))
     implementation(platform("com.google.firebase:firebase-bom:32.3.1")) // Firebase BoM
     implementation("com.google.firebase:firebase-auth-ktx") // Firebase Auth
     implementation("com.google.android.gms:play-services-auth:20.7.0") // Google Sign-In

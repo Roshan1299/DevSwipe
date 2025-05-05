@@ -1,12 +1,14 @@
-package com.first.projectswipe
+package com.first.projectswipe.auth
 
 import android.os.Bundle
+import android.util.Patterns
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.Toast
 import androidx.fragment.app.Fragment
 import androidx.navigation.fragment.findNavController
+import com.first.projectswipe.R
 import com.first.projectswipe.databinding.FragmentRegisterBinding
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.ktx.auth
@@ -71,7 +73,7 @@ class RegisterFragment : Fragment() {
             Toast.makeText(context, "Passwords do not match", Toast.LENGTH_SHORT).show()
             return false
         }
-        if (!android.util.Patterns.EMAIL_ADDRESS.matcher(email).matches()) {
+        if (!Patterns.EMAIL_ADDRESS.matcher(email).matches()) {
             Toast.makeText(context, "Please enter a valid email", Toast.LENGTH_SHORT).show()
             return false
         }
