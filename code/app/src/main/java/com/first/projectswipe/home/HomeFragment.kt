@@ -6,17 +6,18 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.appcompat.app.AppCompatActivity
 import androidx.fragment.app.Fragment
-import com.first.projectswipe.home.HomePagerAdapter
-import com.first.projectswipe.databinding.FragmentHomeBinding
-import com.google.android.material.tabs.TabLayoutMediator
 import androidx.navigation.fragment.findNavController
 import com.first.projectswipe.R
+import com.first.projectswipe.databinding.FragmentHomeBinding
+import com.google.android.material.tabs.TabLayoutMediator
 
 class HomeFragment : Fragment() {
 
     private var _binding: FragmentHomeBinding? = null
     private val binding get() = _binding!!
-    private val tabTitles = arrayOf("Project Ideas", "Seeking Collaborators")
+//    private val tabTitles = arrayOf("Project Ideas", "Seeking Collaborators")
+    private val tabTitles = arrayOf("Project Ideas")
+
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
