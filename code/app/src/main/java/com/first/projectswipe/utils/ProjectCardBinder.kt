@@ -15,6 +15,7 @@ object ProjectCardBinder {
 
         val chipGroup = card.findViewById<ChipGroup>(R.id.projectTagsChipGroup)
         chipGroup.removeAllViews()
+        card.findViewById<TextView>(R.id.projectCreatorName).text = idea.createdBy
         idea.tags?.forEach { tag ->
             val chip = Chip(context).apply {
                 text = tag
