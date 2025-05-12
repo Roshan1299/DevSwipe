@@ -23,8 +23,8 @@ class SwipeHandler(
         card.setOnTouchListener { v, event ->
             when (event.actionMasked) {
                 MotionEvent.ACTION_DOWN -> {
-                    downX = event.rawX
-                    downY = event.rawY
+                    downX = event.x  // 🔄 use local coordinates
+                    downY = event.y
                     velocityTracker = VelocityTracker.obtain().apply {
                         addMovement(event)
                     }
@@ -33,8 +33,9 @@ class SwipeHandler(
 
                 MotionEvent.ACTION_MOVE -> {
                     velocityTracker?.addMovement(event)
-                    val dx = event.rawX - downX
-                    val dy = event.rawY - downY
+                    val dx = event.x - downX
+                    val dy = event.y - downY
+
                     v.translationX = dx
                     v.translationY = dy
                     v.rotation = (dx / 20).coerceIn(-15f, 15f)
@@ -43,20 +44,34 @@ class SwipeHandler(
                 }
 
                 MotionEvent.ACTION_UP -> {
+                    val upX = event.x
+                    val upY = event.y
+                    val dx = upX - downX
+                    val dy = upY - downY
+
                     velocityTracker?.computeCurrentVelocity(1000)
                     val xVelocity = velocityTracker?.getXVelocity(event.getPointerId(0)) ?: 0f
                     velocityTracker?.recycle()
                     velocityTracker = null
 
-                    val dx = event.rawX - downX
                     val isSwipe = abs(dx) > swipeThreshold || abs(xVelocity) > flingThreshold
-                    val direction = if (dx > 0 || xVelocity > 0) 1 else -1
+                    val isHorizontalDominant = abs(dx) > abs(dy)
 
-                    if (isSwipe) {
+                    val direction = if (isHorizontalDominant) {
+                        if (dx < 0 || xVelocity < 0) -1 else 1
+                    } else {
+                        0
+                    }
+
+                    if (isSwipe && direction != 0) {
                         v.performHapticFeedback(HapticFeedbackConstants.VIRTUAL_KEY)
                         animateOffScreen(v, direction)
                     } else {
-                        v.animate().translationX(0f).translationY(0f).rotation(0f).alpha(1f)
+                        v.animate()
+                            .translationX(0f)
+                            .translationY(0f)
+                            .rotation(0f)
+                            .alpha(1f)
                             .setDuration(200)
                             .setInterpolator(AccelerateDecelerateInterpolator())
                             .start()
