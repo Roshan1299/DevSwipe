@@ -1,4 +1,3 @@
-<?xml version="1.0" encoding="utf-8"?>
 <LinearLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
@@ -32,24 +31,16 @@
                 android:textSize="30sp" />
         </FrameLayout>
     </androidx.appcompat.widget.Toolbar>
-    <!-- Tabs -->
-    <com.google.android.material.tabs.TabLayout
-        android:id="@+id/tabs"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:background="@color/white"
-        app:tabTextColor="@android:color/black"
-        app:tabSelectedTextColor="@android:color/black"
-        app:tabIndicatorColor="@android:color/black" />
 
-
-    <!-- ViewPager2 -->
-    <androidx.viewpager2.widget.ViewPager2
-        android:id="@+id/viewPager"
+    <!-- Tinder-style card stack container -->
+    <FrameLayout
+        android:id="@+id/cardStackContainer"
         android:layout_width="match_parent"
         android:layout_height="0dp"
-        android:background="@color/white"
-        android:layout_weight="1" />
+        android:layout_weight="1"
+        android:padding="16dp"
+        android:clipChildren="false"
+        android:clipToPadding="false"/>
 
     <RelativeLayout
         android:layout_width="match_parent"
