@@ -1,0 +1,16 @@
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/cardRoot"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:clipChildren="false"
+    android:clipToPadding="false">
+
+    <include
+        android:id="@+id/frontCardLayout"
+        layout="@layout/layout_card_front" />
+
+    <include
+        android:id="@+id/backCardLayout"
+        layout="@layout/layout_card_back"
+        android:visibility="gone" />
+</FrameLayout>
