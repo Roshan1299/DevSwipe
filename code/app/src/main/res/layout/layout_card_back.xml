@@ -1,0 +1,34 @@
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/backCardLayout"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="vertical"
+    android:padding="20dp"
+    android:background="@android:color/white">
+
+    <TextView
+        android:id="@+id/fullDescriptionTextView"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="This project helps students..."
+        android:textColor="#000"
+        android:textSize="15sp"
+        android:paddingBottom="12dp" />
+
+    <TextView
+        android:id="@+id/githubLink"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="GitHub: https://github.com/project"
+        android:textColor="#1a0dab"
+        android:textSize="14sp" />
+
+    <TextView
+        android:id="@+id/timeline"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Timeline: 4–6 weeks"
+        android:textColor="#555"
+        android:textSize="14sp"
+        android:paddingTop="8dp" />
+</LinearLayout>
