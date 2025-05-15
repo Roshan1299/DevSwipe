@@ -28,7 +28,7 @@ class CardStackManager(
     }
 
     private fun addCard(idea: ProjectIdea, position: Int, animate: Boolean = false) {
-        val card = inflater.inflate(R.layout.item_project_card, container, false)
+        val card = inflater.inflate(R.layout.card_flip_container, container, false)
         ProjectCardBinder.bind(card, context, idea)
 
         val offset = 24 * position

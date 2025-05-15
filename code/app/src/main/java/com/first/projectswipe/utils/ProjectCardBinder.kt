@@ -14,47 +14,63 @@ import com.google.android.material.chip.ChipGroup
 object ProjectCardBinder {
 
     fun bind(card: View, context: Context, idea: ProjectIdea) {
-        // Front card views
-        val titleView = card.findViewById<TextView>(R.id.projectTitleTextView)
-        val descView = card.findViewById<TextView>(R.id.projectDescriptionTextView)
-        val creatorView = card.findViewById<TextView>(R.id.projectCreatorName)
-        val chipGroup = card.findViewById<ChipGroup>(R.id.projectTagsChipGroup)
+        // Front side
+        val frontLayout = card.findViewById<View>(R.id.frontCardLayout)
+        val frontTitle = frontLayout.findViewById<TextView>(R.id.projectTitleTextView)
+        val frontDesc = frontLayout.findViewById<TextView>(R.id.projectDescriptionTextView)
+        val frontCreator = frontLayout.findViewById<TextView>(R.id.projectCreatorName)
+        val frontChips = frontLayout.findViewById<ChipGroup>(R.id.projectTagsChipGroup)
 
-        // Back card views
-        val fullDetailsView = card.findViewById<TextView?>(R.id.fullDescriptionTextView)
-        val githubView = card.findViewById<TextView?>(R.id.githubLink)
-        val timelineView = card.findViewById<TextView?>(R.id.timeline)
-
-        // Bind front
-        titleView.text = idea.title
-        descView.text = idea.description
-        creatorView.text = idea.createdBy
-
-        chipGroup.removeAllViews()
-        idea.tags?.forEach { tag ->
+        frontTitle.text = idea.title
+        frontDesc.text = idea.description
+        frontCreator.text = idea.createdBy
+        frontChips.removeAllViews()
+        idea.tags.forEach { tag ->
             val chip = Chip(context).apply {
                 text = tag
                 isCheckable = false
                 isClickable = false
             }
-            chipGroup.addView(chip)
+            frontChips.addView(chip)
         }
 
-        // Bind back (optional — add checks if null)
-        fullDetailsView?.text = idea.description
-        githubView?.text = "GitHub: https://github.com/yourproject"
-        timelineView?.text = "Timeline: 4–6 weeks"
+        // Back side
+        val backLayout = card.findViewById<View>(R.id.backCardLayout)
+        val backDesc = backLayout.findViewById<TextView>(R.id.fullDescriptionTextView)
+        val backGithub = backLayout.findViewById<TextView>(R.id.githubLink)
+        val backTimeline = backLayout.findViewById<TextView>(R.id.timeline)
+        val backChips = backLayout.findViewById<ChipGroup>(R.id.projectTagsChipGroup)
+
+        backDesc.text = idea.description
+        backGithub.text = "GitHub: https://github.com/yourproject"
+        backTimeline.text = "Timeline: 4–6 weeks"
+        backChips.removeAllViews()
+        idea.tags.forEach { tag ->
+            val chip = Chip(context).apply {
+                text = tag
+                isCheckable = false
+                isClickable = false
+            }
+            backChips.addView(chip)
+        }
 
         // Flip logic
-        val front = card.findViewById<View>(R.id.frontCardLayout)
-        val back = card.findViewById<View>(R.id.backCardLayout)
-        val infoButton = front.findViewById<View>(R.id.infoButton)
+        val frontInfo = frontLayout.findViewById<View>(R.id.infoButton)
+        val backInfo = backLayout.findViewById<View>(R.id.infoButton)
+
+        // Initial visibility
+        frontLayout.visibility = View.VISIBLE
+        backLayout.visibility = View.GONE
 
         var isFlipped = false
-        infoButton.setOnClickListener {
+
+        val flip = {
             isFlipped = !isFlipped
-            flipCard(card, front, back, isFlipped)
+            flipCard(card, frontLayout, backLayout, isFlipped)
         }
+
+        frontInfo.setOnClickListener { flip() }
+        backInfo.setOnClickListener { flip() }
     }
 
     private fun flipCard(root: View, front: View, back: View, showBack: Boolean) {
