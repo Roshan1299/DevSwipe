@@ -55,4 +55,5 @@ dependencies {
     implementation(platform("com.google.firebase:firebase-bom:32.3.1")) // Firebase BoM
     implementation("com.google.firebase:firebase-auth-ktx") // Firebase Auth
     implementation("com.google.android.gms:play-services-auth:20.7.0") // Google Sign-In
+    implementation("com.squareup.picasso:picasso:2.71828")
 }
