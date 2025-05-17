@@ -42,6 +42,11 @@
             app:destination="@id/createProjectIdeaFragment" />
     </fragment>
 
+    <fragment
+        android:id="@+id/profileFragment"
+        android:name="com.first.projectswipe.ui.profile.ProfileFragment"
+        android:label="Profile" />
+
     <!-- Create Project Idea Fragment -->
     <fragment
         android:id="@+id/createProjectIdeaFragment"
