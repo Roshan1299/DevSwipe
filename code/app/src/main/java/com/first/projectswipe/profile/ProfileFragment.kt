@@ -11,7 +11,7 @@ import androidx.fragment.app.Fragment
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.first.projectswipe.R
-import com.first.projectswipe.adapters.ProjectCardAdapter
+import com.first.projectswipe.adapters.ProfilePostAdapter
 import com.first.projectswipe.models.ProjectIdea
 import com.google.android.material.chip.Chip
 import com.google.android.material.chip.ChipGroup
@@ -33,7 +33,7 @@ class ProfileFragment : Fragment() {
     private val db = FirebaseFirestore.getInstance()
 
     private val postList = mutableListOf<ProjectIdea>()
-    private lateinit var adapter: ProjectCardAdapter
+    private lateinit var adapter: ProfilePostAdapter
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -52,7 +52,7 @@ class ProfileFragment : Fragment() {
 
         // Setup RecyclerView
         postsRecyclerView.layoutManager = LinearLayoutManager(requireContext())
-        adapter = ProjectCardAdapter(postList)
+        adapter = ProfilePostAdapter(postList)
         postsRecyclerView.adapter = adapter
 
         loadUserProfile()
@@ -88,7 +88,7 @@ class ProfileFragment : Fragment() {
     private fun loadUserPosts() {
         val userId = auth.currentUser?.uid ?: return
 
-        db.collection("projects")
+        db.collection("project_ideas")
             .whereEqualTo("createdBy", userId)
             .get()
             .addOnSuccessListener { result ->
