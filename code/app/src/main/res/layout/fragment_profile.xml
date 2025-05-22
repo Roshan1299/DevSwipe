@@ -1,126 +1,142 @@
-<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    android:background="@color/white"
-    android:padding="16dp">
+    android:layout_height="match_parent">
 
-    <LinearLayout
+    <!-- Scrollable content -->
+    <ScrollView
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:orientation="vertical">
+        android:layout_height="match_parent"
+        android:padding="16dp"
+        android:background="@color/white">
 
-        <!-- Profile Picture -->
-        <ImageView
-            android:id="@+id/profileImageView"
-            android:layout_width="100dp"
-            android:layout_height="100dp"
-            android:layout_gravity="center"
-            android:scaleType="centerCrop"
-            android:padding="8dp"
-            android:contentDescription="Profile picture" />
-
-        <!-- Name -->
-        <TextView
-            android:id="@+id/profileName"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:textSize="20sp"
-            android:textStyle="bold"
-            android:layout_gravity="center" />
-
-        <!-- University -->
-        <TextView
-            android:id="@+id/profileUniversity"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="University of Alberta"
-            android:layout_gravity="center"
-            android:textSize="14sp"
-            android:textColor="#777777" />
-
-        <!-- Bio -->
-        <TextView
-            android:id="@+id/profileBio"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:text="Passionate about building side projects and connecting collaborators."
-            android:paddingTop="8dp"
-            android:paddingBottom="16dp"
-            android:textAlignment="center" />
-
-        <!-- Skills & Interests -->
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:orientation="horizontal"
-            android:weightSum="2"
-            android:layout_marginBottom="16dp">
+            android:orientation="vertical">
 
-            <LinearLayout
-                android:id="@+id/skillsContainer"
-                android:layout_width="0dp"
+            <!-- Profile Picture -->
+            <com.google.android.material.imageview.ShapeableImageView
+                android:id="@+id/profileImageView"
+                android:layout_width="100dp"
+                android:layout_height="100dp"
+                android:layout_gravity="center"
+                android:padding="8dp"
+                android:src="@drawable/ic_profile_placeholder"/>
+
+            <!-- Name -->
+            <TextView
+                android:id="@+id/profileName"
+                android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_weight="1"
-                android:orientation="vertical"
-                android:padding="12dp"
-                android:layout_marginEnd="8dp"
-                android:background="@drawable/card_background">
+                android:textSize="20sp"
+                android:textStyle="bold"
+                android:layout_gravity="center" />
 
-                <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="Skills"
-                    android:textStyle="bold" />
+            <!-- University -->
+            <TextView
+                android:id="@+id/profileUniversity"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="University of Alberta"
+                android:layout_gravity="center"
+                android:textSize="14sp"
+                android:textColor="#777777" />
 
-                <com.google.android.material.chip.ChipGroup
-                    android:id="@+id/skillsChipGroup"
-                    android:layout_width="match_parent"
+            <!-- Bio -->
+            <TextView
+                android:id="@+id/profileBio"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Passionate about building side projects and connecting collaborators."
+                android:paddingTop="8dp"
+                android:paddingBottom="16dp"
+                android:textAlignment="center" />
+
+            <!-- Skills & Interests -->
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:weightSum="2"
+                android:layout_marginBottom="16dp">
+
+                <LinearLayout
+                    android:id="@+id/skillsContainer"
+                    android:layout_width="0dp"
                     android:layout_height="wrap_content"
-                    app:singleLine="false" />
+                    android:layout_weight="1"
+                    android:orientation="vertical"
+                    android:padding="12dp"
+                    android:layout_marginEnd="8dp"
+                    android:background="@drawable/card_background">
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="Skills"
+                        android:textStyle="bold" />
+
+                    <com.google.android.material.chip.ChipGroup
+                        android:id="@+id/skillsChipGroup"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        app:singleLine="false" />
+                </LinearLayout>
+
+                <LinearLayout
+                    android:id="@+id/interestsContainer"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:orientation="vertical"
+                    android:padding="12dp"
+                    android:layout_marginStart="8dp"
+                    android:background="@drawable/card_background">
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="Interests"
+                        android:textStyle="bold" />
+
+                    <com.google.android.material.chip.ChipGroup
+                        android:id="@+id/interestsChipGroup"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        app:singleLine="false" />
+                </LinearLayout>
             </LinearLayout>
 
-            <LinearLayout
-                android:id="@+id/interestsContainer"
-                android:layout_width="0dp"
+            <!-- User's Posts -->
+            <TextView
+                android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_weight="1"
-                android:orientation="vertical"
-                android:padding="12dp"
-                android:layout_marginStart="8dp"
-                android:background="@drawable/card_background">
+                android:text="Your Posts"
+                android:textSize="18sp"
+                android:textStyle="bold"
+                android:paddingTop="12dp"
+                android:paddingBottom="8dp" />
 
-                <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="Interests"
-                    android:textStyle="bold" />
-
-                <com.google.android.material.chip.ChipGroup
-                    android:id="@+id/interestsChipGroup"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    app:singleLine="false" />
-            </LinearLayout>
+            <androidx.recyclerview.widget.RecyclerView
+                android:id="@+id/userPostsRecyclerView"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:minHeight="100dp"
+                android:overScrollMode="never"
+                android:nestedScrollingEnabled="false" />
         </LinearLayout>
+    </ScrollView>
 
-        <!-- User's Posts -->
-        <TextView
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:text="Your Posts"
-            android:textSize="18sp"
-            android:textStyle="bold"
-            android:paddingTop="12dp"
-            android:paddingBottom="8dp" />
-
-        <androidx.recyclerview.widget.RecyclerView
-            android:id="@+id/userPostsRecyclerView"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:minHeight="100dp"
-            android:overScrollMode="never"
-            android:nestedScrollingEnabled="false" />
-
-    </LinearLayout>
-</ScrollView>
+    <!-- Edit Button on top right -->
+    <ImageButton
+        android:id="@+id/editProfileButton"
+        android:layout_width="40dp"
+        android:layout_height="40dp"
+        android:layout_gravity="top|end"
+        android:layout_margin="16dp"
+        android:background="?attr/selectableItemBackgroundBorderless"
+        android:contentDescription="Edit Profile"
+        android:src="@drawable/ic_edit"
+        />
+</FrameLayout>
