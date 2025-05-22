@@ -25,7 +25,6 @@
             android:id="@+id/profileName"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="Roshan"
             android:textSize="20sp"
             android:textStyle="bold"
             android:layout_gravity="center" />
@@ -119,6 +118,9 @@
             android:id="@+id/userPostsRecyclerView"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            android:minHeight="100dp"
+            android:overScrollMode="never"
             android:nestedScrollingEnabled="false" />
+
     </LinearLayout>
 </ScrollView>
