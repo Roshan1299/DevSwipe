@@ -1,0 +1,65 @@
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:padding="16dp">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical">
+
+        <com.google.android.material.imageview.ShapeableImageView
+            android:id="@+id/editProfileImageView"
+            android:layout_width="100dp"
+            android:layout_height="100dp"
+            android:layout_gravity="center"
+            android:src="@drawable/ic_profile_placeholder"
+            android:scaleType="centerCrop"
+            android:padding="8dp"/>
+
+        <EditText
+            android:id="@+id/nameInput"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:hint="Name" />
+
+        <EditText
+            android:id="@+id/universityInput"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:hint="University" />
+
+        <EditText
+            android:id="@+id/bioInput"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:hint="Bio"
+            android:minLines="3"
+            android:gravity="top" />
+
+        <com.google.android.material.chip.ChipGroup
+            android:id="@+id/skillsChipGroup"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            app:singleSelection="false"
+            app:singleLine="false"
+            android:layout_marginTop="16dp" />
+
+        <EditText
+            android:id="@+id/addSkillInput"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:hint="Add a skill and press enter"
+            android:imeOptions="actionDone"
+            android:inputType="text" />
+
+        <Button
+            android:id="@+id/saveProfileButton"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Save Changes"
+            android:layout_marginTop="24dp" />
+
+    </LinearLayout>
+</ScrollView>
