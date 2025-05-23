@@ -5,6 +5,7 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.ImageButton
 import android.widget.ImageView
 import android.widget.TextView
 import androidx.fragment.app.Fragment
@@ -18,6 +19,7 @@ import com.google.android.material.chip.ChipGroup
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FirebaseFirestore
 import com.squareup.picasso.Picasso
+import androidx.navigation.fragment.findNavController
 
 class ProfileFragment : Fragment() {
 
@@ -35,6 +37,10 @@ class ProfileFragment : Fragment() {
     private val postList = mutableListOf<ProjectIdea>()
     private lateinit var adapter: ProfilePostAdapter
 
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+    }
+
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
@@ -50,6 +56,11 @@ class ProfileFragment : Fragment() {
         interestsChipGroup = view.findViewById(R.id.interestsChipGroup)
         postsRecyclerView = view.findViewById(R.id.userPostsRecyclerView)
 
+        val editBtn = view.findViewById<ImageButton>(R.id.editProfileButton)
+        editBtn.setOnClickListener {
+            findNavController().navigate(R.id.action_profileFragment_to_editProfileFragment)
+        }
+
         // Setup RecyclerView
         postsRecyclerView.layoutManager = LinearLayoutManager(requireContext())
         adapter = ProfilePostAdapter(postList)
@@ -60,6 +71,7 @@ class ProfileFragment : Fragment() {
 
         return view
     }
+
 
     private fun loadUserProfile() {
         val userId = auth.currentUser?.uid ?: return
