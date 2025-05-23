@@ -22,6 +22,7 @@
                 android:layout_height="100dp"
                 android:layout_gravity="center"
                 android:padding="8dp"
+                app:shapeAppearanceOverlay="@style/CircleImageView"
                 android:src="@drawable/ic_profile_placeholder"/>
 
             <!-- Name -->
@@ -38,7 +39,6 @@
                 android:id="@+id/profileUniversity"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="University of Alberta"
                 android:layout_gravity="center"
                 android:textSize="14sp"
                 android:textColor="#777777" />
@@ -48,7 +48,6 @@
                 android:id="@+id/profileBio"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:text="Passionate about building side projects and connecting collaborators."
                 android:paddingTop="8dp"
                 android:paddingBottom="16dp"
                 android:textAlignment="center" />
