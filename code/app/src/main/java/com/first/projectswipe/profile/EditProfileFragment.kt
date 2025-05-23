@@ -1,8 +1,11 @@
 package com.first.projectswipe.profile
 
+import android.Manifest
 import android.app.Activity
 import android.content.Intent
+import android.content.pm.PackageManager
 import android.net.Uri
+import android.os.Build
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
@@ -11,6 +14,7 @@ import android.view.inputmethod.EditorInfo
 import android.widget.Button
 import android.widget.EditText
 import android.widget.Toast
+import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
 import androidx.navigation.fragment.findNavController
 import com.first.projectswipe.R
@@ -39,6 +43,7 @@ class EditProfileFragment : Fragment() {
 
     private var selectedImageUri: Uri? = null
     private val IMAGE_PICK_CODE = 1010
+    private val PERMISSION_CODE = 1001
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -59,12 +64,46 @@ class EditProfileFragment : Fragment() {
         setupSaveButton()
 
         profileImageView.setOnClickListener {
-            val intent = Intent(Intent.ACTION_PICK)
-            intent.type = "image/*"
-            startActivityForResult(intent, IMAGE_PICK_CODE)
+            requestImagePermission()
         }
 
         return view
+    }
+
+    private fun requestImagePermission() {
+        val permission = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU)
+            Manifest.permission.READ_MEDIA_IMAGES
+        else
+            Manifest.permission.READ_EXTERNAL_STORAGE
+
+        if (ContextCompat.checkSelfPermission(requireContext(), permission) != PackageManager.PERMISSION_GRANTED) {
+            requestPermissions(arrayOf(permission), PERMISSION_CODE)
+        } else {
+            pickImageFromGallery()
+        }
+    }
+
+    private fun pickImageFromGallery() {
+        val intent = Intent(Intent.ACTION_PICK)
+        intent.type = "image/*"
+        startActivityForResult(intent, IMAGE_PICK_CODE)
+    }
+
+    override fun onRequestPermissionsResult(requestCode: Int, permissions: Array<out String>, grantResults: IntArray) {
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults)
+        if (requestCode == PERMISSION_CODE && grantResults.isNotEmpty() && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+            pickImageFromGallery()
+        } else {
+            Toast.makeText(context, "Permission denied", Toast.LENGTH_SHORT).show()
+        }
+    }
+
+    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
+        super.onActivityResult(requestCode, resultCode, data)
+        if (requestCode == IMAGE_PICK_CODE && resultCode == Activity.RESULT_OK) {
+            selectedImageUri = data?.data
+            profileImageView.setImageURI(selectedImageUri)
+        }
     }
 
     private fun loadUserData() {
@@ -111,6 +150,9 @@ class EditProfileFragment : Fragment() {
 
     private fun setupSaveButton() {
         saveButton.setOnClickListener {
+            saveButton.isEnabled = false
+            saveButton.text = "Saving..."
+
             val updatedData = mapOf(
                 "name" to nameInput.text.toString(),
                 "university" to universityInput.text.toString(),
@@ -119,17 +161,20 @@ class EditProfileFragment : Fragment() {
             )
 
             db.collection("users").document(userId).update(updatedData).addOnSuccessListener {
-                selectedImageUri?.let { uri ->
-                    uploadProfileImage(uri)
-                } ?: run {
+                if (selectedImageUri != null) {
+                    uploadProfileImage(selectedImageUri!!)
+                } else {
                     Toast.makeText(context, "Profile updated!", Toast.LENGTH_SHORT).show()
-                    findNavController().popBackStack()
+                    navigateToProfile()
                 }
             }.addOnFailureListener {
-                Toast.makeText(context, "Update failed", Toast.LENGTH_SHORT).show()
+                saveButton.isEnabled = true
+                saveButton.text = "Save Changes"
+                Toast.makeText(context, "Update failed: ${it.message}", Toast.LENGTH_SHORT).show()
             }
         }
     }
+
 
     private fun uploadProfileImage(uri: Uri) {
         val ref = storage.reference.child("profile_pics/$userId.jpg")
@@ -138,18 +183,25 @@ class EditProfileFragment : Fragment() {
                 db.collection("users").document(userId)
                     .update("profileImageUrl", downloadUrl.toString())
                     .addOnSuccessListener {
-                        Toast.makeText(context, "Profile & photo updated!", Toast.LENGTH_SHORT).show()
-                        findNavController().popBackStack()
+                        Toast.makeText(context, "Profile photo updated!", Toast.LENGTH_SHORT).show()
+                        navigateToProfile()
+                    }
+                    .addOnFailureListener {
+                        Toast.makeText(context, "Image URL update failed", Toast.LENGTH_SHORT).show()
+                        saveButton.isEnabled = true
+                        saveButton.text = "Save Changes"
                     }
             }
+        }.addOnFailureListener {
+            Toast.makeText(context, "Image upload failed", Toast.LENGTH_SHORT).show()
+            saveButton.isEnabled = true
+            saveButton.text = "Save Changes"
         }
     }
 
-    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
-        super.onActivityResult(requestCode, resultCode, data)
-        if (requestCode == IMAGE_PICK_CODE && resultCode == Activity.RESULT_OK) {
-            selectedImageUri = data?.data
-            profileImageView.setImageURI(selectedImageUri)
-        }
+    private fun navigateToProfile() {
+        findNavController().navigate(R.id.action_editProfileFragment_to_profileFragment)
     }
+
+
 }
