@@ -3,6 +3,8 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent">
 
+
+
     <!-- Scrollable content -->
     <ScrollView
         android:layout_width="match_parent"
@@ -10,10 +12,21 @@
         android:padding="16dp"
         android:background="@color/white">
 
+
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:orientation="vertical">
+
+            <ImageButton
+                android:id="@+id/backButton"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:src="@drawable/ic_back_arrow"
+                android:background="?attr/selectableItemBackgroundBorderless"
+                android:contentDescription="Back"
+                android:padding="8dp"
+                android:layout_margin="8dp" />
 
             <!-- Profile Picture -->
             <com.google.android.material.imageview.ShapeableImageView

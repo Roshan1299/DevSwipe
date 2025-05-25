@@ -10,6 +10,15 @@
         android:layout_height="wrap_content"
         android:orientation="vertical">
 
+        <ImageButton
+            android:id="@+id/backButton"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:src="@drawable/ic_back_arrow"
+            android:background="?attr/selectableItemBackgroundBorderless"
+            android:padding="8dp"
+            android:layout_margin="8dp" />
+
         <com.google.android.material.imageview.ShapeableImageView
             android:id="@+id/editProfileImageView"
             android:layout_width="100dp"

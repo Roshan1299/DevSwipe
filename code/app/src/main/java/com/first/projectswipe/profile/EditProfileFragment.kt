@@ -13,6 +13,7 @@ import android.view.ViewGroup
 import android.view.inputmethod.EditorInfo
 import android.widget.Button
 import android.widget.EditText
+import android.widget.ImageButton
 import android.widget.Toast
 import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
@@ -50,6 +51,8 @@ class EditProfileFragment : Fragment() {
         savedInstanceState: Bundle?
     ): View? {
         val view = inflater.inflate(R.layout.fragment_edit_profile, container, false)
+        val backButton = view.findViewById<ImageButton>(R.id.backButton)
+
 
         profileImageView = view.findViewById(R.id.editProfileImageView)
         nameInput = view.findViewById(R.id.nameInput)
@@ -59,6 +62,9 @@ class EditProfileFragment : Fragment() {
         skillChipGroup = view.findViewById(R.id.skillsChipGroup)
         saveButton = view.findViewById(R.id.saveProfileButton)
 
+        backButton.setOnClickListener {
+            findNavController().popBackStack()
+        }
         loadUserData()
         setupSkillInput()
         setupSaveButton()

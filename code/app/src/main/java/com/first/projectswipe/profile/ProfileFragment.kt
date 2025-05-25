@@ -9,6 +9,7 @@ import android.widget.ImageButton
 import android.widget.ImageView
 import android.widget.TextView
 import androidx.fragment.app.Fragment
+import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.first.projectswipe.R
@@ -19,7 +20,6 @@ import com.google.android.material.chip.ChipGroup
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FirebaseFirestore
 import com.squareup.picasso.Picasso
-import androidx.navigation.fragment.findNavController
 
 class ProfileFragment : Fragment() {
 
@@ -46,6 +46,8 @@ class ProfileFragment : Fragment() {
         savedInstanceState: Bundle?
     ): View {
         val view = inflater.inflate(R.layout.fragment_profile, container, false)
+        val backButton = view.findViewById<ImageButton>(R.id.backButton)
+
 
         // Bind views
         profileImageView = view.findViewById(R.id.profileImageView)
@@ -59,6 +61,10 @@ class ProfileFragment : Fragment() {
         val editBtn = view.findViewById<ImageButton>(R.id.editProfileButton)
         editBtn.setOnClickListener {
             findNavController().navigate(R.id.action_profileFragment_to_editProfileFragment)
+        }
+
+        backButton.setOnClickListener {
+            findNavController().popBackStack()
         }
 
         // Setup RecyclerView
