@@ -8,7 +8,6 @@ import android.view.ViewGroup
 import android.widget.FrameLayout
 import androidx.appcompat.app.AppCompatActivity
 import androidx.fragment.app.Fragment
-import androidx.navigation.fragment.findNavController
 import com.first.projectswipe.R
 import com.first.projectswipe.models.ProjectIdea
 import com.first.projectswipe.utils.CardStackManager
@@ -31,10 +30,6 @@ class HomeFragment : Fragment() {
         // Setup toolbar
         (requireActivity() as AppCompatActivity).setSupportActionBar(view.findViewById(R.id.toolbar))
 
-        // Hook up FAB
-        view.findViewById<View>(R.id.fab_create_project).setOnClickListener {
-            findNavController().navigate(R.id.action_homeFragment_to_createProjectIdeaFragment)
-        }
 
         // Card container
         cardContainer = view.findViewById(R.id.cardStackContainer)

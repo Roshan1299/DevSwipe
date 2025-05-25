@@ -42,6 +42,35 @@
             app:destination="@id/createProjectIdeaFragment" />
     </fragment>
 
+    <fragment
+        android:id="@+id/profileFragment"
+        android:name="com.first.projectswipe.ui.profile.ProfileFragment"
+        android:label="Profile"
+        tools:layout="@layout/fragment_profile">
+
+        <action
+            android:id="@+id/action_profileFragment_to_editProfileFragment"
+            app:destination="@id/editProfileFragment" />
+    </fragment>
+
+    <fragment
+        android:id="@+id/editProfileFragment"
+        android:name="com.first.projectswipe.profile.EditProfileFragment"
+        android:label="Edit Profile"
+        tools:layout="@layout/fragment_edit_profile">
+
+        <action
+            android:id="@+id/action_editProfileFragment_to_profileFragment"
+            app:destination="@id/profileFragment" />
+
+
+    </fragment>
+
+
+
+
+
+
     <!-- Create Project Idea Fragment -->
     <fragment
         android:id="@+id/createProjectIdeaFragment"

@@ -85,11 +85,17 @@ class RegisterFragment : Fragment() {
             .addOnCompleteListener { task ->
                 binding.progressIndicator.visibility = View.GONE
                 if (task.isSuccessful) {
+                    val uid = auth.currentUser?.uid
+                    if (uid != null) {
+                        saveUserProfileToFirestore(uid)
+                    }
+
                     Toast.makeText(
                         context,
                         "Registration successful!",
                         Toast.LENGTH_SHORT
                     ).show()
+
                     findNavController().navigate(R.id.action_registerFragment_to_loginFragment)
                 } else {
                     Toast.makeText(
@@ -98,6 +104,30 @@ class RegisterFragment : Fragment() {
                         Toast.LENGTH_SHORT
                     ).show()
                 }
+            }
+    }
+
+
+    private fun saveUserProfileToFirestore(uid: String) {
+        val db = com.google.firebase.firestore.FirebaseFirestore.getInstance()
+
+        val user = hashMapOf(
+            "name" to "${binding.firstNameInput.text} ${binding.lastNameInput.text}",
+            "username" to binding.usernameInput.text.toString(),
+            "university" to "", // You can add a field in the form later
+            "bio" to "",         // Optional: let user update in profile screen
+            "skills" to listOf<String>(),     // empty for now
+            "interests" to listOf<String>(), // empty for now
+            "profileImageUrl" to ""          // optional
+        )
+
+        db.collection("users").document(uid)
+            .set(user)
+            .addOnSuccessListener {
+                Toast.makeText(context, "Profile created!", Toast.LENGTH_SHORT).show()
+            }
+            .addOnFailureListener {
+                Toast.makeText(context, "Failed to save user profile", Toast.LENGTH_SHORT).show()
             }
     }
 
