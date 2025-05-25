@@ -1,20 +1,20 @@
 <FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
-    android:layout_height="match_parent">
+    android:layout_height="match_parent"
+    android:background="@color/white">
 
-    <!-- Scrollable content -->
-    <ScrollView
+    <!-- Profile Content -->
+    <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:padding="16dp"
-        android:background="@color/white">
+        android:orientation="vertical"
+        android:padding="16dp">
 
-
-        <LinearLayout
+        <!-- Top Bar with Back and Edit Buttons -->
+        <FrameLayout
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:orientation="vertical">
+            android:layout_height="wrap_content">
 
             <ImageButton
                 android:id="@+id/backButton"
@@ -24,129 +24,125 @@
                 android:background="?attr/selectableItemBackgroundBorderless"
                 android:contentDescription="Back"
                 android:padding="8dp"
-                android:layout_margin="8dp" />
+                android:layout_gravity="start" />
 
-            <!-- Profile Picture -->
-            <com.google.android.material.imageview.ShapeableImageView
-                android:id="@+id/profileImageView"
-                android:layout_width="100dp"
-                android:layout_height="100dp"
-                android:layout_gravity="center"
+            <ImageButton
+                android:id="@+id/editProfileButton"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:src="@drawable/ic_edit"
+                android:background="?attr/selectableItemBackgroundBorderless"
+                android:contentDescription="Edit Profile"
                 android:padding="8dp"
-                app:shapeAppearanceOverlay="@style/CircleImageView"
-                android:src="@drawable/ic_profile_placeholder"/>
+                android:layout_gravity="end" />
+        </FrameLayout>
 
-            <!-- Name -->
-            <TextView
-                android:id="@+id/profileName"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:textSize="20sp"
-                android:textStyle="bold"
-                android:layout_gravity="center" />
+        <!-- Profile Info -->
+        <com.google.android.material.imageview.ShapeableImageView
+            android:id="@+id/profileImageView"
+            android:layout_width="100dp"
+            android:layout_height="100dp"
+            android:layout_gravity="center"
+            android:padding="8dp"
+            app:shapeAppearanceOverlay="@style/CircleImageView"
+            android:src="@drawable/ic_profile_placeholder"
+            android:scaleType="centerCrop" />
 
-            <!-- University -->
-            <TextView
-                android:id="@+id/profileUniversity"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_gravity="center"
-                android:textSize="14sp"
-                android:textColor="#777777" />
+        <TextView
+            android:id="@+id/profileName"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textSize="20sp"
+            android:textStyle="bold"
+            android:layout_gravity="center"
+            android:paddingTop="4dp" />
 
-            <!-- Bio -->
-            <TextView
-                android:id="@+id/profileBio"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:paddingTop="8dp"
-                android:paddingBottom="16dp"
-                android:textAlignment="center" />
+        <TextView
+            android:id="@+id/profileUniversity"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textSize="14sp"
+            android:textColor="#777777"
+            android:layout_gravity="center" />
 
-            <!-- Skills & Interests -->
+        <TextView
+            android:id="@+id/profileBio"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:paddingTop="8dp"
+            android:paddingBottom="16dp"
+            android:textAlignment="center" />
+
+        <!-- Skills & Interests -->
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:weightSum="2"
+            android:layout_marginBottom="8dp">
+
             <LinearLayout
-                android:layout_width="match_parent"
+                android:id="@+id/skillsContainer"
+                android:layout_width="0dp"
                 android:layout_height="wrap_content"
-                android:orientation="horizontal"
-                android:weightSum="2"
-                android:layout_marginBottom="16dp">
+                android:layout_weight="1"
+                android:orientation="vertical"
+                android:padding="12dp"
+                android:layout_marginEnd="8dp"
+                android:background="@drawable/card_background">
 
-                <LinearLayout
-                    android:id="@+id/skillsContainer"
-                    android:layout_width="0dp"
+                <TextView
+                    android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:layout_weight="1"
-                    android:orientation="vertical"
-                    android:padding="12dp"
-                    android:layout_marginEnd="8dp"
-                    android:background="@drawable/card_background">
+                    android:text="Skills"
+                    android:textStyle="bold" />
 
-                    <TextView
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:text="Skills"
-                        android:textStyle="bold" />
-
-                    <com.google.android.material.chip.ChipGroup
-                        android:id="@+id/skillsChipGroup"
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        app:singleLine="false" />
-                </LinearLayout>
-
-                <LinearLayout
-                    android:id="@+id/interestsContainer"
-                    android:layout_width="0dp"
+                <com.google.android.material.chip.ChipGroup
+                    android:id="@+id/skillsChipGroup"
+                    android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:layout_weight="1"
-                    android:orientation="vertical"
-                    android:padding="12dp"
-                    android:layout_marginStart="8dp"
-                    android:background="@drawable/card_background">
-
-                    <TextView
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:text="Interests"
-                        android:textStyle="bold" />
-
-                    <com.google.android.material.chip.ChipGroup
-                        android:id="@+id/interestsChipGroup"
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        app:singleLine="false" />
-                </LinearLayout>
+                    app:singleLine="false" />
             </LinearLayout>
 
-            <!-- User's Posts -->
-            <TextView
-                android:layout_width="match_parent"
+            <LinearLayout
+                android:id="@+id/interestsContainer"
+                android:layout_width="0dp"
                 android:layout_height="wrap_content"
-                android:text="Your Posts"
-                android:textSize="18sp"
-                android:textStyle="bold"
-                android:paddingTop="12dp"
-                android:paddingBottom="8dp" />
+                android:layout_weight="1"
+                android:orientation="vertical"
+                android:padding="12dp"
+                android:layout_marginStart="8dp"
+                android:background="@drawable/card_background">
 
-            <androidx.recyclerview.widget.RecyclerView
-                android:id="@+id/userPostsRecyclerView"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:minHeight="100dp"
-                android:overScrollMode="never"
-                android:nestedScrollingEnabled="false" />
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Interests"
+                    android:textStyle="bold" />
+
+                <com.google.android.material.chip.ChipGroup
+                    android:id="@+id/interestsChipGroup"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    app:singleLine="false" />
+            </LinearLayout>
         </LinearLayout>
-    </ScrollView>
 
-    <!-- Edit Button on top right -->
-    <ImageButton
-        android:id="@+id/editProfileButton"
-        android:layout_width="40dp"
-        android:layout_height="40dp"
-        android:layout_gravity="top|end"
-        android:layout_margin="16dp"
-        android:background="?attr/selectableItemBackgroundBorderless"
-        android:contentDescription="Edit Profile"
-        android:src="@drawable/ic_edit"
-        />
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Your Posts"
+            android:textSize="18sp"
+            android:textStyle="bold"
+            android:paddingTop="12dp"
+            android:paddingBottom="8dp" />
+
+        <!-- Scrollable RecyclerView -->
+        <androidx.recyclerview.widget.RecyclerView
+            android:id="@+id/userPostsRecyclerView"
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:layout_weight="1"
+            android:overScrollMode="never" />
+    </LinearLayout>
 </FrameLayout>

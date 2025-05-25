@@ -11,7 +11,6 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.view.inputmethod.EditorInfo
-import android.widget.Button
 import android.widget.EditText
 import android.widget.ImageButton
 import android.widget.Toast
@@ -35,7 +34,8 @@ class EditProfileFragment : Fragment() {
     private lateinit var bioInput: EditText
     private lateinit var skillInput: EditText
     private lateinit var skillChipGroup: ChipGroup
-    private lateinit var saveButton: Button
+    private lateinit var saveButton: ImageButton
+    private lateinit var backButton: ImageButton
 
     private val skills = mutableListOf<String>()
     private val userId = FirebaseAuth.getInstance().currentUser?.uid ?: ""
@@ -51,8 +51,6 @@ class EditProfileFragment : Fragment() {
         savedInstanceState: Bundle?
     ): View? {
         val view = inflater.inflate(R.layout.fragment_edit_profile, container, false)
-        val backButton = view.findViewById<ImageButton>(R.id.backButton)
-
 
         profileImageView = view.findViewById(R.id.editProfileImageView)
         nameInput = view.findViewById(R.id.nameInput)
@@ -61,10 +59,12 @@ class EditProfileFragment : Fragment() {
         skillInput = view.findViewById(R.id.addSkillInput)
         skillChipGroup = view.findViewById(R.id.skillsChipGroup)
         saveButton = view.findViewById(R.id.saveProfileButton)
+        backButton = view.findViewById(R.id.backButton)
 
         backButton.setOnClickListener {
             findNavController().popBackStack()
         }
+
         loadUserData()
         setupSkillInput()
         setupSaveButton()
@@ -157,7 +157,6 @@ class EditProfileFragment : Fragment() {
     private fun setupSaveButton() {
         saveButton.setOnClickListener {
             saveButton.isEnabled = false
-            saveButton.text = "Saving..."
 
             val updatedData = mapOf(
                 "name" to nameInput.text.toString(),
@@ -175,12 +174,10 @@ class EditProfileFragment : Fragment() {
                 }
             }.addOnFailureListener {
                 saveButton.isEnabled = true
-                saveButton.text = "Save Changes"
                 Toast.makeText(context, "Update failed: ${it.message}", Toast.LENGTH_SHORT).show()
             }
         }
     }
-
 
     private fun uploadProfileImage(uri: Uri) {
         val ref = storage.reference.child("profile_pics/$userId.jpg")
@@ -192,22 +189,11 @@ class EditProfileFragment : Fragment() {
                         Toast.makeText(context, "Profile photo updated!", Toast.LENGTH_SHORT).show()
                         navigateToProfile()
                     }
-                    .addOnFailureListener {
-                        Toast.makeText(context, "Image URL update failed", Toast.LENGTH_SHORT).show()
-                        saveButton.isEnabled = true
-                        saveButton.text = "Save Changes"
-                    }
             }
-        }.addOnFailureListener {
-            Toast.makeText(context, "Image upload failed", Toast.LENGTH_SHORT).show()
-            saveButton.isEnabled = true
-            saveButton.text = "Save Changes"
         }
     }
 
     private fun navigateToProfile() {
         findNavController().navigate(R.id.action_editProfileFragment_to_profileFragment)
     }
-
-
 }
