@@ -1,26 +1,39 @@
+<?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:orientation="vertical"
-    android:background="@drawable/card_background"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:padding="12dp"
-    android:layout_marginBottom="12dp"
-    android:elevation="2dp">
+    android:orientation="vertical"
+    android:background="@drawable/card_background">
 
-    <TextView
-        android:id="@+id/projectTitleTextView"
-        android:layout_width="wrap_content"
+    <LinearLayout
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:textSize="16sp"
-        android:textStyle="bold"
-        android:textColor="#000000" />
+        android:orientation="horizontal">
+
+        <TextView
+            android:id="@+id/projectTitleTextView"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:text="Project Title"
+            android:textStyle="bold"
+            android:textSize="16sp" />
+
+        <ImageButton
+            android:id="@+id/moreOptionsButton"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:src="@drawable/ic_more_vert"
+            android:background="?attr/selectableItemBackgroundBorderless"
+            android:contentDescription="More Options" />
+    </LinearLayout>
 
     <com.google.android.material.chip.ChipGroup
         android:id="@+id/skillsChipGroup"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginTop="8dp"
-        app:singleLine="false"
-        app:chipSpacing="4dp" />
+        app:singleLine="false" />
+
 </LinearLayout>

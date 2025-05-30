@@ -1,5 +1,4 @@
-package com.first.projectswipe.ui.profile
-
+package com.first.projectswipe.profile
 import android.graphics.Color
 import android.os.Bundle
 import android.view.LayoutInflater
