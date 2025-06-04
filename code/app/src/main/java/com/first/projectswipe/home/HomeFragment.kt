@@ -27,14 +27,9 @@ class HomeFragment : Fragment() {
     ): View {
         val view = inflater.inflate(R.layout.fragment_home, container, false)
 
-        // Setup toolbar
         (requireActivity() as AppCompatActivity).setSupportActionBar(view.findViewById(R.id.toolbar))
-
-
-        // Card container
         cardContainer = view.findViewById(R.id.cardStackContainer)
 
-        // Load project ideas
         loadIdeas()
 
         return view
@@ -47,14 +42,13 @@ class HomeFragment : Fragment() {
                 projectIdeas.clear()
                 projectIdeas.addAll(result.map { it.toObject(ProjectIdea::class.java) })
 
-                // Setup card stack
                 cardStackManager = CardStackManager(
                     context = requireContext(),
                     container = cardContainer,
                     allIdeas = projectIdeas,
                     onCardSwiped = { idea, direction ->
                         Log.d("Swipe", if (direction > 0) "Liked: ${idea.title}" else "Disliked: ${idea.title}")
-                        // You can save likes/dislikes here
+                        // No need to call restack() here—handled internally!
                     }
                 )
 
