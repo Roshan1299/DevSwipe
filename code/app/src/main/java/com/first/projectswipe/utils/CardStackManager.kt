@@ -11,18 +11,17 @@ class CardStackManager(
     private val context: Context,
     private val container: FrameLayout,
     private val allIdeas: List<ProjectIdea>,
+    private val startingIndex: Int = 0,
     private val onCardSwiped: (ProjectIdea, Int) -> Unit
 ) {
     private val maxVisible = 3
     private val inflater = LayoutInflater.from(context)
 
-    private var currentTopIndex = 0
+    private var currentTopIndex = startingIndex
 
     fun showInitialCards() {
         container.removeAllViews()
-        currentTopIndex = 0
 
-        // Add up to 3 cards in order
         for (i in 0 until maxVisible) {
             addCardAt(i)
         }
@@ -61,13 +60,44 @@ class CardStackManager(
             container.removeView(card)
             currentTopIndex++
 
-            // Add next card if available
-            addCardAt(maxVisible - 1)
+            // Save updated swipe index
+            saveSwipeProgress(currentTopIndex)
 
+            // If all cards swiped, reset index and re-show stack
+            if (currentTopIndex >= allIdeas.size) {
+                resetSwipeProgress()
+                currentTopIndex = 0
+                showInitialCards()
+                return@SwipeHandler
+            }
+
+            addCardAt(maxVisible - 1)
             restack()
             onCardSwiped(idea, direction)
         }.attach()
     }
+
+
+    private fun saveSwipeProgress(index: Int) {
+        context.getSharedPreferences("SwipePrefs", Context.MODE_PRIVATE)
+            .edit()
+            .putInt("swipe_index", index)
+            .apply()
+    }
+
+    private fun resetSwipeProgress() {
+        context.getSharedPreferences("SwipePrefs", Context.MODE_PRIVATE)
+            .edit()
+            .putInt("swipe_index", 0)
+            .apply()
+    }
+
+    fun resetToStart() {
+        currentTopIndex = 0
+        container.removeAllViews()
+        showInitialCards()
+    }
+
 
     private fun restack() {
         for (i in 0 until container.childCount) {

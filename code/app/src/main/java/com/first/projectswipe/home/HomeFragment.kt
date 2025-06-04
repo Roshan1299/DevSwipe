@@ -1,10 +1,12 @@
 package com.first.projectswipe.home
 
+import android.content.Context
 import android.os.Bundle
 import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.Button
 import android.widget.FrameLayout
 import androidx.appcompat.app.AppCompatActivity
 import androidx.fragment.app.Fragment
@@ -31,6 +33,12 @@ class HomeFragment : Fragment() {
         cardContainer = view.findViewById(R.id.cardStackContainer)
 
         loadIdeas()
+        val resetButton = view.findViewById<Button>(R.id.resetButton)
+        resetButton.setOnClickListener {
+            val prefs = requireContext().getSharedPreferences("SwipePrefs", Context.MODE_PRIVATE)
+            prefs.edit().putInt("swipe_index", 0).apply()
+            cardStackManager.resetToStart()
+        }
 
         return view
     }
@@ -42,13 +50,16 @@ class HomeFragment : Fragment() {
                 projectIdeas.clear()
                 projectIdeas.addAll(result.map { it.toObject(ProjectIdea::class.java) })
 
+                val prefs = requireContext().getSharedPreferences("SwipePrefs", Context.MODE_PRIVATE)
+                val savedIndex = prefs.getInt("swipe_index", 0)
+
                 cardStackManager = CardStackManager(
                     context = requireContext(),
                     container = cardContainer,
                     allIdeas = projectIdeas,
+                    startingIndex = savedIndex,
                     onCardSwiped = { idea, direction ->
                         Log.d("Swipe", if (direction > 0) "Liked: ${idea.title}" else "Disliked: ${idea.title}")
-                        // No need to call restack() here—handled internally!
                     }
                 )
 
@@ -58,4 +69,5 @@ class HomeFragment : Fragment() {
                 Log.e("HomeFragment", "Failed to load project ideas", it)
             }
     }
+
 }
