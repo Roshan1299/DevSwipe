@@ -42,8 +42,8 @@ object ProjectCardBinder {
         val backGithub = backLayout.findViewById<TextView>(R.id.githubLink)
         val backTimeline = backLayout.findViewById<TextView>(R.id.timeline)
         val backChips = backLayout.findViewById<ChipGroup>(R.id.projectTagsChipGroup)
-        val likeButtonBack = backLayout.findViewById<View>(R.id.likeButton)
-        val dislikeButtonBack = backLayout.findViewById<View>(R.id.dislikeButton)
+        val likeButtonBack = backLayout.findViewById<View>(R.id.likeButtonBack)
+        val dislikeButtonBack = backLayout.findViewById<View>(R.id.dislikeButtonBack)
 
         backDesc.text = idea.description
         backGithub.text = "GitHub: https://github.com/yourproject"
