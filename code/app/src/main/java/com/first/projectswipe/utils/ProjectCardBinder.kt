@@ -20,6 +20,8 @@ object ProjectCardBinder {
         val frontDesc = frontLayout.findViewById<TextView>(R.id.projectDescriptionTextView)
         val frontCreator = frontLayout.findViewById<TextView>(R.id.projectCreatorName)
         val frontChips = frontLayout.findViewById<ChipGroup>(R.id.projectTagsChipGroup)
+        val likeButtonFront = frontLayout.findViewById<View>(R.id.likeButton)
+        val dislikeButtonFront = frontLayout.findViewById<View>(R.id.dislikeButton)
 
         frontTitle.text = idea.title
         frontDesc.text = idea.description
@@ -40,6 +42,8 @@ object ProjectCardBinder {
         val backGithub = backLayout.findViewById<TextView>(R.id.githubLink)
         val backTimeline = backLayout.findViewById<TextView>(R.id.timeline)
         val backChips = backLayout.findViewById<ChipGroup>(R.id.projectTagsChipGroup)
+        val likeButtonBack = backLayout.findViewById<View>(R.id.likeButton)
+        val dislikeButtonBack = backLayout.findViewById<View>(R.id.dislikeButton)
 
         backDesc.text = idea.description
         backGithub.text = "GitHub: https://github.com/yourproject"
@@ -70,15 +74,20 @@ object ProjectCardBinder {
         frontInfo.setOnClickListener { flip() }
         backInfo.setOnClickListener { flip() }
 
-        // ✅ Like/Dislike swipe buttons
-        val likeButton = frontLayout.findViewById<View>(R.id.likeButton)
-        val dislikeButton = frontLayout.findViewById<View>(R.id.dislikeButton)
-
-        likeButton.setOnClickListener {
+        // Front like/dislike
+        likeButtonFront.setOnClickListener {
             (card.getTag(R.id.swipe_handler_tag) as? SwipeHandler)?.swipeRight()
         }
+        dislikeButtonFront.setOnClickListener {
+            (card.getTag(R.id.swipe_handler_tag) as? SwipeHandler)?.swipeLeft()
+        }
 
-        dislikeButton.setOnClickListener {
+
+        // ✅ Back like/dislike
+        likeButtonBack.setOnClickListener {
+            (card.getTag(R.id.swipe_handler_tag) as? SwipeHandler)?.swipeRight()
+        }
+        dislikeButtonBack.setOnClickListener {
             (card.getTag(R.id.swipe_handler_tag) as? SwipeHandler)?.swipeLeft()
         }
     }
