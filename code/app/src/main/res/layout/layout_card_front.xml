@@ -133,7 +133,7 @@
             android:orientation="horizontal">
 
             <ImageButton
-                android:id="@+id/dislikeButton"
+                android:id="@+id/dislikeButtonBack"
                 android:layout_width="48dp"
                 android:layout_height="48dp"
                 android:background="@drawable/bg_dislike_border"
@@ -146,7 +146,7 @@
                 android:layout_height="1dp" />
 
             <ImageButton
-                android:id="@+id/likeButton"
+                android:id="@+id/likeButtonBack"
                 android:layout_width="48dp"
                 android:layout_height="48dp"
                 android:background="@drawable/bg_like_border"

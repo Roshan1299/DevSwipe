@@ -20,6 +20,8 @@ object ProjectCardBinder {
         val frontDesc = frontLayout.findViewById<TextView>(R.id.projectDescriptionTextView)
         val frontCreator = frontLayout.findViewById<TextView>(R.id.projectCreatorName)
         val frontChips = frontLayout.findViewById<ChipGroup>(R.id.projectTagsChipGroup)
+        val likeButtonFront = frontLayout.findViewById<View>(R.id.likeButton)
+        val dislikeButtonFront = frontLayout.findViewById<View>(R.id.dislikeButton)
 
         frontTitle.text = idea.title
         frontDesc.text = idea.description
@@ -40,6 +42,8 @@ object ProjectCardBinder {
         val backGithub = backLayout.findViewById<TextView>(R.id.githubLink)
         val backTimeline = backLayout.findViewById<TextView>(R.id.timeline)
         val backChips = backLayout.findViewById<ChipGroup>(R.id.projectTagsChipGroup)
+        val likeButtonBack = backLayout.findViewById<View>(R.id.likeButtonBack)
+        val dislikeButtonBack = backLayout.findViewById<View>(R.id.dislikeButtonBack)
 
         backDesc.text = idea.description
         backGithub.text = "GitHub: https://github.com/yourproject"
@@ -58,12 +62,10 @@ object ProjectCardBinder {
         val frontInfo = frontLayout.findViewById<View>(R.id.infoButton)
         val backInfo = backLayout.findViewById<View>(R.id.infoButton)
 
-        // Initial visibility
         frontLayout.visibility = View.VISIBLE
         backLayout.visibility = View.GONE
 
         var isFlipped = false
-
         val flip = {
             isFlipped = !isFlipped
             flipCard(card, frontLayout, backLayout, isFlipped)
@@ -71,19 +73,31 @@ object ProjectCardBinder {
 
         frontInfo.setOnClickListener { flip() }
         backInfo.setOnClickListener { flip() }
+
+        // Front like/dislike
+        likeButtonFront.setOnClickListener {
+            (card.getTag(R.id.swipe_handler_tag) as? SwipeHandler)?.swipeRight()
+        }
+        dislikeButtonFront.setOnClickListener {
+            (card.getTag(R.id.swipe_handler_tag) as? SwipeHandler)?.swipeLeft()
+        }
+
+
+        // ✅ Back like/dislike
+        likeButtonBack.setOnClickListener {
+            (card.getTag(R.id.swipe_handler_tag) as? SwipeHandler)?.swipeRight()
+        }
+        dislikeButtonBack.setOnClickListener {
+            (card.getTag(R.id.swipe_handler_tag) as? SwipeHandler)?.swipeLeft()
+        }
     }
 
     private fun flipCard(root: View, front: View, back: View, showBack: Boolean) {
         val scale = root.context.resources.displayMetrics.density
         root.cameraDistance = 8000 * scale
 
-        val outAnim = ObjectAnimator.ofFloat(root, "rotationY", 0f, 90f).apply {
-            duration = 200
-        }
-
-        val inAnim = ObjectAnimator.ofFloat(root, "rotationY", -90f, 0f).apply {
-            duration = 200
-        }
+        val outAnim = ObjectAnimator.ofFloat(root, "rotationY", 0f, 90f).apply { duration = 200 }
+        val inAnim = ObjectAnimator.ofFloat(root, "rotationY", -90f, 0f).apply { duration = 200 }
 
         outAnim.addListener(object : AnimatorListenerAdapter() {
             override fun onAnimationEnd(animation: Animator) {
@@ -92,7 +106,6 @@ object ProjectCardBinder {
                 inAnim.start()
             }
         })
-
         outAnim.start()
     }
 }

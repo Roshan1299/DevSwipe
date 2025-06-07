@@ -7,6 +7,7 @@ import android.view.MotionEvent
 import android.view.VelocityTracker
 import android.view.View
 import android.view.animation.AccelerateDecelerateInterpolator
+import com.first.projectswipe.R
 import kotlin.math.abs
 
 class SwipeHandler(
@@ -82,6 +83,8 @@ class SwipeHandler(
                 else -> false
             }
         }
+
+        card.setTag(R.id.swipe_handler_tag, this)
     }
 
     private fun animateOffScreen(view: View, direction: Int) {
@@ -100,4 +103,13 @@ class SwipeHandler(
             })
             .start()
     }
+
+    fun swipeLeft() {
+        animateOffScreen(card, -1)
+    }
+
+    fun swipeRight() {
+        animateOffScreen(card, 1)
+    }
+
 }

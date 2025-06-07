@@ -16,12 +16,11 @@ class CardStackManager(
 ) {
     private val maxVisible = 3
     private val inflater = LayoutInflater.from(context)
-
     private var currentTopIndex = startingIndex
+    private var currentSwipeHandler: SwipeHandler? = null
 
     fun showInitialCards() {
         container.removeAllViews()
-
         for (i in 0 until maxVisible) {
             addCardAt(i)
         }
@@ -35,7 +34,6 @@ class CardStackManager(
         val card = inflater.inflate(R.layout.card_flip_container, container, false)
         ProjectCardBinder.bind(card, context, idea)
 
-        // Set position (offset and scale)
         val offset = 24 * position
         val scale = 1f - 0.03f * position
         card.translationY = offset.toFloat()
@@ -47,7 +45,6 @@ class CardStackManager(
             card.x = (container.width - card.width) / 2f
         }
 
-        // Attach swipe logic to top card
         if (position == 0) {
             setupSwipe(card, idea)
         }
@@ -56,14 +53,12 @@ class CardStackManager(
     }
 
     private fun setupSwipe(card: View, idea: ProjectIdea) {
-        SwipeHandler(card, 250f, 1000f) { direction ->
+        val handler = SwipeHandler(card, 250f, 1000f) { direction ->
             container.removeView(card)
             currentTopIndex++
 
-            // Save updated swipe index
             saveSwipeProgress(currentTopIndex)
 
-            // If all cards swiped, reset index and re-show stack
             if (currentTopIndex >= allIdeas.size) {
                 resetSwipeProgress()
                 currentTopIndex = 0
@@ -74,30 +69,10 @@ class CardStackManager(
             addCardAt(maxVisible - 1)
             restack()
             onCardSwiped(idea, direction)
-        }.attach()
+        }
+        handler.attach()
+        currentSwipeHandler = handler
     }
-
-
-    private fun saveSwipeProgress(index: Int) {
-        context.getSharedPreferences("SwipePrefs", Context.MODE_PRIVATE)
-            .edit()
-            .putInt("swipe_index", index)
-            .apply()
-    }
-
-    private fun resetSwipeProgress() {
-        context.getSharedPreferences("SwipePrefs", Context.MODE_PRIVATE)
-            .edit()
-            .putInt("swipe_index", 0)
-            .apply()
-    }
-
-    fun resetToStart() {
-        currentTopIndex = 0
-        container.removeAllViews()
-        showInitialCards()
-    }
-
 
     private fun restack() {
         for (i in 0 until container.childCount) {
@@ -119,5 +94,33 @@ class CardStackManager(
                 setupSwipe(card, allIdeas[ideaIndex])
             }
         }
+    }
+
+    private fun saveSwipeProgress(index: Int) {
+        context.getSharedPreferences("SwipePrefs", Context.MODE_PRIVATE)
+            .edit()
+            .putInt("swipe_index", index)
+            .apply()
+    }
+
+    private fun resetSwipeProgress() {
+        context.getSharedPreferences("SwipePrefs", Context.MODE_PRIVATE)
+            .edit()
+            .putInt("swipe_index", 0)
+            .apply()
+    }
+
+    fun resetToStart() {
+        currentTopIndex = 0
+        container.removeAllViews()
+        showInitialCards()
+    }
+
+    fun swipeLeft() {
+        currentSwipeHandler?.swipeLeft()
+    }
+
+    fun swipeRight() {
+        currentSwipeHandler?.swipeRight()
     }
 }
