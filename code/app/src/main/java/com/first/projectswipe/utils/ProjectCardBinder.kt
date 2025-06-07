@@ -14,7 +14,9 @@ import com.google.android.material.chip.ChipGroup
 object ProjectCardBinder {
 
     fun bind(card: View, context: Context, idea: ProjectIdea) {
-        // Front side
+        val swipeHandler = card.getTag(R.id.swipe_handler_tag) as? SwipeHandler
+
+        // --- FRONT SIDE ---
         val frontLayout = card.findViewById<View>(R.id.frontCardLayout)
         val frontTitle = frontLayout.findViewById<TextView>(R.id.projectTitleTextView)
         val frontDesc = frontLayout.findViewById<TextView>(R.id.projectDescriptionTextView)
@@ -36,7 +38,7 @@ object ProjectCardBinder {
             frontChips.addView(chip)
         }
 
-        // Back side
+        // --- BACK SIDE ---
         val backLayout = card.findViewById<View>(R.id.backCardLayout)
         val backDesc = backLayout.findViewById<TextView>(R.id.fullDescriptionTextView)
         val backGithub = backLayout.findViewById<TextView>(R.id.githubLink)
@@ -58,7 +60,7 @@ object ProjectCardBinder {
             backChips.addView(chip)
         }
 
-        // Flip logic
+        // --- FLIP LOGIC ---
         val frontInfo = frontLayout.findViewById<View>(R.id.infoButton)
         val backInfo = backLayout.findViewById<View>(R.id.infoButton)
 
@@ -74,22 +76,11 @@ object ProjectCardBinder {
         frontInfo.setOnClickListener { flip() }
         backInfo.setOnClickListener { flip() }
 
-        // Front like/dislike
-        likeButtonFront.setOnClickListener {
-            (card.getTag(R.id.swipe_handler_tag) as? SwipeHandler)?.swipeRight()
-        }
-        dislikeButtonFront.setOnClickListener {
-            (card.getTag(R.id.swipe_handler_tag) as? SwipeHandler)?.swipeLeft()
-        }
-
-
-        // ✅ Back like/dislike
-        likeButtonBack.setOnClickListener {
-            (card.getTag(R.id.swipe_handler_tag) as? SwipeHandler)?.swipeRight()
-        }
-        dislikeButtonBack.setOnClickListener {
-            (card.getTag(R.id.swipe_handler_tag) as? SwipeHandler)?.swipeLeft()
-        }
+        // --- SWIPE ACTIONS ---
+        likeButtonFront?.setOnClickListener { swipeHandler?.swipeRight() }
+        dislikeButtonFront?.setOnClickListener { swipeHandler?.swipeLeft() }
+        likeButtonBack?.setOnClickListener { swipeHandler?.swipeRight() }
+        dislikeButtonBack?.setOnClickListener { swipeHandler?.swipeLeft() }
     }
 
     private fun flipCard(root: View, front: View, back: View, showBack: Boolean) {
