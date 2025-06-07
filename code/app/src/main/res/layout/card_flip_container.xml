@@ -13,4 +13,21 @@
         android:id="@+id/backCardLayout"
         layout="@layout/layout_card_back"
         android:visibility="gone" />
+
+    <TextView
+        android:id="@+id/swipeFeedbackLabel"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_margin="16dp"
+        android:text="Like"
+        android:textSize="18sp"
+        android:textStyle="bold"
+        android:textColor="#FFFFFF"
+        android:background="#4CAF50"
+        android:padding="8dp"
+        android:alpha="0"
+        android:elevation="10dp"
+        android:layout_gravity="top|start"
+        />
+
 </FrameLayout>

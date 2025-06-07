@@ -7,6 +7,7 @@ import android.view.MotionEvent
 import android.view.VelocityTracker
 import android.view.View
 import android.view.animation.AccelerateDecelerateInterpolator
+import android.widget.TextView
 import com.first.projectswipe.R
 import kotlin.math.abs
 
@@ -22,9 +23,11 @@ class SwipeHandler(
 
     fun attach() {
         card.setOnTouchListener { v, event ->
+            val label = card.findViewById<TextView?>(R.id.swipeFeedbackLabel)
+
             when (event.actionMasked) {
                 MotionEvent.ACTION_DOWN -> {
-                    downX = event.x  // 🔄 use local coordinates
+                    downX = event.x
                     downY = event.y
                     velocityTracker = VelocityTracker.obtain().apply {
                         addMovement(event)
@@ -41,6 +44,19 @@ class SwipeHandler(
                     v.translationY = dy
                     v.rotation = (dx / 20).coerceIn(-15f, 15f)
                     v.alpha = 1f - (abs(dx) / v.width * 1.5f).coerceIn(0f, 0.7f)
+
+                    // Show swipe label
+                    label?.let {
+                        val percent = (abs(dx) / swipeThreshold).coerceIn(0f, 1f)
+                        it.alpha = percent
+                        if (dx > 0) {
+                            it.text = "Like"
+                            it.setBackgroundColor(0xFF4CAF50.toInt()) // Green
+                        } else {
+                            it.text = "Nope"
+                            it.setBackgroundColor(0xFFF44336.toInt()) // Red
+                        }
+                    }
                     true
                 }
 
@@ -63,6 +79,8 @@ class SwipeHandler(
                     } else {
                         0
                     }
+
+                    label?.alpha = 0f // Hide swipe label
 
                     if (isSwipe && direction != 0) {
                         v.performHapticFeedback(HapticFeedbackConstants.VIRTUAL_KEY)
@@ -88,9 +106,15 @@ class SwipeHandler(
     }
 
     private fun animateOffScreen(view: View, direction: Int) {
-        val targetX = direction * view.width * 1.5f
+        val label = card.findViewById<TextView?>(R.id.swipeFeedbackLabel)
+        label?.apply {
+            text = if (direction > 0) "Like" else "Nope"
+            setBackgroundColor(if (direction > 0) 0xFF4CAF50.toInt() else 0xFFF44336.toInt())
+            alpha = 1f
+        }
+
         view.animate()
-            .translationX(targetX)
+            .translationX(direction * view.width * 1.5f)
             .translationY(view.translationY + 150f)
             .rotation(20f * direction)
             .alpha(0f)
@@ -98,18 +122,13 @@ class SwipeHandler(
             .setInterpolator(AccelerateDecelerateInterpolator())
             .setListener(object : AnimatorListenerAdapter() {
                 override fun onAnimationEnd(animation: Animator) {
+                    label?.alpha = 0f // Fade out after animation
                     onSwipeComplete(direction)
                 }
             })
             .start()
     }
 
-    fun swipeLeft() {
-        animateOffScreen(card, -1)
-    }
-
-    fun swipeRight() {
-        animateOffScreen(card, 1)
-    }
-
+    fun swipeLeft() = animateOffScreen(card, -1)
+    fun swipeRight() = animateOffScreen(card, 1)
 }

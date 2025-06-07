@@ -32,6 +32,30 @@ class CardStackManager(
 
         val idea = allIdeas[dataIndex]
         val card = inflater.inflate(R.layout.card_flip_container, container, false)
+
+        // ✅ Attach SwipeHandler for every card
+        val handler = SwipeHandler(card, 250f, 1000f) { direction ->
+            if (position == 0) { // Only the top card should trigger swipe actions
+                container.removeView(card)
+                currentTopIndex++
+
+                saveSwipeProgress(currentTopIndex)
+
+                if (currentTopIndex >= allIdeas.size) {
+                    resetSwipeProgress()
+                    currentTopIndex = 0
+                    showInitialCards()
+                    return@SwipeHandler
+                }
+
+                addCardAt(maxVisible - 1)
+                restack()
+                onCardSwiped(idea, direction)
+            }
+        }
+        handler.attach()
+
+        // ✅ Bind after swipe handler is attached so tag is set
         ProjectCardBinder.bind(card, context, idea)
 
         val offset = 24 * position
@@ -45,12 +69,13 @@ class CardStackManager(
             card.x = (container.width - card.width) / 2f
         }
 
-        if (position == 0) {
-            setupSwipe(card, idea)
-        }
-
         container.addView(card, 0)
+
+        // ✅ Only store reference to top swipe handler
+        if (position == 0) currentSwipeHandler = handler
     }
+
+
 
     private fun setupSwipe(card: View, idea: ProjectIdea) {
         val handler = SwipeHandler(card, 250f, 1000f) { direction ->
