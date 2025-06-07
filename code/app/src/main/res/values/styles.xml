@@ -4,5 +4,10 @@
         <item name="cornerFamily">rounded</item>
         <item name="cornerSize">50%</item>
     </style>
+    <style name="CustomBottomNavIndicator" parent="Widget.Material3.BottomNavigationView.ActiveIndicator">
+        <!-- Use a lighter shade, e.g., light gray or light accent -->
+        <item name="android:color">#E0E0E0</item> <!-- light gray -->
+        <item name="android:alpha">1.0</item>     <!-- fully visible -->
+    </style>
 
 </resources>
