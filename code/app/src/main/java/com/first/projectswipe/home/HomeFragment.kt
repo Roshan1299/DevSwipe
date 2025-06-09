@@ -13,6 +13,7 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.GravityCompat
 import androidx.drawerlayout.widget.DrawerLayout
 import androidx.fragment.app.Fragment
+import androidx.navigation.fragment.findNavController
 import com.first.projectswipe.R
 import com.first.projectswipe.models.ProjectIdea
 import com.first.projectswipe.utils.CardStackManager
@@ -60,7 +61,7 @@ class HomeFragment : Fragment() {
                 R.id.nav_profile -> Log.d("Drawer", "Profile selected")
                 R.id.nav_logout -> {
                     FirebaseAuth.getInstance().signOut()
-                    requireActivity().recreate()
+                    findNavController().navigate(R.id.action_global_loginFragment)
                 }
                 else -> Log.d("Drawer", "Clicked: ${menuItem.title}")
             }
