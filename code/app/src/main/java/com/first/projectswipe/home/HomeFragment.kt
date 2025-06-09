@@ -8,15 +8,22 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.Button
 import android.widget.FrameLayout
+import android.widget.ImageButton
 import androidx.appcompat.app.AppCompatActivity
+import androidx.core.view.GravityCompat
+import androidx.drawerlayout.widget.DrawerLayout
 import androidx.fragment.app.Fragment
 import com.first.projectswipe.R
 import com.first.projectswipe.models.ProjectIdea
 import com.first.projectswipe.utils.CardStackManager
+import com.google.android.material.navigation.NavigationView
+import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FirebaseFirestore
 
 class HomeFragment : Fragment() {
 
+    private lateinit var drawerLayout: DrawerLayout
+    private lateinit var navigationView: NavigationView
     private lateinit var cardContainer: FrameLayout
     private lateinit var cardStackManager: CardStackManager
 
@@ -29,17 +36,39 @@ class HomeFragment : Fragment() {
     ): View {
         val view = inflater.inflate(R.layout.fragment_home, container, false)
 
-        (requireActivity() as AppCompatActivity).setSupportActionBar(view.findViewById(R.id.toolbar))
+        drawerLayout = view.findViewById(R.id.homeDrawerLayout)
+        navigationView = view.findViewById(R.id.navigationView)
         cardContainer = view.findViewById(R.id.cardStackContainer)
-
-        loadIdeas()
+        val toolbar = view.findViewById<View>(R.id.toolbar)
+        val hamburgerButton = toolbar.findViewById<ImageButton>(R.id.hamburgerButton)
         val resetButton = view.findViewById<Button>(R.id.resetButton)
+
+        (requireActivity() as AppCompatActivity).setSupportActionBar(toolbar as androidx.appcompat.widget.Toolbar)
+
+        hamburgerButton.setOnClickListener {
+            drawerLayout.openDrawer(GravityCompat.START)
+        }
+
         resetButton.setOnClickListener {
             val prefs = requireContext().getSharedPreferences("SwipePrefs", Context.MODE_PRIVATE)
             prefs.edit().putInt("swipe_index", 0).apply()
             cardStackManager.resetToStart()
         }
 
+        navigationView.setNavigationItemSelectedListener { menuItem ->
+            when (menuItem.itemId) {
+                R.id.nav_profile -> Log.d("Drawer", "Profile selected")
+                R.id.nav_logout -> {
+                    FirebaseAuth.getInstance().signOut()
+                    requireActivity().recreate()
+                }
+                else -> Log.d("Drawer", "Clicked: ${menuItem.title}")
+            }
+            drawerLayout.closeDrawer(GravityCompat.START)
+            true
+        }
+
+        loadIdeas()
         return view
     }
 
@@ -69,5 +98,4 @@ class HomeFragment : Fragment() {
                 Log.e("HomeFragment", "Failed to load project ideas", it)
             }
     }
-
 }
