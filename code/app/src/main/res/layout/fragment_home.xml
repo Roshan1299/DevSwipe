@@ -1,29 +1,46 @@
-<FrameLayout
+<androidx.drawerlayout.widget.DrawerLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:id="@+id/homeDrawerLayout"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="@color/white">
 
-    <!-- Whole vertical content including toolbar + card stack -->
+    <!-- MAIN CONTENT -->
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:orientation="vertical">
 
+        <!-- Toolbar with hamburger + center title -->
         <androidx.appcompat.widget.Toolbar
             android:id="@+id/toolbar"
             android:layout_width="match_parent"
             android:layout_height="?attr/actionBarSize"
             android:background="@android:color/white"
-            app:contentInsetStart="0dp"
-            app:contentInsetLeft="0dp"
-            app:contentInsetStartWithNavigation="0dp">
+            android:theme="@style/ThemeOverlay.AppCompat.Light"
+            android:elevation="4dp"
+            app:contentInsetStartWithNavigation="0dp"
+            app:popupTheme="@style/ThemeOverlay.AppCompat.Light">
+
+            <ImageButton
+                android:id="@+id/hamburgerButton"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="start"
+                android:layout_marginStart="12dp"
+                android:layout_marginTop="6dp"
+                android:background="?attr/selectableItemBackgroundBorderless"
+                android:src="@drawable/ic_menu"
+                android:contentDescription="Open drawer"
+                android:tint="@android:color/black" />
+
 
             <FrameLayout
                 android:layout_width="match_parent"
                 android:layout_height="match_parent">
 
+                <!-- Centered Title -->
                 <TextView
                     android:id="@+id/toolbar_title"
                     android:layout_width="wrap_content"
@@ -37,6 +54,7 @@
             </FrameLayout>
         </androidx.appcompat.widget.Toolbar>
 
+        <!-- Swipe Card Stack -->
         <FrameLayout
             android:id="@+id/cardStackContainer"
             android:layout_width="match_parent"
@@ -45,16 +63,26 @@
             android:padding="16dp"
             android:clipChildren="false"
             android:clipToPadding="false" />
+
+        <!-- Reset Button -->
+        <Button
+            android:id="@+id/resetButton"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Reset Cards"
+            android:layout_gravity="center_horizontal"
+            android:layout_marginBottom="80dp"
+            android:textColor="@android:color/white" />
     </LinearLayout>
 
-    <!-- Floating Reset Button Overlayed Above Bottom Navigation -->
-    <Button
-        android:id="@+id/resetButton"
+    <!-- SIDE NAVIGATION DRAWER -->
+    <com.google.android.material.navigation.NavigationView
+        android:id="@+id/navigationView"
         android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="Reset Cards"
-        android:layout_gravity="bottom|center_horizontal"
-        android:layout_marginBottom="80dp"
-        android:layout_marginTop="8dp"
-        android:textColor="@android:color/white" />
-</FrameLayout>
+        android:layout_height="match_parent"
+        android:layout_gravity="start"
+        android:fitsSystemWindows="true"
+        app:menu="@menu/drawer_menu"
+        app:headerLayout="@layout/drawer_header" />
+
+</androidx.drawerlayout.widget.DrawerLayout>
