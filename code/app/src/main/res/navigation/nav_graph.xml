@@ -5,6 +5,12 @@
     android:id="@+id/nav_graph"
     app:startDestination="@id/loginFragment">
 
+    <action
+        android:id="@+id/action_global_loginFragment"
+        app:destination="@id/loginFragment"
+        app:popUpTo="@id/nav_graph"
+        app:popUpToInclusive="true" />
+
     <!-- Login Fragment -->
     <fragment
         android:id="@+id/loginFragment"
