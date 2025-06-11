@@ -3,6 +3,7 @@ package com.first.projectswipe.utils
 import android.content.Context
 import android.view.LayoutInflater
 import android.view.View
+import android.view.animation.OvershootInterpolator
 import android.widget.FrameLayout
 import com.first.projectswipe.R
 import com.first.projectswipe.models.ProjectIdea
@@ -110,6 +111,8 @@ class CardStackManager(
                 .scaleX(scale)
                 .scaleY(scale)
                 .setDuration(200)
+                .setInterpolator(OvershootInterpolator())
+                .withLayer()
                 .start()
 
             card.elevation = (maxVisible - i).toFloat()
@@ -141,11 +144,5 @@ class CardStackManager(
         showInitialCards()
     }
 
-    fun swipeLeft() {
-        currentSwipeHandler?.swipeLeft()
-    }
 
-    fun swipeRight() {
-        currentSwipeHandler?.swipeRight()
-    }
 }
