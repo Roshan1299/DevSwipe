@@ -7,7 +7,6 @@ import android.view.MotionEvent
 import android.view.VelocityTracker
 import android.view.View
 import android.view.animation.AccelerateDecelerateInterpolator
-import android.view.animation.OvershootInterpolator
 import android.widget.TextView
 import com.first.projectswipe.R
 import kotlin.math.abs
@@ -23,7 +22,6 @@ class SwipeHandler(
     private var isTracking = false
     private var velocityTracker: VelocityTracker? = null
     private val label: TextView? = card.findViewById(R.id.swipeFeedbackLabel)
-    private val resetInterpolator = OvershootInterpolator(1.5f)
 
     fun attach() {
         card.isHapticFeedbackEnabled = true
@@ -47,18 +45,12 @@ class SwipeHandler(
                     val dx = event.rawX - downX
                     val dy = event.rawY - downY
 
-                    // Only process if movement is significant
-                    if (abs(dx) > 5 || abs(dy) > 5) {
-                        v.translationX = dx
-                        v.rotation = (dx / 20).coerceIn(-15f, 15f)
+                    v.translationX = dx
+                    v.translationY = dy
+                    v.rotation = (dx / 20).coerceIn(-15f, 15f)
+                    v.alpha = 1f - (abs(dx) / v.width * 1.5f).coerceIn(0f, 0.7f)
 
-                        // Only move Y if we're not in a clear horizontal swipe
-                        if (abs(dx) < swipeThreshold * 0.5f) {
-                            v.translationY = dy * 0.5f
-                        }
-
-                        updateSwipeFeedback(dx)
-                    }
+                    updateSwipeFeedback(dx)
                     true
                 }
 
@@ -72,8 +64,9 @@ class SwipeHandler(
                     velocityTracker = null
 
                     val dx = card.translationX
+                    val direction = if (dx > 0) 1 else -1
+
                     val isSwipe = abs(dx) > swipeThreshold || abs(xVelocity) > flingThreshold
-                    val direction = if (dx < 0 || xVelocity < 0) -1 else 1
 
                     label?.alpha = 0f
 
@@ -89,6 +82,7 @@ class SwipeHandler(
                 else -> false
             }
         }
+        card.setTag(R.id.swipe_handler_tag, this)
     }
 
     private fun updateSwipeFeedback(dx: Float) {
@@ -97,10 +91,10 @@ class SwipeHandler(
             it.alpha = percent
             if (dx > 0) {
                 it.text = "Like"
-                it.setBackgroundColor(0xFF4CAF50.toInt()) // Green
+                it.setBackgroundColor(0xFF4CAF50.toInt())
             } else {
                 it.text = "Nope"
-                it.setBackgroundColor(0xFFF44336.toInt()) // Red
+                it.setBackgroundColor(0xFFF44336.toInt())
             }
         }
     }
@@ -111,27 +105,27 @@ class SwipeHandler(
             .translationX(0f)
             .translationY(0f)
             .rotation(0f)
+            .alpha(1f)
             .setDuration(250)
-            .setInterpolator(resetInterpolator)
+            .setInterpolator(AccelerateDecelerateInterpolator())
             .withLayer()
             .start()
     }
 
     private fun animateOffScreen(view: View, direction: Int) {
-        view.animate().cancel()
-
         label?.apply {
             text = if (direction > 0) "Like" else "Nope"
             setBackgroundColor(if (direction > 0) 0xFF4CAF50.toInt() else 0xFFF44336.toInt())
             alpha = 1f
         }
 
+        view.animate().cancel()
         view.animate()
             .translationX(direction * view.width * 1.5f)
-            .translationY(view.translationY + 100f * direction)
-            .rotation(15f * direction)
-            .alpha(0.7f)
-            .setDuration(200)
+            .translationY(view.translationY + 150f)
+            .rotation(20f * direction)
+            .alpha(0f)
+            .setDuration(250)
             .setInterpolator(AccelerateDecelerateInterpolator())
             .withLayer()
             .setListener(object : AnimatorListenerAdapter() {
@@ -143,6 +137,11 @@ class SwipeHandler(
             .start()
     }
 
-    fun swipeLeft() = animateOffScreen(card, -1)
-    fun swipeRight() = animateOffScreen(card, 1)
+    fun swipeLeft() {
+        animateOffScreen(card, -1)
+    }
+
+    fun swipeRight() {
+        animateOffScreen(card, 1)
+    }
 }
