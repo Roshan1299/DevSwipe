@@ -54,7 +54,12 @@
             </FrameLayout>
         </androidx.appcompat.widget.Toolbar>
 
-        <!-- Add this between the Toolbar and FrameLayout -->
+
+        <View
+            android:layout_width="match_parent"
+            android:layout_height="1dp"
+            android:background="@android:color/darker_gray" />
+
         <FrameLayout
             android:id="@+id/cardStackContainer"
             android:layout_width="match_parent"
