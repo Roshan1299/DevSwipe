@@ -19,81 +19,62 @@ class SwipeHandler(
 ) {
     private var downX = 0f
     private var downY = 0f
+    private var isTracking = false
     private var velocityTracker: VelocityTracker? = null
+    private val label: TextView? = card.findViewById(R.id.swipeFeedbackLabel)
 
     fun attach() {
+        card.isHapticFeedbackEnabled = true
         card.setOnTouchListener { v, event ->
-            val label = card.findViewById<TextView?>(R.id.swipeFeedbackLabel)
-
             when (event.actionMasked) {
                 MotionEvent.ACTION_DOWN -> {
-                    downX = event.x
-                    downY = event.y
-                    velocityTracker = VelocityTracker.obtain().apply {
-                        addMovement(event)
-                    }
+                    v.animate().cancel()
+                    downX = event.rawX
+                    downY = event.rawY
+                    isTracking = true
+                    velocityTracker = VelocityTracker.obtain()
+                    velocityTracker?.addMovement(event)
+                    card.parent?.requestDisallowInterceptTouchEvent(true)
                     true
                 }
 
                 MotionEvent.ACTION_MOVE -> {
+                    if (!isTracking) return@setOnTouchListener false
+
                     velocityTracker?.addMovement(event)
-                    val dx = event.x - downX
-                    val dy = event.y - downY
+                    val dx = event.rawX - downX
+                    val dy = event.rawY - downY
 
                     v.translationX = dx
                     v.translationY = dy
                     v.rotation = (dx / 20).coerceIn(-15f, 15f)
                     v.alpha = 1f - (abs(dx) / v.width * 1.5f).coerceIn(0f, 0.7f)
 
-                    // Show swipe label
-                    label?.let {
-                        val percent = (abs(dx) / swipeThreshold).coerceIn(0f, 1f)
-                        it.alpha = percent
-                        if (dx > 0) {
-                            it.text = "Like"
-                            it.setBackgroundColor(0xFF4CAF50.toInt()) // Green
-                        } else {
-                            it.text = "Nope"
-                            it.setBackgroundColor(0xFFF44336.toInt()) // Red
-                        }
-                    }
+                    updateSwipeFeedback(dx)
                     true
                 }
 
-                MotionEvent.ACTION_UP -> {
-                    val upX = event.x
-                    val upY = event.y
-                    val dx = upX - downX
-                    val dy = upY - downY
+                MotionEvent.ACTION_UP, MotionEvent.ACTION_CANCEL -> {
+                    if (!isTracking) return@setOnTouchListener false
+                    isTracking = false
 
                     velocityTracker?.computeCurrentVelocity(1000)
-                    val xVelocity = velocityTracker?.getXVelocity(event.getPointerId(0)) ?: 0f
+                    val xVelocity = velocityTracker?.xVelocity ?: 0f
                     velocityTracker?.recycle()
                     velocityTracker = null
 
+                    val dx = card.translationX
+                    val direction = if (dx > 0) 1 else -1
+
                     val isSwipe = abs(dx) > swipeThreshold || abs(xVelocity) > flingThreshold
-                    val isHorizontalDominant = abs(dx) > abs(dy)
 
-                    val direction = if (isHorizontalDominant) {
-                        if (dx < 0 || xVelocity < 0) -1 else 1
-                    } else {
-                        0
-                    }
+                    label?.alpha = 0f
 
-                    label?.alpha = 0f // Hide swipe label
-
-                    if (isSwipe && direction != 0) {
+                    if (isSwipe && abs(dx) > 10f) {
                         v.performHapticFeedback(HapticFeedbackConstants.VIRTUAL_KEY)
                         animateOffScreen(v, direction)
                     } else {
-                        v.animate()
-                            .translationX(0f)
-                            .translationY(0f)
-                            .rotation(0f)
-                            .alpha(1f)
-                            .setDuration(200)
-                            .setInterpolator(AccelerateDecelerateInterpolator())
-                            .start()
+                        resetCardPosition(v)
                     }
                     true
                 }
@@ -101,18 +82,44 @@ class SwipeHandler(
                 else -> false
             }
         }
-
         card.setTag(R.id.swipe_handler_tag, this)
     }
 
+    private fun updateSwipeFeedback(dx: Float) {
+        label?.let {
+            val percent = (abs(dx) / swipeThreshold).coerceIn(0f, 1f)
+            it.alpha = percent
+            if (dx > 0) {
+                it.text = "Like"
+                it.setBackgroundColor(0xFF4CAF50.toInt())
+            } else {
+                it.text = "Nope"
+                it.setBackgroundColor(0xFFF44336.toInt())
+            }
+        }
+    }
+
+    private fun resetCardPosition(view: View) {
+        view.animate().cancel()
+        view.animate()
+            .translationX(0f)
+            .translationY(0f)
+            .rotation(0f)
+            .alpha(1f)
+            .setDuration(250)
+            .setInterpolator(AccelerateDecelerateInterpolator())
+            .withLayer()
+            .start()
+    }
+
     private fun animateOffScreen(view: View, direction: Int) {
-        val label = card.findViewById<TextView?>(R.id.swipeFeedbackLabel)
         label?.apply {
             text = if (direction > 0) "Like" else "Nope"
             setBackgroundColor(if (direction > 0) 0xFF4CAF50.toInt() else 0xFFF44336.toInt())
             alpha = 1f
         }
 
+        view.animate().cancel()
         view.animate()
             .translationX(direction * view.width * 1.5f)
             .translationY(view.translationY + 150f)
@@ -120,15 +127,21 @@ class SwipeHandler(
             .alpha(0f)
             .setDuration(250)
             .setInterpolator(AccelerateDecelerateInterpolator())
+            .withLayer()
             .setListener(object : AnimatorListenerAdapter() {
                 override fun onAnimationEnd(animation: Animator) {
-                    label?.alpha = 0f // Fade out after animation
+                    label?.alpha = 0f
                     onSwipeComplete(direction)
                 }
             })
             .start()
     }
 
-    fun swipeLeft() = animateOffScreen(card, -1)
-    fun swipeRight() = animateOffScreen(card, 1)
+    fun swipeLeft() {
+        animateOffScreen(card, -1)
+    }
+
+    fun swipeRight() {
+        animateOffScreen(card, 1)
+    }
 }

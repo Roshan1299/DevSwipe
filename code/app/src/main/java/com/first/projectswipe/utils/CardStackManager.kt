@@ -3,6 +3,7 @@ package com.first.projectswipe.utils
 import android.content.Context
 import android.view.LayoutInflater
 import android.view.View
+import android.view.animation.OvershootInterpolator
 import android.widget.FrameLayout
 import com.first.projectswipe.R
 import com.first.projectswipe.models.ProjectIdea
@@ -33,31 +34,17 @@ class CardStackManager(
         val idea = allIdeas[dataIndex]
         val card = inflater.inflate(R.layout.card_flip_container, container, false)
 
-        // ✅ Attach SwipeHandler for every card
+        // Attach SwipeHandler for ALL cards (needed for like/dislike buttons)
         val handler = SwipeHandler(card, 250f, 1000f) { direction ->
-            if (position == 0) { // Only the top card should trigger swipe actions
-                container.removeView(card)
-                currentTopIndex++
-
-                saveSwipeProgress(currentTopIndex)
-
-                if (currentTopIndex >= allIdeas.size) {
-                    resetSwipeProgress()
-                    currentTopIndex = 0
-                    showInitialCards()
-                    return@SwipeHandler
-                }
-
-                addCardAt(maxVisible - 1)
-                restack()
-                onCardSwiped(idea, direction)
+            // Check if this card is currently the top card in the container
+            val topCard = container.getChildAt(container.childCount - 1)
+            if (card == topCard) {
+                handleCardSwipe(card, idea, direction)
             }
         }
         handler.attach()
 
-        // ✅ Bind after swipe handler is attached so tag is set
-        ProjectCardBinder.bind(card, context, idea)
-
+        // Set up positioning and styling
         val offset = 24 * position
         val scale = 1f - 0.03f * position
         card.translationY = offset.toFloat()
@@ -71,32 +58,34 @@ class CardStackManager(
 
         container.addView(card, 0)
 
-        // ✅ Only store reference to top swipe handler
-        if (position == 0) currentSwipeHandler = handler
+        // Store reference to top card's swipe handler
+        if (position == 0) {
+            currentSwipeHandler = handler
+        }
+
+        // Bind the card data after swipe handler is attached
+        ProjectCardBinder.bind(card, context, idea)
     }
 
+    private fun handleCardSwipe(card: View, idea: ProjectIdea, direction: Int) {
+        container.removeView(card)
+        currentTopIndex++
 
+        saveSwipeProgress(currentTopIndex)
 
-    private fun setupSwipe(card: View, idea: ProjectIdea) {
-        val handler = SwipeHandler(card, 250f, 1000f) { direction ->
-            container.removeView(card)
-            currentTopIndex++
-
-            saveSwipeProgress(currentTopIndex)
-
-            if (currentTopIndex >= allIdeas.size) {
-                resetSwipeProgress()
-                currentTopIndex = 0
-                showInitialCards()
-                return@SwipeHandler
-            }
-
-            addCardAt(maxVisible - 1)
-            restack()
-            onCardSwiped(idea, direction)
+        if (currentTopIndex >= allIdeas.size) {
+            resetSwipeProgress()
+            currentTopIndex = 0
+            showInitialCards()
+            return
         }
-        handler.attach()
-        currentSwipeHandler = handler
+
+        // Add new card at the bottom of the stack
+        addCardAt(maxVisible - 1)
+        // Reposition existing cards
+        restack()
+        // Notify callback
+        onCardSwiped(idea, direction)
     }
 
     private fun restack() {
@@ -110,13 +99,28 @@ class CardStackManager(
                 .scaleX(scale)
                 .scaleY(scale)
                 .setDuration(200)
+                .setInterpolator(OvershootInterpolator())
+                .withLayer()
                 .start()
 
             card.elevation = (maxVisible - i).toFloat()
 
+            // Set up swipe handling for ALL cards (needed for buttons)
             val ideaIndex = currentTopIndex + i
-            if (i == 0 && ideaIndex < allIdeas.size) {
-                setupSwipe(card, allIdeas[ideaIndex])
+            if (ideaIndex < allIdeas.size) {
+                val handler = SwipeHandler(card, 250f, 1000f) { direction ->
+                    // Check if this card is currently the top card in the container
+                    val topCard = container.getChildAt(container.childCount - 1)
+                    if (card == topCard) {
+                        handleCardSwipe(card, allIdeas[ideaIndex], direction)
+                    }
+                }
+                handler.attach()
+
+                // Store reference to top card's handler
+                if (i == 0) {
+                    currentSwipeHandler = handler
+                }
             }
         }
     }
@@ -139,13 +143,5 @@ class CardStackManager(
         currentTopIndex = 0
         container.removeAllViews()
         showInitialCards()
-    }
-
-    fun swipeLeft() {
-        currentSwipeHandler?.swipeLeft()
-    }
-
-    fun swipeRight() {
-        currentSwipeHandler?.swipeRight()
     }
 }
