@@ -27,7 +27,9 @@ object ProjectCardBinder {
 
         frontTitle.text = idea.title
         frontDesc.text = idea.description
-        frontCreator.text = idea.createdBy
+        UserUtils.getUserNameFromUid(idea.createdBy) { name ->
+            frontCreator.text = name
+        }
         frontChips.removeAllViews()
         idea.tags.forEach { tag ->
             val chip = Chip(context).apply {
