@@ -6,5 +6,6 @@ data class ProjectIdea(
     val description: String = "",
     val createdBy: String = "",  // UID or email of the creator
     val tags: List<String> = emptyList(),
-    val createdAt: Long = System.currentTimeMillis()
+    val createdAt: Long = System.currentTimeMillis(),
+    val createdByName: String = ""
 )

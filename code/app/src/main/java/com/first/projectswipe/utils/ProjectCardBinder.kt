@@ -5,7 +5,9 @@ import android.animation.AnimatorListenerAdapter
 import android.animation.ObjectAnimator
 import android.content.Context
 import android.view.View
+import android.widget.ImageView
 import android.widget.TextView
+import com.bumptech.glide.Glide
 import com.first.projectswipe.R
 import com.first.projectswipe.models.ProjectIdea
 import com.google.android.material.chip.Chip
@@ -21,13 +23,13 @@ object ProjectCardBinder {
         val frontTitle = frontLayout.findViewById<TextView>(R.id.projectTitleTextView)
         val frontDesc = frontLayout.findViewById<TextView>(R.id.projectDescriptionTextView)
         val frontCreator = frontLayout.findViewById<TextView>(R.id.projectCreatorName)
+        val frontPfp = frontLayout.findViewById<ImageView>(R.id.projectCreatorAvatar)
         val frontChips = frontLayout.findViewById<ChipGroup>(R.id.projectTagsChipGroup)
         val likeButtonFront = frontLayout.findViewById<View>(R.id.likeButton)
         val dislikeButtonFront = frontLayout.findViewById<View>(R.id.dislikeButton)
 
         frontTitle.text = idea.title
         frontDesc.text = idea.description
-        frontCreator.text = idea.createdBy
         frontChips.removeAllViews()
         idea.tags.forEach { tag ->
             val chip = Chip(context).apply {
@@ -36,6 +38,18 @@ object ProjectCardBinder {
                 isClickable = false
             }
             frontChips.addView(chip)
+        }
+
+        UserUtils.getUserInfo(idea.createdBy) { userInfo ->
+            frontCreator.text = userInfo.name
+            userInfo.profileImageUrl?.let { url ->
+                Glide.with(context)
+                    .load(url)
+                    .placeholder(R.drawable.ic_profile_placeholder)
+                    .error(R.drawable.ic_profile_placeholder)
+                    .circleCrop()
+                    .into(frontPfp)
+            } ?: frontPfp.setImageResource(R.drawable.ic_profile_placeholder)
         }
 
         // --- BACK SIDE ---
