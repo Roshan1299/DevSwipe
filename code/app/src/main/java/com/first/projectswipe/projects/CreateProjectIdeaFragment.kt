@@ -1,12 +1,12 @@
 package com.first.projectswipe.projects
 
 import android.os.Bundle
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.Button
 import android.widget.EditText
+import android.widget.ImageView
 import android.widget.Toast
 import androidx.fragment.app.Fragment
 import androidx.navigation.fragment.findNavController
@@ -15,69 +15,80 @@ import com.first.projectswipe.models.ProjectIdea
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FirebaseFirestore
 
-class CreateProjectIdeaFragment : Fragment() {
+class CreatePostFragment : Fragment() {
 
-    private lateinit var titleEditText: EditText
-    private lateinit var descriptionEditText: EditText
+    private lateinit var projectIdeaTab: Button
+    private lateinit var collabRequestTab: Button
+    private lateinit var projectTitleEditText: EditText
+    private lateinit var previewDescriptionEditText: EditText
+    private lateinit var fullDescriptionEditText: EditText
     private lateinit var tagsEditText: EditText
     private lateinit var saveButton: Button
+    private lateinit var closeButton: ImageView
 
     private val db = FirebaseFirestore.getInstance()
     private val auth = FirebaseAuth.getInstance()
 
-    private var editingProjectId: String? = null
+    private var selectedTab: String = "Project Idea"
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View? {
-        val view = inflater.inflate(R.layout.fragment_create_project_idea, container, false)
+        val view = inflater.inflate(R.layout.fragment_create_post, container, false)
 
-        titleEditText = view.findViewById(R.id.projectTitleEditText)
-        descriptionEditText = view.findViewById(R.id.projectDescriptionEditText)
+        projectIdeaTab = view.findViewById(R.id.projectIdeaTab)
+        collabRequestTab = view.findViewById(R.id.collabRequestTab)
+        projectTitleEditText = view.findViewById(R.id.projectTitleEditText)
+        previewDescriptionEditText = view.findViewById(R.id.previewDescriptionEditText)
+        fullDescriptionEditText = view.findViewById(R.id.fullDescriptionEditText)
         tagsEditText = view.findViewById(R.id.projectTagsEditText)
         saveButton = view.findViewById(R.id.saveProjectButton)
+        closeButton = view.findViewById(R.id.closeButton)
 
-        // Get the projectId from Bundle arguments (passed from ProfilePostAdapter)
-        editingProjectId = arguments?.getString("projectId")
-        if (!editingProjectId.isNullOrEmpty()) {
-            loadProjectForEdit(editingProjectId!!)
+        setTabSelected("Project Idea")
+
+        projectIdeaTab.setOnClickListener {
+            setTabSelected("Project Idea")
+        }
+        collabRequestTab.setOnClickListener {
+            setTabSelected("Collaboration Request")
+        }
+
+        closeButton.setOnClickListener {
+            findNavController().popBackStack()
         }
 
         saveButton.setOnClickListener {
-            if (editingProjectId.isNullOrEmpty()) {
-                saveNewProjectIdea()
+            if (selectedTab == "Project Idea") {
+                saveProjectIdea()
             } else {
-                updateExistingProject(editingProjectId!!)
+                // Implement Collaboration Request save logic
+                Toast.makeText(context, "Collaboration Request not implemented yet", Toast.LENGTH_SHORT).show()
             }
         }
 
         return view
     }
 
-    private fun loadProjectForEdit(projectId: String) {
-        db.collection("project_ideas").document(projectId).get()
-            .addOnSuccessListener { doc ->
-                if (doc != null && doc.exists()) {
-                    val project = doc.toObject(ProjectIdea::class.java)
-                    project?.let {
-                        titleEditText.setText(it.title)
-                        descriptionEditText.setText(it.description)
-                        tagsEditText.setText(it.tags.joinToString(", "))
-                    }
-                }
-            }
-            .addOnFailureListener { e ->
-                Toast.makeText(context, "Failed to load project: ${e.message}", Toast.LENGTH_SHORT).show()
-            }
+    private fun setTabSelected(tab: String) {
+        selectedTab = tab
+        if (tab == "Project Idea") {
+            projectIdeaTab.setBackgroundResource(R.drawable.tab_selected_bg)
+            collabRequestTab.setBackgroundResource(R.drawable.tab_unselected_bg)
+        } else {
+            projectIdeaTab.setBackgroundResource(R.drawable.tab_unselected_bg)
+            collabRequestTab.setBackgroundResource(R.drawable.tab_selected_bg)
+        }
     }
 
-    private fun saveNewProjectIdea() {
-        val title = titleEditText.text.toString().trim()
-        val description = descriptionEditText.text.toString().trim()
+    private fun saveProjectIdea() {
+        val title = projectTitleEditText.text.toString().trim()
+        val preview = previewDescriptionEditText.text.toString().trim()
+        val full = fullDescriptionEditText.text.toString().trim()
         val tags = tagsEditText.text.toString().split(",").map { it.trim() }.filter { it.isNotEmpty() }
 
-        if (title.isEmpty() || description.isEmpty()) {
+        if (title.isEmpty() || preview.isEmpty() || full.isEmpty()) {
             Toast.makeText(context, "Please fill in all fields", Toast.LENGTH_SHORT).show()
             return
         }
@@ -87,7 +98,8 @@ class CreateProjectIdeaFragment : Fragment() {
         val project = ProjectIdea(
             id = newDocRef.id,
             title = title,
-            description = description,
+            previewDescription = preview,
+            fullDescription = full,
             createdBy = currentUser.uid,
             tags = tags
         )
@@ -95,25 +107,6 @@ class CreateProjectIdeaFragment : Fragment() {
         newDocRef.set(project)
             .addOnSuccessListener {
                 Toast.makeText(context, "Project saved!", Toast.LENGTH_SHORT).show()
-                findNavController().popBackStack()
-            }
-            .addOnFailureListener { e ->
-                Log.e("CreateProject", "Error saving project", e)
-                Toast.makeText(context, "Error: ${e.message}", Toast.LENGTH_SHORT).show()
-            }
-    }
-
-    private fun updateExistingProject(projectId: String) {
-        val updatedData = mapOf(
-            "title" to titleEditText.text.toString().trim(),
-            "description" to descriptionEditText.text.toString().trim(),
-            "tags" to tagsEditText.text.toString().split(",").map { it.trim() }.filter { it.isNotEmpty() }
-        )
-
-        db.collection("project_ideas").document(projectId)
-            .update(updatedData)
-            .addOnSuccessListener {
-                Toast.makeText(context, "Project updated!", Toast.LENGTH_SHORT).show()
                 findNavController().popBackStack()
             }
             .addOnFailureListener { e ->
