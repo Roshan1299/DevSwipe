@@ -1,0 +1,138 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="#F6F3F4">
+
+    <LinearLayout
+        android:orientation="vertical"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:padding="24dp"
+        android:gravity="center_horizontal">
+
+        <!-- Top bar -->
+        <RelativeLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="16dp">
+
+            <ImageView
+                android:id="@+id/closeButton"
+                android:layout_width="32dp"
+                android:layout_height="32dp"
+                android:src="@android:drawable/ic_menu_close_clear_cancel"
+                android:layout_alignParentStart="true"
+                android:contentDescription="Close" />
+
+            <TextView
+                android:id="@+id/newPostTitle"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="New Post"
+                android:textStyle="bold"
+                android:textSize="20sp"
+                android:layout_centerHorizontal="true"
+                android:layout_alignParentTop="true"
+                android:gravity="center"/>
+        </RelativeLayout>
+
+        <!-- Tab Selector -->
+        <LinearLayout
+            android:id="@+id/tabSelector"
+            android:layout_width="match_parent"
+            android:layout_height="48dp"
+            android:background="@drawable/tab_selector_bg"
+            android:orientation="horizontal"
+            android:gravity="center"
+            android:layout_marginBottom="24dp"
+            android:padding="4dp">
+
+            <Button
+                android:id="@+id/projectIdeaTab"
+                android:layout_width="0dp"
+                android:layout_height="match_parent"
+                android:layout_weight="1"
+                android:text="Project Idea"
+                android:textColor="#B00020"
+                android:background="@drawable/tab_selected_bg"
+                android:textStyle="bold"
+                android:textSize="15sp"/>
+
+            <Button
+                android:id="@+id/collabRequestTab"
+                android:layout_width="0dp"
+                android:layout_height="match_parent"
+                android:layout_weight="1"
+                android:text="Collaboration Request"
+                android:textColor="#B00020"
+                android:background="@drawable/tab_unselected_bg"
+                android:textStyle="bold"
+                android:textSize="15sp"/>
+        </LinearLayout>
+
+        <!-- Project Title -->
+        <EditText
+            android:id="@+id/projectTitleEditText"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:background="@drawable/edittext_bg"
+            android:hint="Project Title"
+            android:padding="20dp"
+            android:textColor="#B00020"
+            android:textColorHint="#B00020"
+            android:textSize="16sp"
+            android:layout_marginBottom="16dp"/>
+
+        <!-- Short Preview Description -->
+        <EditText
+            android:id="@+id/previewDescriptionEditText"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:background="@drawable/edittext_bg"
+            android:hint="Short Preview Description (for swipeable cards)"
+            android:padding="20dp"
+            android:textColor="#B00020"
+            android:textColorHint="#B00020"
+            android:textSize="16sp"
+            android:layout_marginBottom="16dp"/>
+
+        <!-- Full Detailed Description -->
+        <EditText
+            android:id="@+id/fullDescriptionEditText"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:background="@drawable/edittext_bg"
+            android:hint="Full Detailed Description"
+            android:padding="20dp"
+            android:textColor="#B00020"
+            android:textColorHint="#B00020"
+            android:textSize="16sp"
+            android:minLines="4"
+            android:layout_marginBottom="16dp"/>
+
+        <!-- Tags -->
+        <EditText
+            android:id="@+id/projectTagsEditText"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:background="@drawable/edittext_bg"
+            android:hint="Tags (e.g., AI, Web Dev, Design)"
+            android:padding="20dp"
+            android:textColor="#B00020"
+            android:textColorHint="#B00020"
+            android:textSize="16sp"
+            android:layout_marginBottom="24dp"/>
+
+        <!-- Save Button -->
+        <Button
+            android:id="@+id/saveProjectButton"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Save"
+            android:backgroundTint="#B00020"
+            android:textColor="#FFFFFF"
+            android:textStyle="bold"
+            android:textSize="16sp"/>
+    </LinearLayout>
+</ScrollView>
