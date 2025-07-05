@@ -7,7 +7,9 @@ import android.view.ViewGroup
 import android.widget.Button
 import android.widget.EditText
 import android.widget.ImageView
+import android.widget.TextView
 import android.widget.Toast
+import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
 import androidx.navigation.fragment.findNavController
 import com.first.projectswipe.R
@@ -17,8 +19,8 @@ import com.google.firebase.firestore.FirebaseFirestore
 
 class CreatePostFragment : Fragment() {
 
-    private lateinit var projectIdeaTab: Button
-    private lateinit var collabRequestTab: Button
+    private lateinit var projectIdeaTab: TextView
+    private lateinit var collabRequestTab: TextView
     private lateinit var projectTitleEditText: EditText
     private lateinit var previewDescriptionEditText: EditText
     private lateinit var fullDescriptionEditText: EditText
@@ -74,11 +76,21 @@ class CreatePostFragment : Fragment() {
     private fun setTabSelected(tab: String) {
         selectedTab = tab
         if (tab == "Project Idea") {
-            projectIdeaTab.setBackgroundResource(R.drawable.tab_selected_bg)
-            collabRequestTab.setBackgroundResource(R.drawable.tab_unselected_bg)
+            // Set Project Idea tab as selected (white background)
+            projectIdeaTab.background = ContextCompat.getDrawable(requireContext(), R.drawable.tab_selected_bg)
+            projectIdeaTab.setTextColor(ContextCompat.getColor(requireContext(), R.color.black))
+
+            // Set Collaboration Request tab as unselected (transparent/light blue)
+            collabRequestTab.background = ContextCompat.getDrawable(requireContext(), R.drawable.tab_unselected_bg)
+            collabRequestTab.setTextColor(ContextCompat.getColor(requireContext(), R.color.black))
         } else {
-            projectIdeaTab.setBackgroundResource(R.drawable.tab_unselected_bg)
-            collabRequestTab.setBackgroundResource(R.drawable.tab_selected_bg)
+            // Set Project Idea tab as unselected (transparent/light blue)
+            projectIdeaTab.background = ContextCompat.getDrawable(requireContext(), R.drawable.tab_unselected_bg)
+            projectIdeaTab.setTextColor(ContextCompat.getColor(requireContext(), R.color.black))
+
+            // Set Collaboration Request tab as selected (white background)
+            collabRequestTab.background = ContextCompat.getDrawable(requireContext(), R.drawable.tab_selected_bg)
+            collabRequestTab.setTextColor(ContextCompat.getColor(requireContext(), R.color.black))
         }
     }
 
