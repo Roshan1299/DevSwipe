@@ -2,7 +2,7 @@
 <ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="#F6F3F4">
+    android:background="#FFFFFF">
 
     <LinearLayout
         android:orientation="vertical"
@@ -48,18 +48,20 @@
             android:layout_marginBottom="24dp"
             android:padding="4dp">
 
-            <Button
+            <TextView
                 android:id="@+id/projectIdeaTab"
                 android:layout_width="0dp"
                 android:layout_height="match_parent"
                 android:layout_weight="1"
                 android:text="Project Idea"
-                android:textColor="#B00020"
+                android:textColor="#000000"
+                android:textSize="15sp"
                 android:background="@drawable/tab_selected_bg"
-                android:textStyle="bold"
-                android:textSize="15sp"/>
+                android:gravity="center"
+                android:clickable="true"
+                android:focusable="true"/>
 
-            <Button
+            <TextView
                 android:id="@+id/collabRequestTab"
                 android:layout_width="0dp"
                 android:layout_height="match_parent"
@@ -68,10 +70,13 @@
                 android:textColor="#B00020"
                 android:background="@drawable/tab_unselected_bg"
                 android:textStyle="bold"
-                android:textSize="15sp"/>
+                android:textSize="15sp"
+                android:gravity="center"
+                android:clickable="true"
+                android:focusable="true"/>
         </LinearLayout>
 
-        <!-- Project Title -->
+        <!-- Rest of your layout remains the same -->
         <EditText
             android:id="@+id/projectTitleEditText"
             android:layout_width="match_parent"
@@ -79,12 +84,11 @@
             android:background="@drawable/edittext_bg"
             android:hint="Project Title"
             android:padding="20dp"
-            android:textColor="#B00020"
-            android:textColorHint="#B00020"
+            android:textColor="#000000"
+            android:textColorHint="#000000"
             android:textSize="16sp"
             android:layout_marginBottom="16dp"/>
 
-        <!-- Short Preview Description -->
         <EditText
             android:id="@+id/previewDescriptionEditText"
             android:layout_width="match_parent"
@@ -97,7 +101,6 @@
             android:textSize="16sp"
             android:layout_marginBottom="16dp"/>
 
-        <!-- Full Detailed Description -->
         <EditText
             android:id="@+id/fullDescriptionEditText"
             android:layout_width="match_parent"
@@ -111,7 +114,6 @@
             android:minLines="4"
             android:layout_marginBottom="16dp"/>
 
-        <!-- Tags -->
         <EditText
             android:id="@+id/projectTagsEditText"
             android:layout_width="match_parent"
@@ -124,7 +126,6 @@
             android:textSize="16sp"
             android:layout_marginBottom="24dp"/>
 
-        <!-- Save Button -->
         <Button
             android:id="@+id/saveProjectButton"
             android:layout_width="match_parent"
