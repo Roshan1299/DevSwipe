@@ -54,6 +54,7 @@
                 android:layout_height="match_parent"
                 android:layout_weight="1"
                 android:text="Project Idea"
+                android:textStyle="bold"
                 android:textColor="#000000"
                 android:textSize="15sp"
                 android:background="@drawable/tab_selected_bg"
@@ -67,7 +68,7 @@
                 android:layout_height="match_parent"
                 android:layout_weight="1"
                 android:text="Collaboration Request"
-                android:textColor="#B00020"
+                android:textColor="#1A6980"
                 android:background="@drawable/tab_unselected_bg"
                 android:textStyle="bold"
                 android:textSize="15sp"
@@ -76,7 +77,6 @@
                 android:focusable="true"/>
         </LinearLayout>
 
-        <!-- Rest of your layout remains the same -->
         <EditText
             android:id="@+id/projectTitleEditText"
             android:layout_width="match_parent"
@@ -84,8 +84,8 @@
             android:background="@drawable/edittext_bg"
             android:hint="Project Title"
             android:padding="20dp"
-            android:textColor="#000000"
-            android:textColorHint="#000000"
+            android:textColor="#1A6980"
+            android:textColorHint="#1A6980"
             android:textSize="16sp"
             android:layout_marginBottom="16dp"/>
 
