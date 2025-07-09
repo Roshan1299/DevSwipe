@@ -13,7 +13,6 @@ import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
 import androidx.navigation.fragment.findNavController
 import com.first.projectswipe.R
-import com.first.projectswipe.models.ProjectIdea
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FirebaseFirestore
 
@@ -25,6 +24,7 @@ class CreatePostFragment : Fragment() {
     private lateinit var previewDescriptionEditText: EditText
     private lateinit var fullDescriptionEditText: EditText
     private lateinit var tagsEditText: EditText
+    private lateinit var githubLinkEditText: EditText
     private lateinit var difficultyLevelContainer: View
     private lateinit var difficultyLevelText: TextView
     private lateinit var difficultyUpArrow: ImageView
@@ -50,8 +50,21 @@ class CreatePostFragment : Fragment() {
         setupTabSelection()
         setupDifficultySelection()
         setupClickListeners()
+        setupFocusListeners()
 
         return view
+    }
+
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        super.onViewCreated(view, savedInstanceState)
+        // Hide bottom navigation when this fragment is shown
+        activity?.findViewById<View>(R.id.bottomNavigationView)?.visibility = View.GONE
+    }
+
+    override fun onDestroyView() {
+        super.onDestroyView()
+        // Show bottom navigation when leaving this fragment
+        activity?.findViewById<View>(R.id.bottomNavigationView)?.visibility = View.VISIBLE
     }
 
     private fun initializeViews(view: View) {
@@ -61,6 +74,7 @@ class CreatePostFragment : Fragment() {
         previewDescriptionEditText = view.findViewById(R.id.previewDescriptionEditText)
         fullDescriptionEditText = view.findViewById(R.id.fullDescriptionEditText)
         tagsEditText = view.findViewById(R.id.projectTagsEditText)
+        githubLinkEditText = view.findViewById(R.id.githubLinkEditText)
         difficultyLevelContainer = view.findViewById(R.id.difficultyLevelContainer)
         difficultyLevelText = view.findViewById(R.id.difficultyLevelText)
         difficultyUpArrow = view.findViewById(R.id.difficultyUpArrow)
@@ -127,30 +141,45 @@ class CreatePostFragment : Fragment() {
                 Toast.makeText(context, "Collaboration Request not implemented yet", Toast.LENGTH_SHORT).show()
             }
         }
+    }
 
-        // Add focus listeners to ensure proper scrolling when keyboard appears
-        fullDescriptionEditText.setOnFocusChangeListener { _, hasFocus ->
-            if (hasFocus) {
-                // Post with delay to ensure keyboard is shown
-                view?.postDelayed({
-                    fullDescriptionEditText.requestFocus()
-                    // Scroll to make the field visible
-                    val scrollView = view?.parent as? androidx.core.widget.NestedScrollView
-                    scrollView?.smoothScrollTo(0, fullDescriptionEditText.bottom)
-                }, 200)
+    private fun setupFocusListeners() {
+        val editTexts = listOf(
+            projectTitleEditText,
+            previewDescriptionEditText,
+            fullDescriptionEditText,
+            tagsEditText,
+            githubLinkEditText
+        )
+
+        editTexts.forEach { editText ->
+            editText.setOnFocusChangeListener { view, hasFocus ->
+                if (hasFocus) {
+                    // Scroll to the focused field with a small delay to ensure keyboard is visible
+                    view.postDelayed({
+                        scrollToView(view)
+                    }, 200)
+                }
             }
         }
+    }
 
-        tagsEditText.setOnFocusChangeListener { _, hasFocus ->
-            if (hasFocus) {
-                // Post with delay to ensure keyboard is shown
-                view?.postDelayed({
-                    tagsEditText.requestFocus()
-                    // Scroll to make the field visible
-                    val scrollView = view?.parent as? androidx.core.widget.NestedScrollView
-                    scrollView?.smoothScrollTo(0, tagsEditText.bottom)
-                }, 200)
+    private fun scrollToView(view: View) {
+        val scrollView = this.view?.parent as? androidx.core.widget.NestedScrollView
+        scrollView?.let { sv ->
+            // Calculate appropriate padding based on the field
+            val extraPadding = when (view.id) {
+                R.id.projectTitleEditText -> 150
+                R.id.previewDescriptionEditText -> 200
+                R.id.fullDescriptionEditText -> 250
+                R.id.projectTagsEditText -> 300
+                R.id.githubLinkEditText -> 350
+                else -> 200
             }
+
+            // Scroll to position that keeps the field visible above the keyboard
+            val scrollY = view.top + extraPadding
+            sv.smoothScrollTo(0, scrollY.coerceAtLeast(0))
         }
     }
 
@@ -175,30 +204,49 @@ class CreatePostFragment : Fragment() {
         }
     }
 
+    private fun isValidGitHubUrl(url: String): Boolean {
+        if (url.isEmpty()) return true // Optional field, empty is valid
+        return url.startsWith("https://github.com/") || url.startsWith("http://github.com/")
+    }
+
     private fun saveProjectIdea() {
         val title = projectTitleEditText.text.toString().trim()
         val preview = previewDescriptionEditText.text.toString().trim()
         val full = fullDescriptionEditText.text.toString().trim()
         val tags = tagsEditText.text.toString().split(",").map { it.trim() }.filter { it.isNotEmpty() }
+        val githubLink = githubLinkEditText.text.toString().trim()
 
         if (title.isEmpty() || preview.isEmpty() || full.isEmpty()) {
-            Toast.makeText(context, "Please fill in all fields", Toast.LENGTH_SHORT).show()
+            Toast.makeText(context, "Please fill in all required fields", Toast.LENGTH_SHORT).show()
+            return
+        }
+
+        if (!isValidGitHubUrl(githubLink)) {
+            Toast.makeText(context, "Please enter a valid GitHub URL (https://github.com/...)", Toast.LENGTH_SHORT).show()
             return
         }
 
         val currentUser = auth.currentUser ?: return
         val newDocRef = db.collection("project_ideas").document()
-        val project = ProjectIdea(
-            id = newDocRef.id,
-            title = title,
-            previewDescription = preview,
-            fullDescription = full,
-            createdBy = currentUser.uid,
-            tags = tags,
-            difficulty = selectedDifficulty
+
+        // Create project data map with optional GitHub link
+        val projectData = mutableMapOf<String, Any>(
+            "id" to newDocRef.id,
+            "title" to title,
+            "previewDescription" to preview,
+            "fullDescription" to full,
+            "createdBy" to currentUser.uid,
+            "tags" to tags,
+            "difficulty" to selectedDifficulty,
+            "createdAt" to com.google.firebase.Timestamp.now()
         )
 
-        newDocRef.set(project)
+        // Add GitHub link only if it's not empty
+        if (githubLink.isNotEmpty()) {
+            projectData["githubLink"] = githubLink
+        }
+
+        newDocRef.set(projectData)
             .addOnSuccessListener {
                 Toast.makeText(context, "Project saved!", Toast.LENGTH_SHORT).show()
                 findNavController().popBackStack()
