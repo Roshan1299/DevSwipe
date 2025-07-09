@@ -29,7 +29,7 @@ object ProjectCardBinder {
         val dislikeButtonFront = frontLayout.findViewById<View>(R.id.dislikeButton)
 
         frontTitle.text = idea.title
-        frontDesc.text = idea.description
+        frontDesc.text = idea.previewDescription
         frontChips.removeAllViews()
         idea.tags.forEach { tag ->
             val chip = Chip(context).apply {
@@ -61,7 +61,7 @@ object ProjectCardBinder {
         val likeButtonBack = backLayout.findViewById<View>(R.id.likeButtonBack)
         val dislikeButtonBack = backLayout.findViewById<View>(R.id.dislikeButtonBack)
 
-        backDesc.text = idea.description
+        backDesc.text = idea.fullDescription
         backGithub.text = "GitHub: https://github.com/yourproject"
         backTimeline.text = "Timeline: 4–6 weeks"
         backChips.removeAllViews()

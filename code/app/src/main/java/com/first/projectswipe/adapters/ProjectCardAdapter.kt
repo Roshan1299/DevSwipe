@@ -26,8 +26,8 @@ class ProjectCardAdapter(private val projectList: List<ProjectIdea>) :
     override fun onBindViewHolder(holder: ViewHolder, position: Int) {
         val project = projectList[position]
         holder.titleView.text = project.title
-        holder.descView.text = project.description
-//        holder.creatorView.text = project.createdByName // or use a lookup for UID → name
+        holder.descView.text = project.previewDescription
+        holder.creatorView.text = project.createdByName // or use a lookup for UID → name
     }
 
     override fun getItemCount(): Int = projectList.size
