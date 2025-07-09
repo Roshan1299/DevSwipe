@@ -9,5 +9,6 @@ data class ProjectIdea(
     val createdAt: Long = System.currentTimeMillis(),
     val createdByName: String = "",
     val previewDescription: String = "",
-    val fullDescription: String = ""
+    val fullDescription: String = "",
+    val difficulty: String = "Beginner"
 )
