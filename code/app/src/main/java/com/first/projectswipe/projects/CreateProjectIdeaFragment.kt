@@ -1,6 +1,8 @@
 package com.first.projectswipe.projects
 
 import android.os.Bundle
+import android.text.InputFilter
+import android.text.Spanned
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -13,8 +15,13 @@ import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
 import androidx.navigation.fragment.findNavController
 import com.first.projectswipe.R
+import com.google.android.flexbox.FlexboxLayout
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FirebaseFirestore
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.tasks.await
 
 class CreatePostFragment : Fragment() {
 
@@ -24,6 +31,8 @@ class CreatePostFragment : Fragment() {
     private lateinit var previewDescriptionEditText: EditText
     private lateinit var fullDescriptionEditText: EditText
     private lateinit var tagsEditText: EditText
+    private lateinit var addTagButton: ImageView
+    private lateinit var tagsContainer: FlexboxLayout
     private lateinit var githubLinkEditText: EditText
     private lateinit var difficultyLevelContainer: View
     private lateinit var difficultyLevelText: TextView
@@ -40,6 +49,22 @@ class CreatePostFragment : Fragment() {
     private val difficultyLevels = listOf("Beginner", "Intermediate", "Advanced", "Expert")
     private var currentDifficultyIndex = 0
 
+    // Tag management
+    private val selectedTags = mutableListOf<String>()
+    private val maxTags = 8
+    private val maxTagLength = 20
+
+    // Popular tech stack suggestions
+    private val popularTags = listOf(
+        "React", "Vue", "Angular", "JavaScript", "TypeScript",
+        "Python", "Java", "Kotlin", "Swift", "C++",
+        "Node.js", "Express", "Django", "Flask", "Spring",
+        "MongoDB", "PostgreSQL", "MySQL", "Firebase", "AWS",
+        "Docker", "Kubernetes", "Git", "GraphQL", "REST API",
+        "Machine Learning", "AI", "Data Science", "Web Dev", "Mobile",
+        "UI/UX", "Frontend", "Backend", "Full Stack", "DevOps"
+    )
+
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
@@ -51,19 +76,20 @@ class CreatePostFragment : Fragment() {
         setupDifficultySelection()
         setupClickListeners()
         setupFocusListeners()
+        setupTextLimits()
+        setupTagInput()
 
         return view
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        // Hide bottom navigation when this fragment is shown
         activity?.findViewById<View>(R.id.bottomNavigationView)?.visibility = View.GONE
+        updateTagsDisplay() // Initialize tags display
     }
 
     override fun onDestroyView() {
         super.onDestroyView()
-        // Show bottom navigation when leaving this fragment
         activity?.findViewById<View>(R.id.bottomNavigationView)?.visibility = View.VISIBLE
     }
 
@@ -74,6 +100,8 @@ class CreatePostFragment : Fragment() {
         previewDescriptionEditText = view.findViewById(R.id.previewDescriptionEditText)
         fullDescriptionEditText = view.findViewById(R.id.fullDescriptionEditText)
         tagsEditText = view.findViewById(R.id.projectTagsEditText)
+        addTagButton = view.findViewById(R.id.addTagButton)
+        tagsContainer = view.findViewById(R.id.tagsContainer)
         githubLinkEditText = view.findViewById(R.id.githubLinkEditText)
         difficultyLevelContainer = view.findViewById(R.id.difficultyLevelContainer)
         difficultyLevelText = view.findViewById(R.id.difficultyLevelText)
@@ -82,19 +110,116 @@ class CreatePostFragment : Fragment() {
         saveButton = view.findViewById(R.id.saveProjectButton)
         closeButton = view.findViewById(R.id.closeButton)
 
-        // Set initial difficulty level
         updateDifficultyDisplay()
+    }
+
+    private fun setupTagInput() {
+        // Add tag length filter
+        tagsEditText.filters = arrayOf(InputFilter.LengthFilter(maxTagLength))
+
+        addTagButton.setOnClickListener {
+            addTagFromInput()
+        }
+
+        tagsEditText.setOnEditorActionListener { _, _, _ ->
+            addTagFromInput()
+            true
+        }
+    }
+
+    private fun addTagFromInput() {
+        val tagText = tagsEditText.text.toString().trim()
+        if (tagText.isNotEmpty()) {
+            addTag(tagText)
+            tagsEditText.text.clear()
+        }
+    }
+
+    private fun addTag(tag: String) {
+        // Validate tag
+        if (tag.length > maxTagLength) {
+            Toast.makeText(context, "Tag is too long (max $maxTagLength characters)", Toast.LENGTH_SHORT).show()
+            return
+        }
+
+        if (selectedTags.size >= maxTags) {
+            Toast.makeText(context, "Maximum $maxTags tags allowed", Toast.LENGTH_SHORT).show()
+            return
+        }
+
+        val normalizedTag = tag.lowercase().replaceFirstChar { it.uppercase() }
+        if (selectedTags.contains(normalizedTag)) {
+            Toast.makeText(context, "Tag already added", Toast.LENGTH_SHORT).show()
+            return
+        }
+
+        selectedTags.add(normalizedTag)
+        updateTagsDisplay()
+    }
+
+    private fun removeTag(tag: String) {
+        selectedTags.remove(tag)
+        updateTagsDisplay()
+    }
+
+    private fun updateTagsDisplay() {
+        tagsContainer.removeAllViews()
+
+        // Add selected tags
+        selectedTags.forEach { tag ->
+            tagsContainer.addView(createSelectedTagChip(tag))
+        }
+
+        // Add popular tags (up to a maximum to prevent overcrowding)
+        val remainingSpace = maxTags - selectedTags.size
+        popularTags.filter { !selectedTags.contains(it) }
+            .take(remainingSpace.coerceAtMost(10))
+            .forEach { tag ->
+                tagsContainer.addView(createPopularTagChip(tag))
+            }
+    }
+
+    private fun createPopularTagChip(tag: String): View {
+        val chipView = LayoutInflater.from(context).inflate(R.layout.chip_popular_tag, tagsContainer, false)
+        chipView.findViewById<TextView>(R.id.chipText).text = tag
+        chipView.setOnClickListener {
+            addTag(tag)
+        }
+        return chipView
+    }
+
+    private fun createSelectedTagChip(tag: String): View {
+        val chipView = LayoutInflater.from(context).inflate(R.layout.chip_selected_tag, tagsContainer, false)
+        chipView.findViewById<TextView>(R.id.chipText).text = tag
+        chipView.findViewById<ImageView>(R.id.removeTagButton).setOnClickListener {
+            removeTag(tag)
+        }
+        return chipView
+    }
+
+    private fun setupTextLimits() {
+        fullDescriptionEditText.filters = arrayOf(object : InputFilter {
+            override fun filter(
+                source: CharSequence?,
+                start: Int,
+                end: Int,
+                dest: Spanned?,
+                dstart: Int,
+                dend: Int
+            ): CharSequence? {
+                val newText = dest.toString().substring(0, dstart) +
+                        source.toString().substring(start, end) +
+                        dest.toString().substring(dend)
+                return if (newText.split("\n").size > 4) "" else null
+            }
+        })
+        fullDescriptionEditText.maxLines = 4
     }
 
     private fun setupTabSelection() {
         setTabSelected("Project Idea")
-
-        projectIdeaTab.setOnClickListener {
-            setTabSelected("Project Idea")
-        }
-        collabRequestTab.setOnClickListener {
-            setTabSelected("Collaboration Request")
-        }
+        projectIdeaTab.setOnClickListener { setTabSelected("Project Idea") }
+        collabRequestTab.setOnClickListener { setTabSelected("Collaboration Request") }
     }
 
     private fun setupDifficultySelection() {
@@ -112,7 +237,6 @@ class CreatePostFragment : Fragment() {
             }
         }
 
-        // Make the entire container clickable to cycle through difficulties
         difficultyLevelContainer.setOnClickListener {
             currentDifficultyIndex = (currentDifficultyIndex + 1) % difficultyLevels.size
             updateDifficultyDisplay()
@@ -122,8 +246,6 @@ class CreatePostFragment : Fragment() {
     private fun updateDifficultyDisplay() {
         selectedDifficulty = difficultyLevels[currentDifficultyIndex]
         difficultyLevelText.text = selectedDifficulty
-
-        // Update arrow visibility/opacity based on position
         difficultyUpArrow.alpha = if (currentDifficultyIndex > 0) 1.0f else 0.3f
         difficultyDownArrow.alpha = if (currentDifficultyIndex < difficultyLevels.size - 1) 1.0f else 0.3f
     }
@@ -137,28 +259,22 @@ class CreatePostFragment : Fragment() {
             if (selectedTab == "Project Idea") {
                 saveProjectIdea()
             } else {
-                // Implement Collaboration Request save logic
                 Toast.makeText(context, "Collaboration Request not implemented yet", Toast.LENGTH_SHORT).show()
             }
         }
     }
 
     private fun setupFocusListeners() {
-        val editTexts = listOf(
+        listOf(
             projectTitleEditText,
             previewDescriptionEditText,
             fullDescriptionEditText,
             tagsEditText,
             githubLinkEditText
-        )
-
-        editTexts.forEach { editText ->
+        ).forEach { editText ->
             editText.setOnFocusChangeListener { view, hasFocus ->
                 if (hasFocus) {
-                    // Scroll to the focused field with a small delay to ensure keyboard is visible
-                    view.postDelayed({
-                        scrollToView(view)
-                    }, 200)
+                    view.postDelayed({ scrollToView(view) }, 200)
                 }
             }
         }
@@ -166,8 +282,7 @@ class CreatePostFragment : Fragment() {
 
     private fun scrollToView(view: View) {
         val scrollView = this.view?.parent as? androidx.core.widget.NestedScrollView
-        scrollView?.let { sv ->
-            // Calculate appropriate padding based on the field
+        scrollView?.let {
             val extraPadding = when (view.id) {
                 R.id.projectTitleEditText -> 150
                 R.id.previewDescriptionEditText -> 200
@@ -176,44 +291,32 @@ class CreatePostFragment : Fragment() {
                 R.id.githubLinkEditText -> 350
                 else -> 200
             }
-
-            // Scroll to position that keeps the field visible above the keyboard
-            val scrollY = view.top + extraPadding
-            sv.smoothScrollTo(0, scrollY.coerceAtLeast(0))
+            it.smoothScrollTo(0, view.top + extraPadding)
         }
     }
 
     private fun setTabSelected(tab: String) {
         selectedTab = tab
-        if (tab == "Project Idea") {
-            // Set Project Idea tab as selected (white background)
-            projectIdeaTab.background = ContextCompat.getDrawable(requireContext(), R.drawable.tab_selected_bg)
-            projectIdeaTab.setTextColor(ContextCompat.getColor(requireContext(), R.color.black))
-
-            // Set Collaboration Request tab as unselected (transparent/light blue)
-            collabRequestTab.background = ContextCompat.getDrawable(requireContext(), R.drawable.tab_unselected_bg)
-            collabRequestTab.setTextColor(ContextCompat.getColor(requireContext(), R.color.black))
-        } else {
-            // Set Project Idea tab as unselected (transparent/light blue)
-            projectIdeaTab.background = ContextCompat.getDrawable(requireContext(), R.drawable.tab_unselected_bg)
-            projectIdeaTab.setTextColor(ContextCompat.getColor(requireContext(), R.color.black))
-
-            // Set Collaboration Request tab as selected (white background)
-            collabRequestTab.background = ContextCompat.getDrawable(requireContext(), R.drawable.tab_selected_bg)
-            collabRequestTab.setTextColor(ContextCompat.getColor(requireContext(), R.color.black))
+        projectIdeaTab.apply {
+            background = ContextCompat.getDrawable(requireContext(),
+                if (tab == "Project Idea") R.drawable.tab_selected_bg else R.drawable.tab_unselected_bg)
+            setTextColor(ContextCompat.getColor(requireContext(), R.color.black))
+        }
+        collabRequestTab.apply {
+            background = ContextCompat.getDrawable(requireContext(),
+                if (tab == "Collaboration Request") R.drawable.tab_selected_bg else R.drawable.tab_unselected_bg)
+            setTextColor(ContextCompat.getColor(requireContext(), R.color.black))
         }
     }
 
     private fun isValidGitHubUrl(url: String): Boolean {
-        if (url.isEmpty()) return true // Optional field, empty is valid
-        return url.startsWith("https://github.com/") || url.startsWith("http://github.com/")
+        return url.isEmpty() || url.startsWith("https://github.com/") || url.startsWith("http://github.com/")
     }
 
     private fun saveProjectIdea() {
         val title = projectTitleEditText.text.toString().trim()
         val preview = previewDescriptionEditText.text.toString().trim()
         val full = fullDescriptionEditText.text.toString().trim()
-        val tags = tagsEditText.text.toString().split(",").map { it.trim() }.filter { it.isNotEmpty() }
         val githubLink = githubLinkEditText.text.toString().trim()
 
         if (title.isEmpty() || preview.isEmpty() || full.isEmpty()) {
@@ -221,38 +324,41 @@ class CreatePostFragment : Fragment() {
             return
         }
 
+        if (selectedTags.isEmpty()) {
+            Toast.makeText(context, "Please add at least one tag", Toast.LENGTH_SHORT).show()
+            return
+        }
+
         if (!isValidGitHubUrl(githubLink)) {
-            Toast.makeText(context, "Please enter a valid GitHub URL (https://github.com/...)", Toast.LENGTH_SHORT).show()
+            Toast.makeText(context, "Please enter a valid GitHub URL", Toast.LENGTH_SHORT).show()
             return
         }
 
         val currentUser = auth.currentUser ?: return
         val newDocRef = db.collection("project_ideas").document()
 
-        // Create project data map with optional GitHub link
         val projectData = mutableMapOf<String, Any>(
             "id" to newDocRef.id,
             "title" to title,
             "previewDescription" to preview,
             "fullDescription" to full,
             "createdBy" to currentUser.uid,
-            "tags" to tags,
-            "difficulty" to selectedDifficulty,
-            "createdAt" to com.google.firebase.Timestamp.now()
+            "tags" to selectedTags,
+            "difficulty" to selectedDifficulty
         )
 
-        // Add GitHub link only if it's not empty
         if (githubLink.isNotEmpty()) {
             projectData["githubLink"] = githubLink
         }
 
-        newDocRef.set(projectData)
-            .addOnSuccessListener {
+        CoroutineScope(Dispatchers.Main).launch {
+            try {
+                newDocRef.set(projectData).await()
                 Toast.makeText(context, "Project saved!", Toast.LENGTH_SHORT).show()
                 findNavController().popBackStack()
-            }
-            .addOnFailureListener { e ->
+            } catch (e: Exception) {
                 Toast.makeText(context, "Error: ${e.message}", Toast.LENGTH_SHORT).show()
             }
+        }
     }
 }
