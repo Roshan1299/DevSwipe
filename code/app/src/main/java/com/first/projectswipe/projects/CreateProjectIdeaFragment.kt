@@ -25,6 +25,10 @@ class CreatePostFragment : Fragment() {
     private lateinit var previewDescriptionEditText: EditText
     private lateinit var fullDescriptionEditText: EditText
     private lateinit var tagsEditText: EditText
+    private lateinit var difficultyLevelContainer: View
+    private lateinit var difficultyLevelText: TextView
+    private lateinit var difficultyUpArrow: ImageView
+    private lateinit var difficultyDownArrow: ImageView
     private lateinit var saveButton: Button
     private lateinit var closeButton: ImageView
 
@@ -32,6 +36,9 @@ class CreatePostFragment : Fragment() {
     private val auth = FirebaseAuth.getInstance()
 
     private var selectedTab: String = "Project Idea"
+    private var selectedDifficulty: String = "Beginner"
+    private val difficultyLevels = listOf("Beginner", "Intermediate", "Advanced", "Expert")
+    private var currentDifficultyIndex = 0
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -39,15 +46,33 @@ class CreatePostFragment : Fragment() {
     ): View? {
         val view = inflater.inflate(R.layout.fragment_create_post, container, false)
 
+        initializeViews(view)
+        setupTabSelection()
+        setupDifficultySelection()
+        setupClickListeners()
+
+        return view
+    }
+
+    private fun initializeViews(view: View) {
         projectIdeaTab = view.findViewById(R.id.projectIdeaTab)
         collabRequestTab = view.findViewById(R.id.collabRequestTab)
         projectTitleEditText = view.findViewById(R.id.projectTitleEditText)
         previewDescriptionEditText = view.findViewById(R.id.previewDescriptionEditText)
         fullDescriptionEditText = view.findViewById(R.id.fullDescriptionEditText)
         tagsEditText = view.findViewById(R.id.projectTagsEditText)
+        difficultyLevelContainer = view.findViewById(R.id.difficultyLevelContainer)
+        difficultyLevelText = view.findViewById(R.id.difficultyLevelText)
+        difficultyUpArrow = view.findViewById(R.id.difficultyUpArrow)
+        difficultyDownArrow = view.findViewById(R.id.difficultyDownArrow)
         saveButton = view.findViewById(R.id.saveProjectButton)
         closeButton = view.findViewById(R.id.closeButton)
 
+        // Set initial difficulty level
+        updateDifficultyDisplay()
+    }
+
+    private fun setupTabSelection() {
         setTabSelected("Project Idea")
 
         projectIdeaTab.setOnClickListener {
@@ -56,7 +81,40 @@ class CreatePostFragment : Fragment() {
         collabRequestTab.setOnClickListener {
             setTabSelected("Collaboration Request")
         }
+    }
 
+    private fun setupDifficultySelection() {
+        difficultyUpArrow.setOnClickListener {
+            if (currentDifficultyIndex > 0) {
+                currentDifficultyIndex--
+                updateDifficultyDisplay()
+            }
+        }
+
+        difficultyDownArrow.setOnClickListener {
+            if (currentDifficultyIndex < difficultyLevels.size - 1) {
+                currentDifficultyIndex++
+                updateDifficultyDisplay()
+            }
+        }
+
+        // Make the entire container clickable to cycle through difficulties
+        difficultyLevelContainer.setOnClickListener {
+            currentDifficultyIndex = (currentDifficultyIndex + 1) % difficultyLevels.size
+            updateDifficultyDisplay()
+        }
+    }
+
+    private fun updateDifficultyDisplay() {
+        selectedDifficulty = difficultyLevels[currentDifficultyIndex]
+        difficultyLevelText.text = selectedDifficulty
+
+        // Update arrow visibility/opacity based on position
+        difficultyUpArrow.alpha = if (currentDifficultyIndex > 0) 1.0f else 0.3f
+        difficultyDownArrow.alpha = if (currentDifficultyIndex < difficultyLevels.size - 1) 1.0f else 0.3f
+    }
+
+    private fun setupClickListeners() {
         closeButton.setOnClickListener {
             findNavController().popBackStack()
         }
@@ -70,7 +128,30 @@ class CreatePostFragment : Fragment() {
             }
         }
 
-        return view
+        // Add focus listeners to ensure proper scrolling when keyboard appears
+        fullDescriptionEditText.setOnFocusChangeListener { _, hasFocus ->
+            if (hasFocus) {
+                // Post with delay to ensure keyboard is shown
+                view?.postDelayed({
+                    fullDescriptionEditText.requestFocus()
+                    // Scroll to make the field visible
+                    val scrollView = view?.parent as? androidx.core.widget.NestedScrollView
+                    scrollView?.smoothScrollTo(0, fullDescriptionEditText.bottom)
+                }, 200)
+            }
+        }
+
+        tagsEditText.setOnFocusChangeListener { _, hasFocus ->
+            if (hasFocus) {
+                // Post with delay to ensure keyboard is shown
+                view?.postDelayed({
+                    tagsEditText.requestFocus()
+                    // Scroll to make the field visible
+                    val scrollView = view?.parent as? androidx.core.widget.NestedScrollView
+                    scrollView?.smoothScrollTo(0, tagsEditText.bottom)
+                }, 200)
+            }
+        }
     }
 
     private fun setTabSelected(tab: String) {
@@ -113,7 +194,8 @@ class CreatePostFragment : Fragment() {
             previewDescription = preview,
             fullDescription = full,
             createdBy = currentUser.uid,
-            tags = tags
+            tags = tags,
+            difficulty = selectedDifficulty
         )
 
         newDocRef.set(project)
