@@ -5,7 +5,7 @@
         android:title="Home" />
 
     <item
-        android:id="@+id/createProjectIdeaFragment"
+        android:id="@+id/createPostFragment"
         android:icon="@drawable/ic_add"
         android:title="Add Post" />
 
@@ -13,6 +13,4 @@
         android:id="@+id/profileFragment"
         android:icon="@drawable/ic_person"
         android:title="Profile" />
-
-
 </menu>

@@ -2,7 +2,7 @@ plugins {
     alias(libs.plugins.android.application)
     alias(libs.plugins.kotlin.android)
     alias(libs.plugins.google.services)
-    id("kotlin-kapt") // Enable kapt here (correct way with plugins block)
+    id("kotlin-kapt")
 }
 
 android {
@@ -51,18 +51,23 @@ dependencies {
     implementation(libs.androidx.navigation.fragment.ktx)
     implementation(libs.androidx.navigation.ui.ktx)
 
-    // Firebase
-    implementation(platform("com.google.firebase:firebase-bom:32.3.1"))
+    // Firebase (Use BOM to manage versions)
+    implementation(platform("com.google.firebase:firebase-bom:33.1.0")) // Updated to latest BOM
     implementation("com.google.firebase:firebase-auth-ktx")
-    implementation("com.google.firebase:firebase-firestore-ktx:24.9.0")
+    implementation("com.google.firebase:firebase-firestore-ktx")
     implementation("com.google.firebase:firebase-storage-ktx")
-    implementation("com.google.android.gms:play-services-auth:20.7.0")
+    implementation("com.google.android.gms:play-services-auth")
 
     // Image Loading
     implementation("com.github.bumptech.glide:glide:4.16.0")
     kapt("com.github.bumptech.glide:compiler:4.16.0")
-    // Optional: Remove if not using
     implementation("com.squareup.picasso:picasso:2.71828")
+
+    // Coroutines
+    implementation("org.jetbrains.kotlinx:kotlinx-coroutines-play-services:1.8.1")
+
+    // Flexbox
+    implementation("com.google.android.flexbox:flexbox:3.0.0")
 
     // Testing
     testImplementation(libs.junit)

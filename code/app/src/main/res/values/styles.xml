@@ -1,13 +1,28 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
+    <!-- Base application theme -->
+    <style name="AppTheme" parent="Theme.MaterialComponents.Light.NoActionBar">
+        <item name="colorPrimary">@color/colorPrimary</item>
+        <item name="colorPrimaryDark">@color/colorPrimaryDark</item>
+        <item name="colorAccent">@color/colorAccent</item>
+        <item name="android:buttonStyle">@style/WhiteButtonStyle</item>
+    </style>
+
+    <style name="WhiteButtonStyle" parent="Widget.AppCompat.Button.Borderless">
+        <item name="android:background">@drawable/tab_unselected_bg</item>
+        <item name="android:textColor">@color/black</item>
+        <item name="android:textSize">15sp</item>
+        <item name="android:textStyle">bold</item>
+        <item name="backgroundTint">@android:color/white</item>
+    </style>
+
     <style name="CircleImageView" parent="">
         <item name="cornerFamily">rounded</item>
         <item name="cornerSize">50%</item>
     </style>
-    <style name="CustomBottomNavIndicator" parent="Widget.Material3.BottomNavigationView.ActiveIndicator">
-        <!-- Use a lighter shade, e.g., light gray or light accent -->
-        <item name="android:color">#E0E0E0</item> <!-- light gray -->
-        <item name="android:alpha">1.0</item>     <!-- fully visible -->
-    </style>
 
+    <style name="CustomBottomNavIndicator" parent="Widget.Material3.BottomNavigationView.ActiveIndicator">
+        <item name="android:color">#E0E0E0</item>
+        <item name="android:alpha">1.0</item>
+    </style>
 </resources>

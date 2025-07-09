@@ -85,7 +85,7 @@ class ProfilePostAdapter(
         val bundle = Bundle().apply {
             putString("projectId", project.id)
         }
-        view.findNavController().navigate(R.id.createProjectIdeaFragment, bundle)
+        view.findNavController().navigate(R.id.createPostFragment, bundle)
     }
 
 

@@ -44,8 +44,8 @@
         android:label="Home"
         tools:layout="@layout/fragment_home">
         <action
-            android:id="@+id/action_homeFragment_to_createProjectIdeaFragment"
-            app:destination="@id/createProjectIdeaFragment" />
+            android:id="@+id/action_homeFragment_to_createPostFragment"
+            app:destination="@id/createPostFragment" />
     </fragment>
 
     <fragment
@@ -59,14 +59,13 @@
             app:destination="@id/editProfileFragment" />
 
         <action
-            android:id="@+id/action_profileFragment_to_createProjectIdeaFragment"
-            app:destination="@id/createProjectIdeaFragment">
+            android:id="@+id/action_profileFragment_to_createPostFragment"
+            app:destination="@id/createPostFragment">
             <argument
                 android:name="projectId"
                 app:argType="string"
                 android:defaultValue="" />
         </action>
-
     </fragment>
 
     <fragment
@@ -78,18 +77,16 @@
         <action
             android:id="@+id/action_editProfileFragment_to_profileFragment"
             app:destination="@id/profileFragment" />
-
-
     </fragment>
 
-    <!-- Create Project Idea Fragment -->
+    <!-- Create Post Fragment -->
     <fragment
-        android:id="@+id/createProjectIdeaFragment"
-        android:name="com.first.projectswipe.projects.CreateProjectIdeaFragment"
-        android:label="Create Project Idea"
-        tools:layout="@layout/fragment_create_project_idea">
+        android:id="@+id/createPostFragment"
+        android:name="com.first.projectswipe.projects.CreatePostFragment"
+        android:label="Create Post"
+        tools:layout="@layout/fragment_create_post">
         <action
-            android:id="@+id/action_createProjectIdeaFragment_to_homeFragment"
+            android:id="@+id/action_createPostFragment_to_homeFragment"
             app:destination="@id/homeFragment" />
         <argument
             android:name="projectId"

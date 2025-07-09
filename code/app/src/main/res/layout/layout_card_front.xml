@@ -57,7 +57,6 @@
                             android:id="@+id/projectCreatorName"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:text="Alex Johnson"
                             android:textColor="#000000"
                             android:textStyle="bold"
                             android:textSize="14sp" />
@@ -66,7 +65,6 @@
                             android:id="@+id/projectCreatorUniversity"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:text="University of Alberta"
                             android:textColor="#777777"
                             android:textSize="12sp" />
                     </LinearLayout>
@@ -87,7 +85,6 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="16dp"
-                android:text="AI Writing Assistant"
                 android:textSize="20sp"
                 android:textStyle="bold"
                 android:textColor="#000000" />
@@ -98,7 +95,6 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="6dp"
-                android:text="Build an AI-powered writing assistant that helps students..."
                 android:textSize="14sp"
                 android:textColor="#444444"
                 android:maxLines="4"
