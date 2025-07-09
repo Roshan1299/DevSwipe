@@ -54,16 +54,6 @@
             android:textColor="#444444"
             android:paddingBottom="12dp" />
 
-        <TextView
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:text="Timeline:"
-            android:textSize="14sp"
-            android:textStyle="bold"
-            android:textColor="#000000"
-            android:layout_marginTop="8dp"
-            android:paddingBottom="4dp" />
-
         <!-- Timeline -->
         <TextView
             android:id="@+id/timeline"
