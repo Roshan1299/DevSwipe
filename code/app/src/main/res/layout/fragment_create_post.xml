@@ -2,7 +2,9 @@
 <ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="#FFFFFF">
+    android:background="#FFFFFF"
+    android:fillViewport="true"
+    android:scrollbars="vertical">
 
     <LinearLayout
         android:orientation="vertical"
@@ -31,6 +33,7 @@
                 android:layout_height="wrap_content"
                 android:text="New Post"
                 android:textStyle="bold"
+                android:textColor="@color/black"
                 android:textSize="20sp"
                 android:layout_centerHorizontal="true"
                 android:layout_alignParentTop="true"
@@ -99,6 +102,8 @@
             android:textColor="#1A6980"
             android:textColorHint="#1A6980"
             android:textSize="16sp"
+            android:minLines="3"
+            android:gravity="top|start"
             android:layout_marginBottom="16dp"/>
 
         <EditText
@@ -112,6 +117,7 @@
             android:textColorHint="#1A6980"
             android:textSize="16sp"
             android:minLines="4"
+            android:gravity="top|start"
             android:layout_marginBottom="16dp"/>
 
         <EditText
@@ -133,7 +139,7 @@
             android:layout_height="wrap_content"
             android:background="@drawable/edittext_bg"
             android:padding="20dp"
-            android:layout_marginBottom="45dp"
+            android:layout_marginBottom="16dp"
             android:clickable="true"
             android:focusable="true">
 
@@ -171,6 +177,20 @@
                     android:contentDescription="Decrease difficulty"/>
             </LinearLayout>
         </RelativeLayout>
+
+        <!-- GitHub Link Field -->
+        <EditText
+            android:id="@+id/githubLinkEditText"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:background="@drawable/edittext_bg"
+            android:hint="GitHub Link (Optional)"
+            android:padding="20dp"
+            android:textColor="#1A6980"
+            android:textColorHint="#1A6980"
+            android:textSize="16sp"
+            android:inputType="textUri"
+            android:layout_marginBottom="45dp"/>
 
         <Button
             android:id="@+id/saveProjectButton"
