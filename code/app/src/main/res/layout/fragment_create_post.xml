@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="#FFFFFF"
@@ -111,26 +112,65 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:background="@drawable/edittext_bg"
-            android:hint="Full Detailed Description"
+            android:hint="Full Detailed Description (4 lines max)"
             android:padding="20dp"
             android:textColor="#1A6980"
             android:textColorHint="#1A6980"
             android:textSize="16sp"
             android:minLines="4"
+            android:maxLines="4"
             android:gravity="top|start"
             android:layout_marginBottom="16dp"/>
 
-        <EditText
-            android:id="@+id/projectTagsEditText"
+        <!-- Tags Section -->
+        <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:background="@drawable/edittext_bg"
-            android:hint="Tags (e.g., AI, Web Dev, Design)"
-            android:padding="20dp"
-            android:textColor="#1A6980"
-            android:textColorHint="#1A6980"
-            android:textSize="16sp"
-            android:layout_marginBottom="16dp"/>
+            android:orientation="vertical"
+            android:layout_marginBottom="16dp">
+
+            <!-- Tag Input Row -->
+            <RelativeLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:background="@drawable/edittext_bg"
+                android:padding="20dp">
+
+                <EditText
+                    android:id="@+id/projectTagsEditText"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginEnd="40dp"
+                    android:background="@android:color/transparent"
+                    android:hint="Tags (e.g., AI, Web Dev, Design)"
+                    android:textColor="#1A6980"
+                    android:textColorHint="#1A6980"
+                    android:textSize="16sp"
+                    android:imeOptions="actionDone"
+                    android:maxLines="1"/>
+
+                <ImageView
+                    android:id="@+id/addTagButton"
+                    android:layout_width="24dp"
+                    android:layout_height="24dp"
+                    android:layout_alignParentEnd="true"
+                    android:layout_centerVertical="true"
+                    android:src="@android:drawable/ic_input_add"
+                    android:background="?attr/selectableItemBackgroundBorderless"
+                    android:contentDescription="Add tag"
+                    android:tint="#1A6980"/>
+            </RelativeLayout>
+
+            <!-- Tags Container -->
+            <com.google.android.flexbox.FlexboxLayout
+                android:id="@+id/tagsContainer"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="12dp"
+                app:flexWrap="wrap"
+                app:justifyContent="flex_start"
+                app:alignItems="flex_start" />
+        </LinearLayout>
 
         <!-- Difficulty Level Field -->
         <RelativeLayout
