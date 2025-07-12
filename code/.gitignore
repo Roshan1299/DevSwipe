@@ -1,3 +1,10 @@
+# macOS
+.DS_Store
+
+# Android Studio
+.idea/
+!.idea/codeStyles/Project.xml  # Only keep shared code style if needed
+
 *.iml
 .gradle
 /local.properties
