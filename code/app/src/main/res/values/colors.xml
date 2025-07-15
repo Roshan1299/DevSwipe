@@ -5,4 +5,12 @@
     <color name="colorPrimary">#6200EE</color>  <!-- Purple 500 -->
     <color name="colorPrimaryDark">#3700B3</color>  <!-- Purple 700 -->
     <color name="colorAccent">#03DAC6</color>
+    <color name="purple_primary">#6366F1</color>
+    <color name="purple_primary_light">#818CF8</color>
+    <color name="bottom_nav_background">#F8FAFC</color>
+    <color name="bottom_nav_border">#E2E8F0</color>
+    <color name="bottom_nav_icon_selected">#6366F1</color>
+    <color name="bottom_nav_icon_unselected">#64748B</color>
+    <color name="bottom_nav_text_selected">#6366F1</color>
+    <color name="bottom_nav_text_unselected">#64748B</color>
 </resources>
