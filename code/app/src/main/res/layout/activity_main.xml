@@ -15,16 +15,169 @@
         app:navGraph="@navigation/nav_graph"
         app:defaultNavHost="true" />
 
-    <!-- Bottom Navigation View -->
-    <com.google.android.material.bottomnavigation.BottomNavigationView
-        android:id="@+id/bottomNavigationView"
+    <!-- Custom Bottom Navigation -->
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:id="@+id/customBottomNav"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
+        android:layout_height="80dp"
         android:layout_gravity="bottom"
-        android:background="@android:color/white"
-        app:itemIconTint="@color/bottom_nav_color"
-        app:itemTextColor="@color/bottom_nav_color"
-        app:itemActiveIndicatorStyle="@style/CustomBottomNavIndicator"
-        app:menu="@menu/bottom_nav_menu" />
+        android:background="@drawable/bottom_nav_background"
+        android:elevation="8dp"
+        android:paddingHorizontal="16dp"
+        android:paddingVertical="8dp">
+
+        <!-- Collaborate Button -->
+        <LinearLayout
+            android:id="@+id/collaborateButton"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:gravity="center"
+            android:padding="8dp"
+            android:background="?attr/selectableItemBackgroundBorderless"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintEnd_toStartOf="@id/ideasButton"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintBottom_toBottomOf="parent">
+
+            <ImageView
+                android:id="@+id/collaborateIcon"
+                android:layout_width="24dp"
+                android:layout_height="24dp"
+                android:src="@drawable/ic_collaborate"
+                android:contentDescription="Collaborate"
+                app:tint="@color/bottom_nav_icon_color" />
+
+            <TextView
+                android:id="@+id/collaborateText"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Collaborate"
+                android:textSize="12sp"
+                android:textColor="@color/bottom_nav_text_color"
+                android:layout_marginTop="4dp"
+                 />
+
+        </LinearLayout>
+
+        <!-- Ideas Button -->
+        <LinearLayout
+            android:id="@+id/ideasButton"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:gravity="center"
+            android:padding="8dp"
+            android:background="?attr/selectableItemBackgroundBorderless"
+            app:layout_constraintStart_toEndOf="@id/collaborateButton"
+            app:layout_constraintEnd_toStartOf="@id/addButton"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintBottom_toBottomOf="parent">
+
+            <ImageView
+                android:id="@+id/ideasIcon"
+                android:layout_width="24dp"
+                android:layout_height="24dp"
+                android:src="@drawable/ic_ideas"
+                android:contentDescription="Ideas"
+                app:tint="@color/bottom_nav_icon_color" />
+
+            <TextView
+                android:id="@+id/ideasText"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Ideas"
+                android:textSize="12sp"
+                android:textColor="@color/bottom_nav_text_color"
+                android:layout_marginTop="4dp"
+                 />
+
+        </LinearLayout>
+
+        <!-- Add Button (Floating Action Button) -->
+        <com.google.android.material.floatingactionbutton.FloatingActionButton
+            android:id="@+id/addButton"
+            android:layout_width="56dp"
+            android:layout_height="56dp"
+            android:src="@drawable/ic_add_white"
+            android:contentDescription="Add"
+            app:backgroundTint="@color/purple_primary"
+            app:tint="@android:color/white"
+            app:elevation="6dp"
+            app:borderWidth="0dp"
+            app:layout_constraintStart_toEndOf="@id/ideasButton"
+            app:layout_constraintEnd_toStartOf="@id/chatButton"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintBottom_toBottomOf="parent" />
+
+        <!-- Chat Button -->
+        <LinearLayout
+            android:id="@+id/chatButton"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:gravity="center"
+            android:padding="8dp"
+            android:background="?attr/selectableItemBackgroundBorderless"
+            app:layout_constraintStart_toEndOf="@id/addButton"
+            app:layout_constraintEnd_toStartOf="@id/profileButton"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintBottom_toBottomOf="parent">
+
+            <ImageView
+                android:id="@+id/chatIcon"
+                android:layout_width="24dp"
+                android:layout_height="24dp"
+                android:src="@drawable/ic_chat"
+                android:contentDescription="Chat"
+                app:tint="@color/bottom_nav_icon_color" />
+
+            <TextView
+                android:id="@+id/chatText"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Chat"
+                android:textSize="12sp"
+                android:textColor="@color/bottom_nav_text_color"
+                android:layout_marginTop="4dp"
+               />
+
+        </LinearLayout>
+
+        <!-- Profile Button -->
+        <LinearLayout
+            android:id="@+id/profileButton"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:gravity="center"
+            android:padding="8dp"
+            android:background="?attr/selectableItemBackgroundBorderless"
+            app:layout_constraintStart_toEndOf="@id/chatButton"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintBottom_toBottomOf="parent">
+
+            <ImageView
+                android:id="@+id/profileIcon"
+                android:layout_width="24dp"
+                android:layout_height="24dp"
+                android:src="@drawable/ic_profile"
+                android:contentDescription="Profile"
+                app:tint="@color/bottom_nav_icon_color" />
+
+            <TextView
+                android:id="@+id/profileText"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Profile"
+                android:textSize="12sp"
+                android:textColor="@color/bottom_nav_text_color"
+                android:layout_marginTop="4dp"
+                 />
+
+        </LinearLayout>
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
 
 </androidx.coordinatorlayout.widget.CoordinatorLayout>
