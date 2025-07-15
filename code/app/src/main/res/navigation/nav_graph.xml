@@ -20,7 +20,7 @@
             android:id="@+id/action_loginFragment_to_registerFragment"
             app:destination="@id/registerFragment" />
         <action
-            android:id="@+id/action_loginFragment_to_homeFragment"
+            android:id="@+id/action_loginFragment_to_ideasFragment"
             app:destination="@id/homeFragment" />
     </fragment>
 
@@ -33,31 +33,52 @@
             android:id="@+id/action_registerFragment_to_loginFragment"
             app:destination="@id/loginFragment" />
         <action
-            android:id="@+id/action_registerFragment_to_homeFragment"
+            android:id="@+id/action_registerFragment_to_ideasFragment"
             app:destination="@id/homeFragment" />
     </fragment>
 
-    <!-- Home Fragment (Main Page with Tabs) -->
+    <!-- Ideas Fragment (Main/Home Page) -->
     <fragment
         android:id="@+id/homeFragment"
         android:name="com.first.projectswipe.home.HomeFragment"
-        android:label="Home"
+        android:label="Ideas"
         tools:layout="@layout/fragment_home">
         <action
-            android:id="@+id/action_homeFragment_to_createPostFragment"
+            android:id="@+id/action_ideasFragment_to_createPostFragment"
             app:destination="@id/createPostFragment" />
     </fragment>
 
+    <!-- Collaborate Fragment -->
+<!--    <fragment-->
+<!--        android:id="@+id/collaborateFragment"-->
+<!--        android:name="com.first.projectswipe.collaborate.CollaborateFragment"-->
+<!--        android:label="Collaborate"-->
+<!--        tools:layout="@layout/fragment_collaborate">-->
+<!--        <action-->
+<!--            android:id="@+id/action_collaborateFragment_to_createPostFragment"-->
+<!--            app:destination="@id/createPostFragment" />-->
+<!--    </fragment>-->
+
+    <!-- Chat Fragment -->
+<!--    <fragment-->
+<!--        android:id="@+id/chatFragment"-->
+<!--        android:name="com.first.projectswipe.chat.ChatFragment"-->
+<!--        android:label="Chat"-->
+<!--        tools:layout="@layout/fragment_chat">-->
+<!--        <action-->
+<!--            android:id="@+id/action_chatFragment_to_createPostFragment"-->
+<!--            app:destination="@id/createPostFragment" />-->
+<!--    </fragment>-->
+
+    <!-- Profile Fragment -->
     <fragment
         android:id="@+id/profileFragment"
         android:name="com.first.projectswipe.profile.ProfileFragment"
         android:label="Profile"
         tools:layout="@layout/fragment_profile">
-
         <action
             android:id="@+id/action_profileFragment_to_editProfileFragment"
             app:destination="@id/editProfileFragment" />
-
         <action
             android:id="@+id/action_profileFragment_to_createPostFragment"
             app:destination="@id/createPostFragment">
@@ -68,12 +89,12 @@
         </action>
     </fragment>
 
+    <!-- Edit Profile Fragment -->
     <fragment
         android:id="@+id/editProfileFragment"
         android:name="com.first.projectswipe.profile.EditProfileFragment"
         android:label="Edit Profile"
         tools:layout="@layout/fragment_edit_profile">
-
         <action
             android:id="@+id/action_editProfileFragment_to_profileFragment"
             app:destination="@id/profileFragment" />
@@ -86,7 +107,7 @@
         android:label="Create Post"
         tools:layout="@layout/fragment_create_post">
         <action
-            android:id="@+id/action_createPostFragment_to_homeFragment"
+            android:id="@+id/action_createPostFragment_to_ideasFragment"
             app:destination="@id/homeFragment" />
         <argument
             android:name="projectId"
