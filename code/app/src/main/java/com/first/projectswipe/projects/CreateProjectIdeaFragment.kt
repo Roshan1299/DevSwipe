@@ -84,13 +84,13 @@ class CreatePostFragment : Fragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        activity?.findViewById<View>(R.id.bottomNavigationView)?.visibility = View.GONE
+        activity?.findViewById<View>(R.id.customBottomNav)?.visibility = View.GONE
         updateTagsDisplay() // Initialize tags display
     }
 
     override fun onDestroyView() {
         super.onDestroyView()
-        activity?.findViewById<View>(R.id.bottomNavigationView)?.visibility = View.VISIBLE
+        activity?.findViewById<View>(R.id.customBottomNav)?.visibility = View.VISIBLE
     }
 
     private fun initializeViews(view: View) {
