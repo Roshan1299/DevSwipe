@@ -28,7 +28,7 @@
         <androidx.cardview.widget.CardView
             android:id="@+id/customBottomNav"
             android:layout_width="match_parent"
-            android:layout_height="130dp"
+            android:layout_height="match_parent"
             app:cardCornerRadius="44dp"
             app:cardElevation="10dp"
             app:cardBackgroundColor="@color/white"
@@ -69,7 +69,7 @@
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:text="Collaborate"
-                        android:textSize="13sp"
+                        android:textSize="12sp"
                         android:textColor="@color/bottom_nav_text_color"
                         android:layout_marginTop="2dp" />
                 </LinearLayout>
@@ -83,7 +83,7 @@
                     android:gravity="center"
                     android:background="?attr/selectableItemBackgroundBorderless"
                     app:layout_constraintStart_toEndOf="@id/collaborateButton"
-                    app:layout_constraintEnd_toStartOf="@id/addButton"
+                    app:layout_constraintEnd_toStartOf="@id/Randomahh"
                     app:layout_constraintTop_toTopOf="parent"
                     app:layout_constraintBottom_toBottomOf="parent"
                     app:layout_constraintHorizontal_weight="1">
@@ -107,7 +107,7 @@
 
                 <!-- Custom Square Add Button -->
                 <FrameLayout
-                    android:id="@+id/addButton"
+                    android:id="@+id/Randomahh"
                     android:layout_width="72dp"
                     android:layout_height="72dp"
                     app:layout_constraintTop_toTopOf="parent"
@@ -116,25 +116,6 @@
                     app:layout_constraintEnd_toStartOf="@id/chatButton"
                     android:layout_marginTop="0dp"
                     android:layout_marginBottom="0dp">
-
-                    <!-- Main purple square with rounded corners and shadow -->
-                    <View
-                        android:id="@+id/addButtonBg"
-                        android:layout_width="match_parent"
-                        android:layout_height="match_parent"
-                        android:background="@drawable/bg_add_btn"
-                        android:elevation="12dp"
-                        android:layout_gravity="center"
-                        />
-
-                    <ImageView
-                        android:id="@+id/addIcon"
-                        android:layout_width="40dp"
-                        android:layout_height="40dp"
-                        android:src="@drawable/ic_add_white"
-                        android:layout_gravity="center"
-                        android:tint="@android:color/white"
-                        android:layout_margin="16dp" />
                 </FrameLayout>
 
                 <!-- Chat Button -->
@@ -145,7 +126,7 @@
                     android:orientation="vertical"
                     android:gravity="center"
                     android:background="?attr/selectableItemBackgroundBorderless"
-                    app:layout_constraintStart_toEndOf="@id/addButton"
+                    app:layout_constraintStart_toEndOf="@id/Randomahh"
                     app:layout_constraintEnd_toStartOf="@id/profileButton"
                     app:layout_constraintTop_toTopOf="parent"
                     app:layout_constraintBottom_toBottomOf="parent"
@@ -199,7 +180,34 @@
                         android:layout_marginTop="2dp" />
                 </LinearLayout>
 
+
             </androidx.constraintlayout.widget.ConstraintLayout>
+
+
+        </androidx.cardview.widget.CardView>
+
+        <androidx.cardview.widget.CardView
+            android:id="@+id/addButtons"
+            android:layout_width="64dp"
+            android:layout_height="64dp"
+            android:layout_gravity="center_horizontal"
+            android:layout_marginBottom="10dp"
+            app:cardCornerRadius="32dp"
+            app:cardElevation="16dp"
+            android:clickable="true"
+            android:focusable="true"
+            app:cardBackgroundColor="@color/colorPrimary"
+            android:foreground="?attr/selectableItemBackgroundBorderless">
+
+            <ImageView
+                android:id="@+id/addIcon"
+                android:layout_width="32dp"
+                android:layout_height="32dp"
+                android:src="@drawable/ic_add_white"
+                android:layout_gravity="center"
+                app:tint="@color/white" />
+
         </androidx.cardview.widget.CardView>
     </FrameLayout>
+
 </androidx.coordinatorlayout.widget.CoordinatorLayout>
