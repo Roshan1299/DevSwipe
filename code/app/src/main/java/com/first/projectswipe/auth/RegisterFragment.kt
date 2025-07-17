@@ -52,7 +52,7 @@ class RegisterFragment : Fragment() {
         }
 
         binding.loginPrompt.setOnClickListener {
-            findNavController().navigate(R.id.action_registerFragment_to_homeFragment)
+            findNavController().navigate(R.id.action_registerFragment_to_ideasFragment)
         }
     }
 

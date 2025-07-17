@@ -100,7 +100,7 @@ class LoginFragment : Fragment() {
                 binding.progressIndicator.visibility = View.GONE
                 if (task.isSuccessful) {
                     // Navigate to FirstFragment after successful login
-                    findNavController().navigate(R.id.action_loginFragment_to_homeFragment)
+                    findNavController().navigate(R.id.action_loginFragment_to_ideasFragment)
                 } else {
                     // Show error message
                     Toast.makeText(context, "Login failed: ${task.exception?.message}", Toast.LENGTH_SHORT).show()
@@ -136,7 +136,7 @@ class LoginFragment : Fragment() {
                 binding.progressIndicator.visibility = View.GONE
                 if (task.isSuccessful) {
                     // Navigate to FirstFragment after successful Google Sign-In
-                    findNavController().navigate(R.id.action_loginFragment_to_homeFragment)
+                    findNavController().navigate(R.id.action_loginFragment_to_ideasFragment)
                 } else {
                     // Show error message
                     Toast.makeText(context, "Google Sign-In failed: ${task.exception?.message}", Toast.LENGTH_SHORT).show()

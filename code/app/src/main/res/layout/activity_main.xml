@@ -4,7 +4,8 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:id="@+id/mainContainer"
     android:layout_width="match_parent"
-    android:layout_height="match_parent">
+    android:layout_height="match_parent"
+    android:fitsSystemWindows="true">
 
     <!-- Fragment container -->
     <androidx.fragment.app.FragmentContainerView
@@ -15,16 +16,198 @@
         app:navGraph="@navigation/nav_graph"
         app:defaultNavHost="true" />
 
-    <!-- Bottom Navigation View -->
-    <com.google.android.material.bottomnavigation.BottomNavigationView
-        android:id="@+id/bottomNavigationView"
+    <!-- Floating bottom nav bar -->
+    <FrameLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_gravity="bottom"
-        android:background="@android:color/white"
-        app:itemIconTint="@color/bottom_nav_color"
-        app:itemTextColor="@color/bottom_nav_color"
-        app:itemActiveIndicatorStyle="@style/CustomBottomNavIndicator"
-        app:menu="@menu/bottom_nav_menu" />
+        android:layout_marginBottom="32dp"
+        android:layout_marginStart="8dp"
+        android:layout_marginEnd="8dp">
+
+        <androidx.cardview.widget.CardView
+            android:id="@+id/customBottomNav"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            app:cardCornerRadius="44dp"
+            app:cardElevation="10dp"
+            app:cardBackgroundColor="@color/white"
+            android:layout_gravity="center"
+            app:cardUseCompatPadding="true"
+            android:clipChildren="false"
+            android:clipToPadding="false">
+
+            <androidx.constraintlayout.widget.ConstraintLayout
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:paddingStart="12dp"
+                android:paddingEnd="12dp">
+
+                <!-- Collaborate Button -->
+                <LinearLayout
+                    android:id="@+id/collaborateButton"
+                    android:layout_width="0dp"
+                    android:layout_height="match_parent"
+                    android:orientation="vertical"
+                    android:gravity="center"
+                    android:background="?attr/selectableItemBackgroundBorderless"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintEnd_toStartOf="@id/ideasButton"
+                    app:layout_constraintTop_toTopOf="parent"
+                    app:layout_constraintBottom_toBottomOf="parent"
+                    app:layout_constraintHorizontal_weight="1">
+
+                    <ImageView
+                        android:id="@+id/collaborateIcon"
+                        android:layout_width="32dp"
+                        android:layout_height="32dp"
+                        android:src="@drawable/ic_collaborate"
+                        app:tint="@color/bottom_nav_icon_color" />
+
+                    <TextView
+                        android:id="@+id/collaborateText"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="Collaborate"
+                        android:textSize="12sp"
+                        android:textColor="@color/bottom_nav_text_color"
+                        android:layout_marginTop="2dp" />
+                </LinearLayout>
+
+                <!-- Ideas Button -->
+                <LinearLayout
+                    android:id="@+id/ideasButton"
+                    android:layout_width="0dp"
+                    android:layout_height="match_parent"
+                    android:orientation="vertical"
+                    android:gravity="center"
+                    android:background="?attr/selectableItemBackgroundBorderless"
+                    app:layout_constraintStart_toEndOf="@id/collaborateButton"
+                    app:layout_constraintEnd_toStartOf="@id/Randomahh"
+                    app:layout_constraintTop_toTopOf="parent"
+                    app:layout_constraintBottom_toBottomOf="parent"
+                    app:layout_constraintHorizontal_weight="1">
+
+                    <ImageView
+                        android:id="@+id/ideasIcon"
+                        android:layout_width="32dp"
+                        android:layout_height="32dp"
+                        android:src="@drawable/ic_ideas"
+                        app:tint="@color/bottom_nav_icon_color" />
+
+                    <TextView
+                        android:id="@+id/ideasText"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="Ideas"
+                        android:textSize="13sp"
+                        android:textColor="@color/bottom_nav_text_color"
+                        android:layout_marginTop="2dp" />
+                </LinearLayout>
+
+                <!-- Custom Square Add Button -->
+                <FrameLayout
+                    android:id="@+id/Randomahh"
+                    android:layout_width="72dp"
+                    android:layout_height="72dp"
+                    app:layout_constraintTop_toTopOf="parent"
+                    app:layout_constraintBottom_toBottomOf="parent"
+                    app:layout_constraintStart_toEndOf="@id/ideasButton"
+                    app:layout_constraintEnd_toStartOf="@id/chatButton"
+                    android:layout_marginTop="0dp"
+                    android:layout_marginBottom="0dp">
+                </FrameLayout>
+
+                <!-- Chat Button -->
+                <LinearLayout
+                    android:id="@+id/chatButton"
+                    android:layout_width="0dp"
+                    android:layout_height="match_parent"
+                    android:orientation="vertical"
+                    android:gravity="center"
+                    android:background="?attr/selectableItemBackgroundBorderless"
+                    app:layout_constraintStart_toEndOf="@id/Randomahh"
+                    app:layout_constraintEnd_toStartOf="@id/profileButton"
+                    app:layout_constraintTop_toTopOf="parent"
+                    app:layout_constraintBottom_toBottomOf="parent"
+                    app:layout_constraintHorizontal_weight="1">
+
+                    <ImageView
+                        android:id="@+id/chatIcon"
+                        android:layout_width="32dp"
+                        android:layout_height="32dp"
+                        android:src="@drawable/ic_chat"
+                        app:tint="@color/bottom_nav_icon_color" />
+
+                    <TextView
+                        android:id="@+id/chatText"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="Chat"
+                        android:textSize="13sp"
+                        android:textColor="@color/bottom_nav_text_color"
+                        android:layout_marginTop="2dp" />
+                </LinearLayout>
+
+                <!-- Profile Button -->
+                <LinearLayout
+                    android:id="@+id/profileButton"
+                    android:layout_width="0dp"
+                    android:layout_height="match_parent"
+                    android:orientation="vertical"
+                    android:gravity="center"
+                    android:background="?attr/selectableItemBackgroundBorderless"
+                    app:layout_constraintStart_toEndOf="@id/chatButton"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintTop_toTopOf="parent"
+                    app:layout_constraintBottom_toBottomOf="parent"
+                    app:layout_constraintHorizontal_weight="1">
+
+                    <ImageView
+                        android:id="@+id/profileIcon"
+                        android:layout_width="32dp"
+                        android:layout_height="32dp"
+                        android:src="@drawable/ic_profile"
+                        app:tint="@color/bottom_nav_icon_color" />
+
+                    <TextView
+                        android:id="@+id/profileText"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="Profile"
+                        android:textSize="13sp"
+                        android:textColor="@color/bottom_nav_text_color"
+                        android:layout_marginTop="2dp" />
+                </LinearLayout>
+
+
+            </androidx.constraintlayout.widget.ConstraintLayout>
+
+
+        </androidx.cardview.widget.CardView>
+
+        <androidx.cardview.widget.CardView
+            android:id="@+id/addButtons"
+            android:layout_width="64dp"
+            android:layout_height="64dp"
+            android:layout_gravity="center_horizontal"
+            android:layout_marginTop="15dp"
+            app:cardCornerRadius="32dp"
+            app:cardElevation="16dp"
+            android:clickable="true"
+            android:focusable="true"
+            app:cardBackgroundColor="@color/colorPrimary"
+            android:foreground="?attr/selectableItemBackgroundBorderless">
+
+            <ImageView
+                android:id="@+id/addIcon"
+                android:layout_width="32dp"
+                android:layout_height="32dp"
+                android:src="@drawable/ic_add_white"
+                android:layout_gravity="center"
+                app:tint="@color/white" />
+
+        </androidx.cardview.widget.CardView>
+    </FrameLayout>
 
 </androidx.coordinatorlayout.widget.CoordinatorLayout>
