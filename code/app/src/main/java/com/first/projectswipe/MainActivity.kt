@@ -31,8 +31,14 @@ class MainActivity : AppCompatActivity() {
         // Hide bottom nav on login/register screens
         navController.addOnDestinationChangedListener { _, destination, _ ->
             when (destination.id) {
-                R.id.loginFragment, R.id.registerFragment -> binding.customBottomNav.visibility = View.GONE
-                else -> binding.customBottomNav.visibility = View.VISIBLE
+                R.id.loginFragment, R.id.registerFragment -> {
+                    binding.customBottomNav.visibility = View.GONE
+                    binding.addButtons.visibility = View.GONE
+                }
+                else -> {
+                    binding.customBottomNav.visibility = View.VISIBLE
+                    binding.addButtons.visibility = View.VISIBLE
+                }
             }
         }
 
@@ -66,8 +72,9 @@ class MainActivity : AppCompatActivity() {
         }
 
         // Add button (floating action button)
-        binding.addButton.setOnClickListener {
-            navigateToFragment(R.id.createPostFragment)
+        binding.addButtons.setOnClickListener {
+//            navigateToFragment(R.id.createPostFragment)
+            handleAddButtonClick()
         }
 
         // Chat button
@@ -88,8 +95,41 @@ class MainActivity : AppCompatActivity() {
 
     private fun navigateToFragment(fragmentId: Int) {
         if (navController.currentDestination?.id != fragmentId) {
-            navController.navigate(fragmentId)
+            try {
+                navController.navigate(fragmentId)
+            } catch (e: IllegalArgumentException) {
+                // Handle navigation error gracefully
+                e.printStackTrace()
+            }
         }
+    }
+
+    private fun handleAddButtonClick() {
+        // Add button click animation
+        animateAddButton()
+
+        // Navigate to create post fragment
+        try {
+            navController.navigate(R.id.createPostFragment)
+        } catch (e: IllegalArgumentException) {
+            // Handle navigation error gracefully
+            e.printStackTrace()
+        }
+    }
+
+    private fun animateAddButton() {
+        binding.addButtons.animate()
+            .scaleX(1.1f)
+            .scaleY(1.1f)
+            .setDuration(100)
+            .withEndAction {
+                binding.addButtons.animate()
+                    .scaleX(1.0f)
+                    .scaleY(1.0f)
+                    .setDuration(100)
+                    .start()
+            }
+            .start()
     }
 
     private fun updateBottomNavSelection(selectedId: Int) {
