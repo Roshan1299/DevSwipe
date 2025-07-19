@@ -69,16 +69,6 @@
             android:padding="16dp"
             android:clipChildren="false"
             android:clipToPadding="false" />
-
-        <!-- Reset Button -->
-        <Button
-            android:id="@+id/resetButton"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="Reset Cards"
-            android:layout_gravity="center_horizontal"
-            android:layout_marginBottom="80dp"
-            android:textColor="@android:color/white" />
     </LinearLayout>
 
     <!-- SIDE NAVIGATION DRAWER -->

@@ -112,7 +112,7 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:background="@drawable/edittext_bg"
-            android:hint="Full Detailed Description (4 lines max)"
+            android:hint="Full Detailed Description"
             android:padding="20dp"
             android:textColor="#1A6980"
             android:textColorHint="#1A6980"
