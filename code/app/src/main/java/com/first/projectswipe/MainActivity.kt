@@ -28,10 +28,10 @@ class MainActivity : AppCompatActivity() {
         // Setup custom bottom navigation
         setupBottomNavigation()
 
-        // Hide bottom nav on login/register screens
+        // Hide bottom nav on login/register screens and CreatePostFragment
         navController.addOnDestinationChangedListener { _, destination, _ ->
             when (destination.id) {
-                R.id.loginFragment, R.id.registerFragment -> {
+                R.id.loginFragment, R.id.registerFragment, R.id.createPostFragment -> {
                     binding.customBottomNav.visibility = View.GONE
                     binding.addButtons.visibility = View.GONE
                 }
