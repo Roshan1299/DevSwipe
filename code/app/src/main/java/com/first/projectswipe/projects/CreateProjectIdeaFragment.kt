@@ -84,13 +84,8 @@ class CreatePostFragment : Fragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        activity?.findViewById<View>(R.id.customBottomNav)?.visibility = View.GONE
+        // Bottom navigation is already hidden by MainActivity's navigation listener
         updateTagsDisplay() // Initialize tags display
-    }
-
-    override fun onDestroyView() {
-        super.onDestroyView()
-        activity?.findViewById<View>(R.id.customBottomNav)?.visibility = View.VISIBLE
     }
 
     private fun initializeViews(view: View) {
@@ -198,6 +193,30 @@ class CreatePostFragment : Fragment() {
     }
 
     private fun setupTextLimits() {
+        // Limit preview description to 2 lines
+        previewDescriptionEditText.maxLines = 2
+        previewDescriptionEditText.filters = arrayOf(
+            InputFilter.LengthFilter(60),
+            object : InputFilter {
+                override fun filter(
+                    source: CharSequence?,
+                    start: Int,
+                    end: Int,
+                    dest: Spanned?,
+                    dstart: Int,
+                    dend: Int
+                ): CharSequence? {
+                    val newText = dest.toString().substring(0, dstart) +
+                            source.toString().substring(start, end) +
+                            dest.toString().substring(dend)
+
+                    // Prevent more than 2 manual line breaks
+                    return if (newText.split("\n").size > 2) "" else null
+                }
+            }
+        )
+
+        // Limit full description to 4 lines
         fullDescriptionEditText.filters = arrayOf(object : InputFilter {
             override fun filter(
                 source: CharSequence?,
