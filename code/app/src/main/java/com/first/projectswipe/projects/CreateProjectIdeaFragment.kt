@@ -51,18 +51,20 @@ class CreatePostFragment : Fragment() {
 
     // Tag management
     private val selectedTags = mutableListOf<String>()
-    private val maxTags = 8
+    private val maxTags = 5
     private val maxTagLength = 20
 
     // Popular tech stack suggestions
     private val popularTags = listOf(
-        "React", "Vue", "Angular", "JavaScript", "TypeScript",
-        "Python", "Java", "Kotlin", "Swift", "C++",
-        "Node.js", "Express", "Django", "Flask", "Spring",
-        "MongoDB", "PostgreSQL", "MySQL", "Firebase", "AWS",
-        "Docker", "Kubernetes", "Git", "GraphQL", "REST API",
-        "Machine Learning", "AI", "Data Science", "Web Dev", "Mobile",
-        "UI/UX", "Frontend", "Backend", "Full Stack", "DevOps"
+        "Web Dev",
+        "Python",
+        "AI/ML",
+        "JavaScript",
+        "Kotlin",
+        "Data Science",
+        "DevOps",
+        "Docker",
+        "C++"
     )
 
     override fun onCreateView(
@@ -165,10 +167,10 @@ class CreatePostFragment : Fragment() {
             tagsContainer.addView(createSelectedTagChip(tag))
         }
 
-        // Add popular tags (up to a maximum to prevent overcrowding)
-        val remainingSpace = maxTags - selectedTags.size
+        // Always show at least 8 popular tags (or all available if less than 8)
+        // Filter out already selected tags and show up to 8 popular tags
         popularTags.filter { !selectedTags.contains(it) }
-            .take(remainingSpace.coerceAtMost(10))
+            .take(8) // Always show up to 8 popular tags
             .forEach { tag ->
                 tagsContainer.addView(createPopularTagChip(tag))
             }
