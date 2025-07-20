@@ -42,19 +42,13 @@ class HomeFragment : Fragment() {
         cardContainer = view.findViewById(R.id.cardStackContainer)
         val toolbar = view.findViewById<View>(R.id.toolbar)
         val hamburgerButton = toolbar.findViewById<ImageButton>(R.id.hamburgerButton)
-        val resetButton = view.findViewById<Button>(R.id.resetButton)
-
         (requireActivity() as AppCompatActivity).setSupportActionBar(toolbar as androidx.appcompat.widget.Toolbar)
 
         hamburgerButton.setOnClickListener {
             drawerLayout.openDrawer(GravityCompat.START)
         }
 
-        resetButton.setOnClickListener {
-            val prefs = requireContext().getSharedPreferences("SwipePrefs", Context.MODE_PRIVATE)
-            prefs.edit().putInt("swipe_index", 0).apply()
-            cardStackManager.resetToStart()
-        }
+
 
         navigationView.setNavigationItemSelectedListener { menuItem ->
             when (menuItem.itemId) {

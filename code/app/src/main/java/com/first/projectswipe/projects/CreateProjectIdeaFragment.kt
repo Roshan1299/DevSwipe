@@ -51,18 +51,20 @@ class CreatePostFragment : Fragment() {
 
     // Tag management
     private val selectedTags = mutableListOf<String>()
-    private val maxTags = 8
+    private val maxTags = 5
     private val maxTagLength = 20
 
     // Popular tech stack suggestions
     private val popularTags = listOf(
-        "React", "Vue", "Angular", "JavaScript", "TypeScript",
-        "Python", "Java", "Kotlin", "Swift", "C++",
-        "Node.js", "Express", "Django", "Flask", "Spring",
-        "MongoDB", "PostgreSQL", "MySQL", "Firebase", "AWS",
-        "Docker", "Kubernetes", "Git", "GraphQL", "REST API",
-        "Machine Learning", "AI", "Data Science", "Web Dev", "Mobile",
-        "UI/UX", "Frontend", "Backend", "Full Stack", "DevOps"
+        "Web Dev",
+        "Python",
+        "AI/ML",
+        "JavaScript",
+        "Kotlin",
+        "Data Science",
+        "DevOps",
+        "Docker",
+        "C++"
     )
 
     override fun onCreateView(
@@ -84,13 +86,8 @@ class CreatePostFragment : Fragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        activity?.findViewById<View>(R.id.customBottomNav)?.visibility = View.GONE
+        // Bottom navigation is already hidden by MainActivity's navigation listener
         updateTagsDisplay() // Initialize tags display
-    }
-
-    override fun onDestroyView() {
-        super.onDestroyView()
-        activity?.findViewById<View>(R.id.customBottomNav)?.visibility = View.VISIBLE
     }
 
     private fun initializeViews(view: View) {
@@ -170,10 +167,10 @@ class CreatePostFragment : Fragment() {
             tagsContainer.addView(createSelectedTagChip(tag))
         }
 
-        // Add popular tags (up to a maximum to prevent overcrowding)
-        val remainingSpace = maxTags - selectedTags.size
+        // Always show at least 8 popular tags (or all available if less than 8)
+        // Filter out already selected tags and show up to 8 popular tags
         popularTags.filter { !selectedTags.contains(it) }
-            .take(remainingSpace.coerceAtMost(10))
+            .take(8) // Always show up to 8 popular tags
             .forEach { tag ->
                 tagsContainer.addView(createPopularTagChip(tag))
             }
@@ -198,6 +195,30 @@ class CreatePostFragment : Fragment() {
     }
 
     private fun setupTextLimits() {
+        // Limit preview description to 2 lines
+        previewDescriptionEditText.maxLines = 2
+        previewDescriptionEditText.filters = arrayOf(
+            InputFilter.LengthFilter(60),
+            object : InputFilter {
+                override fun filter(
+                    source: CharSequence?,
+                    start: Int,
+                    end: Int,
+                    dest: Spanned?,
+                    dstart: Int,
+                    dend: Int
+                ): CharSequence? {
+                    val newText = dest.toString().substring(0, dstart) +
+                            source.toString().substring(start, end) +
+                            dest.toString().substring(dend)
+
+                    // Prevent more than 2 manual line breaks
+                    return if (newText.split("\n").size > 2) "" else null
+                }
+            }
+        )
+
+        // Limit full description to 4 lines
         fullDescriptionEditText.filters = arrayOf(object : InputFilter {
             override fun filter(
                 source: CharSequence?,
