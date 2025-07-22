@@ -12,7 +12,7 @@
         android:layout_height="match_parent"
         android:orientation="vertical">
 
-        <!-- Toolbar with hamburger + center title -->
+        <!-- Toolbar with hamburger + center logo + filter -->
         <androidx.appcompat.widget.Toolbar
             android:id="@+id/toolbar"
             android:layout_width="match_parent"
@@ -20,40 +20,74 @@
             android:background="@android:color/white"
             android:theme="@style/ThemeOverlay.AppCompat.Light"
             android:elevation="4dp"
+            android:contentInsetStart="0dp"
+            android:contentInsetLeft="0dp"
+            android:contentInsetStartWithNavigation="0dp"
+            app:contentInsetStart="0dp"
+            app:contentInsetLeft="0dp"
             app:contentInsetStartWithNavigation="0dp"
             app:popupTheme="@style/ThemeOverlay.AppCompat.Light">
 
-            <ImageButton
-                android:id="@+id/hamburgerButton"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_gravity="start"
-                android:layout_marginStart="12dp"
-                android:layout_marginTop="6dp"
-                android:background="?attr/selectableItemBackgroundBorderless"
-                android:src="@drawable/ic_menu"
-                android:contentDescription="Open drawer"
-                android:tint="@android:color/black" />
-
-
-            <FrameLayout
+            <!-- Full width container for proper centering -->
+            <RelativeLayout
                 android:layout_width="match_parent"
                 android:layout_height="match_parent">
 
-                <!-- Centered Title -->
-                <TextView
-                    android:id="@+id/toolbar_title"
+                <!-- Hamburger Button - Left -->
+                <ImageButton
+                    android:id="@+id/hamburgerButton"
+                    android:layout_width="48dp"
+                    android:layout_height="48dp"
+                    android:layout_marginStart="8dp"
+                    android:layout_alignParentStart="true"
+                    android:layout_centerVertical="true"
+                    android:background="?attr/selectableItemBackgroundBorderless"
+                    android:src="@drawable/ic_menu"
+                    android:contentDescription="Open drawer"
+                    android:tint="@android:color/black" />
+
+                <!-- Filter Button - Right -->
+                <ImageButton
+                    android:id="@+id/filterButton"
+                    android:layout_width="48dp"
+                    android:layout_height="48dp"
+                    android:layout_alignParentEnd="true"
+                    android:layout_centerVertical="true"
+                    android:layout_marginEnd="8dp"
+                    android:background="?attr/selectableItemBackgroundBorderless"
+                    android:src="@android:drawable/ic_menu_sort_by_size"
+                    android:contentDescription="Filter projects"
+                    android:tint="@android:color/black" />
+
+                <!-- Centered DevSwipe Logo with Text -->
+                <LinearLayout
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:layout_gravity="center"
-                    android:text="ProjectSwipe"
-                    android:fontFamily="sans-serif-black"
-                    android:textColor="@android:color/black"
-                    android:textStyle="bold"
-                    android:textSize="30sp" />
-            </FrameLayout>
-        </androidx.appcompat.widget.Toolbar>
+                    android:layout_centerInParent="true"
+                    android:orientation="horizontal"
+                    android:gravity="center_vertical">
 
+                    <ImageView
+                        android:id="@+id/toolbar_logo_icon"
+                        android:layout_width="45dp"
+                        android:layout_height="45dp"
+                        android:src="@mipmap/ic_launcher"
+                        android:scaleType="fitCenter"
+                        android:adjustViewBounds="true"
+                        android:contentDescription="DevSwipe Icon" />
+
+                    <TextView
+                        android:id="@+id/toolbar_logo_text"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="DevSwipe"
+                        android:textColor="#2196F3"
+                        android:textStyle="bold"
+                        android:textSize="24sp" />
+                </LinearLayout>
+
+            </RelativeLayout>
+        </androidx.appcompat.widget.Toolbar>
 
         <View
             android:layout_width="match_parent"

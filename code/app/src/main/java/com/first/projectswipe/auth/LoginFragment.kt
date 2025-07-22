@@ -3,10 +3,12 @@ package com.first.projectswipe.auth
 import android.content.Intent
 import android.os.Bundle
 import android.util.Log
+import android.util.Patterns
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.Toast
+import androidx.core.widget.doOnTextChanged
 import androidx.fragment.app.Fragment
 import androidx.navigation.fragment.findNavController
 import com.first.projectswipe.R
@@ -42,68 +44,130 @@ class LoginFragment : Fragment() {
         super.onViewCreated(view, savedInstanceState)
 
         try {
-            // Get Firebase Auth instance directly
-            // MainActivity should have already initialized Firebase
-            auth = FirebaseAuth.getInstance()
-            Log.d(TAG, "Firebase Auth instance obtained successfully")
-
-            // Configure Google Sign-In
-            val gso = GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
-                .requestIdToken(getString(R.string.default_web_client_id))
-                .requestEmail()
-                .build()
-            googleSignInClient = GoogleSignIn.getClient(requireActivity(), gso)
-
-            // Handle email/password login
-            binding.loginButton.setOnClickListener {
-                val email = binding.emailInput.text.toString()
-                val password = binding.passwordInput.text.toString()
-
-                if (validateInputs(email, password)) {
-                    binding.progressIndicator.visibility = View.VISIBLE
-                    loginWithFirebase(email, password)
-                }
-            }
-
-            // Handle Google Sign-In button click
-            binding.googleSignInButton.setOnClickListener {
-                signInWithGoogle()
-            }
-
-            // Navigate to Register screen
-            binding.registerPrompt.setOnClickListener {
-                findNavController().navigate(R.id.action_loginFragment_to_registerFragment)
-            }
-
-            // Navigate to Reset Password screen
-            binding.forgotPasswordText.setOnClickListener {
-                // Use Navigation Component to navigate to ResetPasswordFragment
-            }
+            setupFirebaseAuth()
+            setupUI()
+            setupClickListeners()
+            setupTextWatchers()
         } catch (e: Exception) {
             Log.e(TAG, "Error in LoginFragment initialization: ${e.message}", e)
-            Toast.makeText(context, "Login initialization failed: ${e.message}", Toast.LENGTH_LONG).show()
+            showToast("Login initialization failed: ${e.message}")
         }
     }
 
-    // Rest of the methods remain the same...
-    private fun validateInputs(email: String, password: String): Boolean {
-        if (email.isEmpty() || password.isEmpty()) {
-            Toast.makeText(context, "Email and password cannot be empty", Toast.LENGTH_SHORT).show()
-            return false
+    private fun setupFirebaseAuth() {
+        // Get Firebase Auth instance
+        auth = FirebaseAuth.getInstance()
+        Log.d(TAG, "Firebase Auth instance obtained successfully")
+
+        // Configure Google Sign-In
+        val gso = GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
+            .requestIdToken(getString(R.string.default_web_client_id))
+            .requestEmail()
+            .build()
+        googleSignInClient = GoogleSignIn.getClient(requireActivity(), gso)
+    }
+
+    private fun setupUI() {
+        // Initially disable login button
+        updateLoginButtonState()
+    }
+
+    private fun setupClickListeners() {
+        binding.loginButton.setOnClickListener {
+            val email = binding.emailInput.text.toString().trim()
+            val password = binding.passwordInput.text.toString()
+
+            if (validateInputs(email, password)) {
+                loginWithFirebase(email, password)
+            }
         }
-        return true
+
+        binding.forgotPasswordText.setOnClickListener {
+            findNavController().navigate(R.id.action_loginFragment_to_resetPasswordFragment)
+        }
+
+        binding.registerPrompt.setOnClickListener {
+            findNavController().navigate(R.id.action_loginFragment_to_registerFragment)
+        }
+    }
+
+    private fun setupTextWatchers() {
+        binding.emailInput.doOnTextChanged { _, _, _, _ ->
+            updateLoginButtonState()
+            clearEmailError()
+        }
+
+        binding.passwordInput.doOnTextChanged { _, _, _, _ ->
+            updateLoginButtonState()
+            clearPasswordError()
+        }
+    }
+
+    private fun updateLoginButtonState() {
+        val email = binding.emailInput.text.toString().trim()
+        val password = binding.passwordInput.text.toString()
+
+        binding.loginButton.isEnabled = email.isNotEmpty() && password.isNotEmpty()
+
+        // Update button appearance based on state
+        binding.loginButton.alpha = if (binding.loginButton.isEnabled) 1.0f else 0.6f
+    }
+
+    private fun validateInputs(email: String, password: String): Boolean {
+        var isValid = true
+
+        // Validate email
+        if (email.isEmpty()) {
+            binding.emailLayout.error = "Email is required"
+            isValid = false
+        } else if (!Patterns.EMAIL_ADDRESS.matcher(email).matches()) {
+            binding.emailLayout.error = "Please enter a valid email address"
+            isValid = false
+        }
+
+        // Validate password
+        if (password.isEmpty()) {
+            binding.passwordLayout.error = "Password is required"
+            isValid = false
+        } else if (password.length < 6) {
+            binding.passwordLayout.error = "Password must be at least 6 characters"
+            isValid = false
+        }
+
+        return isValid
+    }
+
+    private fun clearEmailError() {
+        binding.emailLayout.error = null
+    }
+
+    private fun clearPasswordError() {
+        binding.passwordLayout.error = null
     }
 
     private fun loginWithFirebase(email: String, password: String) {
+        showLoading(true)
+
         auth.signInWithEmailAndPassword(email, password)
             .addOnCompleteListener { task ->
-                binding.progressIndicator.visibility = View.GONE
+                showLoading(false)
+
                 if (task.isSuccessful) {
-                    // Navigate to FirstFragment after successful login
+                    Log.d(TAG, "signInWithEmail:success")
+                    val user = auth.currentUser
+                    showToast("Welcome back, ${user?.email}")
+
+                    // Navigate to main screen
                     findNavController().navigate(R.id.action_loginFragment_to_ideasFragment)
                 } else {
-                    // Show error message
-                    Toast.makeText(context, "Login failed: ${task.exception?.message}", Toast.LENGTH_SHORT).show()
+                    Log.w(TAG, "signInWithEmail:failure", task.exception)
+                    val errorMessage = when (task.exception?.message) {
+                        "The email address is badly formatted." -> "Please enter a valid email address"
+                        "There is no user record corresponding to this identifier. The user may have been deleted." -> "No account found with this email"
+                        "The password is invalid or the user does not have a password." -> "Incorrect password"
+                        else -> "Login failed. Please try again."
+                    }
+                    showToast(errorMessage)
                 }
             }
     }
@@ -120,28 +184,56 @@ class LoginFragment : Fragment() {
             val task = GoogleSignIn.getSignedInAccountFromIntent(data)
             try {
                 val account = task.getResult(ApiException::class.java)
+                Log.d(TAG, "firebaseAuthWithGoogle:" + account.id)
                 account?.idToken?.let { firebaseAuthWithGoogle(it) }
             } catch (e: ApiException) {
-                // Handle Google Sign-In failure
-                Toast.makeText(context, "Google Sign-In failed: ${e.statusCode}", Toast.LENGTH_SHORT).show()
+                Log.w(TAG, "Google sign in failed", e)
+                showToast("Google Sign-In failed")
             }
         }
     }
 
     private fun firebaseAuthWithGoogle(idToken: String) {
-        binding.progressIndicator.visibility = View.VISIBLE
+        showLoading(true)
+
         val credential = GoogleAuthProvider.getCredential(idToken, null)
         auth.signInWithCredential(credential)
-            .addOnCompleteListener { task ->
-                binding.progressIndicator.visibility = View.GONE
+            .addOnCompleteListener(requireActivity()) { task ->
+                showLoading(false)
+
                 if (task.isSuccessful) {
-                    // Navigate to FirstFragment after successful Google Sign-In
+                    Log.d(TAG, "signInWithCredential:success")
+                    val user = auth.currentUser
+                    showToast("Welcome, ${user?.displayName}")
+
+                    // Navigate to main screen
                     findNavController().navigate(R.id.action_loginFragment_to_ideasFragment)
                 } else {
-                    // Show error message
-                    Toast.makeText(context, "Google Sign-In failed: ${task.exception?.message}", Toast.LENGTH_SHORT).show()
+                    Log.w(TAG, "signInWithCredential:failure", task.exception)
+                    showToast("Authentication failed")
                 }
             }
+    }
+
+    private fun showLoading(isLoading: Boolean) {
+        binding.progressIndicator.visibility = if (isLoading) View.VISIBLE else View.GONE
+        binding.loginButton.isEnabled = !isLoading
+        binding.emailInput.isEnabled = !isLoading
+        binding.passwordInput.isEnabled = !isLoading
+    }
+
+    private fun showToast(message: String) {
+        Toast.makeText(context, message, Toast.LENGTH_SHORT).show()
+    }
+
+    override fun onStart() {
+        super.onStart()
+        // Check if user is signed in and update UI accordingly
+        val currentUser = auth.currentUser
+        if (currentUser != null) {
+            // User is already signed in, navigate to main screen
+            findNavController().navigate(R.id.action_loginFragment_to_ideasFragment)
+        }
     }
 
     override fun onDestroyView() {

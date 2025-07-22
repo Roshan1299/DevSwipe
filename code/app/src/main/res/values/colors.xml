@@ -9,8 +9,9 @@
     <color name="purple_primary_light">#818CF8</color>
     <color name="bottom_nav_background">#F8FAFC</color>
     <color name="bottom_nav_border">#E2E8F0</color>
-    <color name="bottom_nav_icon_selected">#6366F1</color>
+    <color name="bottom_nav_icon_selected">#1FB6FF</color>
     <color name="bottom_nav_icon_unselected">#64748B</color>
-    <color name="bottom_nav_text_selected">#6366F1</color>
+    <color name="bottom_nav_text_selected">#1FB6FF</color>
     <color name="bottom_nav_text_unselected">#64748B</color>
+    <color name="Icon_blue">#1FB6FF</color>
 </resources>
