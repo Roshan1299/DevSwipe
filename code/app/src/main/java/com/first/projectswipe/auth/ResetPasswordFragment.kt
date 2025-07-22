@@ -101,12 +101,7 @@ class ResetPasswordFragment : Fragment() {
         } else if (!Patterns.EMAIL_ADDRESS.matcher(email).matches()) {
             binding.emailLayout.error = "Please enter a valid email address"
             isValid = false
-        } else if (!email.contains("university") && !email.contains("edu") && !email.contains("ac.")) {
-            // Optional: Add university email validation
-            binding.emailLayout.error = "Please enter a valid university email address"
-            isValid = false
         }
-
         return isValid
     }
 

@@ -4,15 +4,17 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:fillViewport="true"
+    android:fillViewport="false"
     android:fitsSystemWindows="true"
-    android:background="#FFFFFF">
+    android:background="#FFFFFF"
+    android:overScrollMode="ifContentScrolls">
 
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="vertical"
-        android:padding="24dp">
+        android:padding="24dp"
+        android:paddingBottom="80dp">
 
         <!-- Logo -->
         <ImageView
@@ -76,7 +78,8 @@
                         android:hint="Full Name"
                         android:inputType="textPersonName"
                         android:textColor="@android:color/black"
-                        android:textColorHint="@android:color/darker_gray"/>
+                        android:textColorHint="@android:color/darker_gray"
+                        android:imeOptions="actionNext"/>
                 </com.google.android.material.textfield.TextInputLayout>
 
                 <Space
@@ -99,7 +102,8 @@
                         android:hint="University Email"
                         android:inputType="textEmailAddress"
                         android:textColor="@android:color/black"
-                        android:textColorHint="@android:color/darker_gray"/>
+                        android:textColorHint="@android:color/darker_gray"
+                        android:imeOptions="actionNext"/>
                 </com.google.android.material.textfield.TextInputLayout>
 
                 <Space
@@ -123,7 +127,8 @@
                         android:hint="Password"
                         android:inputType="textPassword"
                         android:textColor="@android:color/black"
-                        android:textColorHint="@android:color/darker_gray"/>
+                        android:textColorHint="@android:color/darker_gray"
+                        android:imeOptions="actionNext"/>
                 </com.google.android.material.textfield.TextInputLayout>
 
                 <Space
@@ -147,7 +152,8 @@
                         android:hint="Confirm Password"
                         android:inputType="textPassword"
                         android:textColor="@android:color/black"
-                        android:textColorHint="@android:color/darker_gray"/>
+                        android:textColorHint="@android:color/darker_gray"
+                        android:imeOptions="actionNext"/>
                 </com.google.android.material.textfield.TextInputLayout>
 
                 <Space
@@ -172,7 +178,8 @@
                         android:inputType="none"
                         android:focusable="false"
                         android:textColor="@android:color/black"
-                        android:textColorHint="@android:color/darker_gray"/>
+                        android:textColorHint="@android:color/darker_gray"
+                        android:imeOptions="actionDone"/>
                 </com.google.android.material.textfield.TextInputLayout>
 
                 <Space
