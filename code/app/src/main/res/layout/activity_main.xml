@@ -196,7 +196,7 @@
             app:cardElevation="16dp"
             android:clickable="true"
             android:focusable="true"
-            app:cardBackgroundColor="@color/colorPrimary"
+            app:cardBackgroundColor="#1FB6FF"
             android:foreground="?attr/selectableItemBackgroundBorderless">
 
             <ImageView
