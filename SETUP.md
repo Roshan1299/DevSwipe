@@ -51,75 +51,15 @@ Android Studio will automatically start syncing the project. If it doesn't:
 
 ## 🔥 Firebase Configuration
 
-### Step 1: Create Firebase Project
+**Important**: Before running the app, you must complete the Firebase setup. Please follow the detailed instructions in `FIREBASE_SETUP.md` to:
 
-1. Go to [Firebase Console](https://console.firebase.google.com/)
-2. Click **"Create a project"** or **"Add project"**
-3. Enter project name: `ProjectSwipe` (or your preferred name)
-4. **Disable** Google Analytics (optional for development)
-5. Click **"Create project"**
+- Create a Firebase project
+- Configure Authentication (Email/Password + Google Sign-In)
+- Set up Firestore Database
+- Enable Cloud Messaging
+- Download and place the `google-services.json` file
 
-### Step 2: Add Android App to Firebase
-
-1. In Firebase Console, click **"Add app"** → **Android**
-2. Enter the following details:
-   ```
-   Android package name: com.yourname.projectswipe
-   App nickname: ProjectSwipe
-   Debug signing certificate SHA-1: (optional for development)
-   ```
-3. Click **"Register app"**
-
-### Step 3: Download Configuration File
-
-1. Download the `google-services.json` file
-2. Place it in your app module directory:
-   ```
-   ProjectSwipe/
-   └── app/
-       └── google-services.json  ← Place here
-   ```
-
-### Step 4: Enable Firebase Services
-
-In Firebase Console, enable the following services:
-
-#### Authentication
-1. Go to **Authentication → Sign-in method**
-2. Enable **Email/Password**
-3. Enable **Google** sign-in
-   - Add your app's SHA-1 fingerprint (for release builds)
-   - Download updated `google-services.json` if prompted
-
-#### Firestore Database
-1. Go to **Firestore Database**
-2. Click **"Create database"**
-3. Select **"Start in test mode"** (for development)
-4. Choose your preferred location (closest to your users)
-
-#### Cloud Messaging (FCM)
-1. Go to **Cloud Messaging**
-2. FCM is automatically enabled when you add the Android app
-
-### Step 5: Get SHA-1 Fingerprint (For Google Sign-In)
-
-Run this command in your project terminal:
-
-```bash
-# For debug builds (development)
-./gradlew signingReport
-
-# Or use keytool directly
-keytool -list -v -alias androiddebugkey -keystore ~/.android/debug.keystore
-```
-
-Default password for debug keystore: `android`
-
-Copy the SHA-1 fingerprint and add it to your Firebase project:
-1. Go to **Project Settings → General**
-2. Scroll to **Your apps** → **ProjectSwipe**
-3. Click **"Add fingerprint"**
-4. Paste the SHA-1 fingerprint
+The app will not function properly without proper Firebase configuration.
 
 ## 📱 Android Studio Configuration
 
@@ -227,11 +167,12 @@ android {
 
 ### Method 1: Using Android Studio
 
-1. Connect your Android device via USB (with USB Debugging enabled)
+1. **Complete Firebase setup first** (see `FIREBASE_SETUP.md`)
+2. Connect your Android device via USB (with USB Debugging enabled)
    - Or start your AVD from AVD Manager
-2. Click the **"Run"** button (green play icon)
-3. Select your device/emulator
-4. Wait for the build to complete and app to launch
+3. Click the **"Run"** button (green play icon)
+4. Select your device/emulator
+5. Wait for the build to complete and app to launch
 
 ### Method 2: Using Command Line
 
@@ -252,17 +193,15 @@ android {
 - App should launch without crashes
 - You should see the authentication screen
 
-### 2. Firebase Connection Test
+### 2. Authentication Test
 - Try creating an account with email/password
-- Verify user appears in Firebase Console → Authentication
+- Test Google Sign-In functionality
+- Verify users appear in Firebase Console
 
-### 3. Google Sign-In Test
-- Try signing in with Google
-- Verify SHA-1 fingerprint is correctly configured if this fails
-
-### 4. Database Test
+### 3. Core Features Test
 - Complete post-registration setup (skills & interests)
-- Verify data appears in Firebase Console → Firestore
+- Test project swiping interface
+- Verify data synchronization with Firestore
 
 ## 🛠️ Troubleshooting
 
@@ -287,14 +226,15 @@ Solution: Update gradle wrapper
 
 **Issue**: `FirebaseApp is not initialized`
 ```
-Solution: Ensure google-services.json is in app/ directory
+Solution: Complete Firebase setup following FIREBASE_SETUP.md
+Ensure google-services.json is in app/ directory
 Check that google-services plugin is applied in build.gradle
 ```
 
-**Issue**: `Google Sign-In failed`
+**Issue**: Authentication or database errors
 ```
-Solution: Verify SHA-1 fingerprint is added to Firebase project
-Ensure Google Sign-In is enabled in Firebase Console
+Solution: Refer to FIREBASE_SETUP.md for detailed configuration
+Verify all Firebase services are properly enabled
 ```
 
 #### Runtime Issues
@@ -304,6 +244,7 @@ Ensure Google Sign-In is enabled in Firebase Console
 Solution: Check Android Studio Logcat for error details
 Verify minimum SDK version (API 24+)
 Clear app data and restart
+Ensure Firebase is properly configured
 ```
 
 ### Getting Debug Information
@@ -343,7 +284,6 @@ git push origin feature/your-feature-name
 
 ### Documentation
 - [Android Developer Guide](https://developer.android.com/guide)
-- [Firebase Android Documentation](https://firebase.google.com/docs/android/setup)
 - [Kotlin for Android](https://developer.android.com/kotlin)
 - [Material Design Components](https://material.io/develop/android)
 
@@ -366,18 +306,18 @@ git push origin feature/your-feature-name
 
 Once you have the app running:
 
-1. **Explore the Codebase**: Familiarize yourself with the project structure
-2. **Check the MVP Features**: Test authentication, project creation, and swiping
-3. **Review Database Schema**: See `DATABASE_SCHEMA.md` for data structure
-4. **Read Architecture**: Check `ARCHITECTURE.md` for technical details
-5. **Firebase Setup**: Review `FIREBASE_SETUP.md` for advanced configuration
+1. **Complete Firebase Setup**: Follow `FIREBASE_SETUP.md` for backend configuration
+2. **Explore the Codebase**: Familiarize yourself with the project structure
+3. **Check the MVP Features**: Test authentication, project creation, and swiping
+4. **Review Database Schema**: See `DATABASE_SCHEMA.md` for data structure
+5. **Read Architecture**: Check `ARCHITECTURE.md` for technical details
 
 ## 🆘 Getting Help
 
 If you encounter issues:
 
 1. **Check the Logs**: Android Studio Logcat provides detailed error information
-2. **Firebase Console**: Verify your configuration and check for service issues
+2. **Firebase Issues**: Refer to `FIREBASE_SETUP.md` and Firebase Console
 3. **Stack Overflow**: Search for specific error messages
 4. **Android Developer Community**: [developer.android.com/community](https://developer.android.com/community)
 
@@ -386,5 +326,5 @@ If you encounter issues:
 **Happy Coding! 🚀**
 
 *Last Updated: July 23, 2025*  
-*Version: 1.0*  
+*Version: 2.0*  
 *For ProjectSwipe MVP Development*
