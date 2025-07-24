@@ -26,7 +26,7 @@ jobs:
         
     # Step 3: Cache Gradle dependencies (speeds up builds)
     - name: Cache Gradle dependencies
-      uses: actions/cache@v3
+      uses: actions/cache@v4
       with:
         path: |
           ~/.gradle/caches
@@ -53,14 +53,14 @@ jobs:
       
     # Step 8: Upload APK for Download
     - name: Upload Debug APK
-      uses: actions/upload-artifact@v3
+      uses: actions/upload-artifact@v4
       with:
         name: ProjectSwipe-Debug-APK
         path: code/app/build/outputs/apk/debug/*.apk
         
     # Step 9: Upload Test Results (if tests fail)
     - name: Upload Test Reports
-      uses: actions/upload-artifact@v3
+      uses: actions/upload-artifact@v4
       if: failure()
       with:
         name: test-reports
@@ -68,7 +68,7 @@ jobs:
         
     # Step 10: Upload Lint Results
     - name: Upload Lint Reports
-      uses: actions/upload-artifact@v3
+      uses: actions/upload-artifact@v4
       if: always()
       with:
         name: lint-reports
