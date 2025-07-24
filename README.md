@@ -109,15 +109,8 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 
 ## 📞 Contact
 
-**Project Maintainer**: [Your Name]
-- GitHub: [@yourusername](https://github.com/yourusername)
-- Email: your.email@university.edu
-
-## 🙏 Acknowledgments
-
-- Thanks to all university students who provided feedback during development
-- Firebase team for excellent backend services
-- Material Design team for beautiful UI components
+**Project Maintainer**: Roshan
+- GitHub: [Roshan1299](https://github.com/Roshan1299)
 
 ---
 
