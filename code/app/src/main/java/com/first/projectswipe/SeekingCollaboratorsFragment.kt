@@ -12,7 +12,7 @@ class SeekingCollaboratorsFragment : Fragment() {
         container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View? {
-        // Temporary layout — replace with your own
+        // Temporary layout
         return inflater.inflate(android.R.layout.simple_list_item_1, container, false)
     }
 }
