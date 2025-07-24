@@ -9,6 +9,7 @@ import android.view.ViewGroup
 import android.widget.Button
 import android.widget.FrameLayout
 import android.widget.ImageButton
+import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.GravityCompat
 import androidx.drawerlayout.widget.DrawerLayout
@@ -20,6 +21,7 @@ import com.first.projectswipe.utils.CardStackManager
 import com.google.android.material.navigation.NavigationView
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FirebaseFirestore
+import com.google.firebase.firestore.Query
 
 class HomeFragment : Fragment() {
 
@@ -66,29 +68,80 @@ class HomeFragment : Fragment() {
     }
 
     private fun loadIdeas() {
+        Log.d("HomeFragment", "Starting to load project ideas...")
+
+        // Reset saved index when loading fresh data
+        val prefs = requireContext().getSharedPreferences("SwipePrefs", Context.MODE_PRIVATE)
+        prefs.edit().putInt("swipe_index", 0).apply()
+
         db.collection("project_ideas")
+            .orderBy("title", Query.Direction.ASCENDING) // Add ordering to ensure consistent results
             .get()
             .addOnSuccessListener { result ->
+                Log.d("HomeFragment", "Firestore query successful. Documents found: ${result.size()}")
+
+                if (result.isEmpty) {
+                    Log.w("HomeFragment", "No project ideas found in database")
+                    Toast.makeText(requireContext(), "No project ideas found. Try creating some!", Toast.LENGTH_LONG).show()
+                    return@addOnSuccessListener
+                }
+
                 projectIdeas.clear()
-                projectIdeas.addAll(result.map { it.toObject(ProjectIdea::class.java) })
 
-                val prefs = requireContext().getSharedPreferences("SwipePrefs", Context.MODE_PRIVATE)
-                val savedIndex = prefs.getInt("swipe_index", 0)
+                // Convert documents to ProjectIdea objects with error handling
+                for (document in result) {
+                    try {
+                        val projectIdea = document.toObject(ProjectIdea::class.java)
 
-                cardStackManager = CardStackManager(
-                    context = requireContext(),
-                    container = cardContainer,
-                    allIdeas = projectIdeas,
-                    startingIndex = savedIndex,
-                    onCardSwiped = { idea, direction ->
-                        Log.d("Swipe", if (direction > 0) "Liked: ${idea.title}" else "Disliked: ${idea.title}")
+                        // Ensure the document has required fields
+                        if (projectIdea.title.isNotEmpty() && projectIdea.previewDescription.isNotEmpty()) {
+                            // If the document doesn't have an ID, create a new object with the document ID
+                            val finalProjectIdea = if (projectIdea.id.isEmpty()) {
+                                projectIdea.copy(id = document.id)
+                            } else {
+                                projectIdea
+                            }
+
+                            projectIdeas.add(finalProjectIdea)
+                            Log.d("HomeFragment", "Added project: ${finalProjectIdea.title} with ID: ${finalProjectIdea.id}")
+                        } else {
+                            Log.w("HomeFragment", "Skipping document ${document.id} - missing required fields")
+                        }
+                    } catch (e: Exception) {
+                        Log.e("HomeFragment", "Error converting document ${document.id} to ProjectIdea", e)
                     }
-                )
+                }
 
-                cardStackManager.showInitialCards()
+                Log.d("HomeFragment", "Successfully loaded ${projectIdeas.size} project ideas")
+
+                if (projectIdeas.isNotEmpty()) {
+                    // Initialize CardStackManager with the loaded data
+                    cardStackManager = CardStackManager(
+                        context = requireContext(),
+                        container = cardContainer,
+                        allIdeas = projectIdeas,
+                        startingIndex = 0, // Start from beginning since we reset the index
+                        onCardSwiped = { idea, direction ->
+                            Log.d("Swipe", if (direction > 0) "Liked: ${idea.title}" else "Disliked: ${idea.title}")
+                        }
+                    )
+
+                    cardStackManager.showInitialCards()
+                    Log.d("HomeFragment", "CardStackManager initialized and cards displayed")
+                } else {
+                    Log.w("HomeFragment", "No valid project ideas after filtering")
+                    Toast.makeText(requireContext(), "No valid project ideas found", Toast.LENGTH_SHORT).show()
+                }
             }
-            .addOnFailureListener {
-                Log.e("HomeFragment", "Failed to load project ideas", it)
+            .addOnFailureListener { exception ->
+                Log.e("HomeFragment", "Failed to load project ideas", exception)
+                Toast.makeText(requireContext(), "Failed to load projects: ${exception.message}", Toast.LENGTH_SHORT).show()
             }
+    }
+
+    override fun onResume() {
+        super.onResume()
+        // Reload ideas when returning to this fragment to show any new posts
+        loadIdeas()
     }
 }

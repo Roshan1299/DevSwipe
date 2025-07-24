@@ -3,6 +3,7 @@ package com.first.projectswipe.projects
 import android.os.Bundle
 import android.text.InputFilter
 import android.text.Spanned
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -17,6 +18,7 @@ import androidx.navigation.fragment.findNavController
 import com.first.projectswipe.R
 import com.google.android.flexbox.FlexboxLayout
 import com.google.firebase.auth.FirebaseAuth
+import com.google.firebase.firestore.FieldValue
 import com.google.firebase.firestore.FirebaseFirestore
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -198,7 +200,7 @@ class CreatePostFragment : Fragment() {
         // Limit preview description to 2 lines
         previewDescriptionEditText.maxLines = 2
         previewDescriptionEditText.filters = arrayOf(
-            InputFilter.LengthFilter(60),
+            InputFilter.LengthFilter(83),
             object : InputFilter {
                 override fun filter(
                     source: CharSequence?,
@@ -358,26 +360,39 @@ class CreatePostFragment : Fragment() {
         val currentUser = auth.currentUser ?: return
         val newDocRef = db.collection("project_ideas").document()
 
+        Log.d("CreatePostFragment", "Saving project with ID: ${newDocRef.id}")
+
+        // Get user's display name or email for createdByName
+        val createdByName = currentUser.displayName ?: currentUser.email ?: "Anonymous"
+
         val projectData = mutableMapOf<String, Any>(
             "id" to newDocRef.id,
             "title" to title,
             "previewDescription" to preview,
             "fullDescription" to full,
             "createdBy" to currentUser.uid,
+            "createdByName" to createdByName, // Added this field
             "tags" to selectedTags,
-            "difficulty" to selectedDifficulty
+            "difficulty" to selectedDifficulty,
+            "timeline" to "", // Added this field with empty default
+            "createdAt" to FieldValue.serverTimestamp() // Optional: add timestamp
         )
 
         if (githubLink.isNotEmpty()) {
             projectData["githubLink"] = githubLink
+        } else {
+            // Ensure githubLink field exists even if empty
+            projectData["githubLink"] = ""
         }
 
         CoroutineScope(Dispatchers.Main).launch {
             try {
                 newDocRef.set(projectData).await()
+                Log.d("CreatePostFragment", "Project saved successfully: ${newDocRef.id}")
                 Toast.makeText(context, "Project saved!", Toast.LENGTH_SHORT).show()
                 findNavController().popBackStack()
             } catch (e: Exception) {
+                Log.e("CreatePostFragment", "Error saving project", e)
                 Toast.makeText(context, "Error: ${e.message}", Toast.LENGTH_SHORT).show()
             }
         }
