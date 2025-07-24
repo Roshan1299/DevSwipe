@@ -48,8 +48,6 @@ class HomeFragment : Fragment() {
             drawerLayout.openDrawer(GravityCompat.START)
         }
 
-
-
         navigationView.setNavigationItemSelectedListener { menuItem ->
             when (menuItem.itemId) {
                 R.id.nav_profile -> Log.d("Drawer", "Profile selected")
