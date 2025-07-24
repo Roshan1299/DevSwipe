@@ -44,7 +44,7 @@
                     android:background="?attr/selectableItemBackgroundBorderless"
                     android:src="@drawable/ic_menu"
                     android:contentDescription="Open drawer"
-                    android:tint="@android:color/black" />
+                    />
 
                 <!-- Filter Button - Right -->
                 <ImageButton
