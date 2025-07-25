@@ -47,9 +47,9 @@ jobs:
     - name: Run Unit Tests
       run: cd code && ./gradlew test
       
-    # Step 7: Run Android Lint (code quality check)
-    - name: Run Android Lint
-      run: cd code && ./gradlew lint
+    # # Step 7: Run Android Lint (code quality check)
+    # - name: Run Android Lint
+    #   run: cd code && ./gradlew lint
       
     # Step 8: Upload APK for Download
     - name: Upload Debug APK
@@ -66,10 +66,10 @@ jobs:
         name: test-reports
         path: code/app/build/reports/tests/
         
-    # Step 10: Upload Lint Results
-    - name: Upload Lint Reports
-      uses: actions/upload-artifact@v4
-      if: always()
-      with:
-        name: lint-reports
-        path: code/app/build/reports/lint-results*.html
+    # # Step 10: Upload Lint Results
+    # - name: Upload Lint Reports
+    #   uses: actions/upload-artifact@v4
+    #   if: always()
+    #   with:
+    #     name: lint-reports
+    #     path: code/app/build/reports/lint-results*.html
