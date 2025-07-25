@@ -70,10 +70,6 @@ class HomeFragment : Fragment() {
     private fun loadIdeas() {
         Log.d("HomeFragment", "Starting to load project ideas...")
 
-        // Reset saved index when loading fresh data
-        val prefs = requireContext().getSharedPreferences("SwipePrefs", Context.MODE_PRIVATE)
-        prefs.edit().putInt("swipe_index", 0).apply()
-
         db.collection("project_ideas")
             .orderBy("title", Query.Direction.ASCENDING) // Add ordering to ensure consistent results
             .get()
@@ -115,12 +111,21 @@ class HomeFragment : Fragment() {
                 Log.d("HomeFragment", "Successfully loaded ${projectIdeas.size} project ideas")
 
                 if (projectIdeas.isNotEmpty()) {
-                    // Initialize CardStackManager with the loaded data
+                    // Restore saved swipe position for app persistence
+                    val prefs = requireContext().getSharedPreferences("SwipePrefs", Context.MODE_PRIVATE)
+                    val savedIndex = prefs.getInt("swipe_index", 0)
+
+                    // Ensure savedIndex is within bounds
+                    val startingIndex = if (savedIndex < projectIdeas.size) savedIndex else 0
+
+                    Log.d("HomeFragment", "Restoring swipe position: $startingIndex (saved: $savedIndex)")
+
+                    // Initialize CardStackManager with the loaded data and saved position
                     cardStackManager = CardStackManager(
                         context = requireContext(),
                         container = cardContainer,
                         allIdeas = projectIdeas,
-                        startingIndex = 0, // Start from beginning since we reset the index
+                        startingIndex = startingIndex,
                         onCardSwiped = { idea, direction ->
                             Log.d("Swipe", if (direction > 0) "Liked: ${idea.title}" else "Disliked: ${idea.title}")
                         }
