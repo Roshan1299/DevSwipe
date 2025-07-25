@@ -371,11 +371,11 @@ class CreatePostFragment : Fragment() {
             "previewDescription" to preview,
             "fullDescription" to full,
             "createdBy" to currentUser.uid,
-            "createdByName" to createdByName, // Added this field
+            "createdByName" to createdByName,
             "tags" to selectedTags,
             "difficulty" to selectedDifficulty,
-            "timeline" to "", // Added this field with empty default
-            "createdAt" to FieldValue.serverTimestamp() // Optional: add timestamp
+            "timeline" to "",
+            "createdAt" to FieldValue.serverTimestamp()
         )
 
         if (githubLink.isNotEmpty()) {
