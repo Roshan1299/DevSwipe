@@ -5,7 +5,6 @@
 ![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)
 ![Kotlin](https://img.shields.io/badge/Made%20with-Kotlin-blueviolet.svg)
 ![Platform](https://img.shields.io/badge/platform-Android-green.svg)
-![Profile Views](https://komarev.com/ghpvc/?username=Roshan1299&color=blue&style=flat)
 
 > **Discover side projects and find collaborators through an engaging Tinder-style interface**
 
