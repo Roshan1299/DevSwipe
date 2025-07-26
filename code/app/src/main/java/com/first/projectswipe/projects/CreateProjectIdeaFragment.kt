@@ -146,7 +146,13 @@ class CreatePostFragment : Fragment() {
             return
         }
 
-        val normalizedTag = tag.lowercase().replaceFirstChar { it.uppercase() }
+        // Only capitalize the first letter, preserve the rest of the user's input
+        val normalizedTag = if (tag.isNotEmpty()) {
+            tag.first().uppercase() + tag.drop(1)
+        } else {
+            tag
+        }
+
         if (selectedTags.contains(normalizedTag)) {
             Toast.makeText(context, "Tag already added", Toast.LENGTH_SHORT).show()
             return
