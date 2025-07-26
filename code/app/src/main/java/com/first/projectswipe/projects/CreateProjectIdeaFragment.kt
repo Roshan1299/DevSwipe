@@ -198,9 +198,9 @@ class CreatePostFragment : Fragment() {
 
     private fun setupTextLimits() {
         // Limit preview description to 2 lines
-        previewDescriptionEditText.maxLines = 2
+        previewDescriptionEditText.maxLines = 3
         previewDescriptionEditText.filters = arrayOf(
-            InputFilter.LengthFilter(83),
+            InputFilter.LengthFilter(100),
             object : InputFilter {
                 override fun filter(
                     source: CharSequence?,
