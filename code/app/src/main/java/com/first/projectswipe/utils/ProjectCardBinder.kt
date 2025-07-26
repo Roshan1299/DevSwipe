@@ -56,14 +56,14 @@ object ProjectCardBinder {
         val backLayout = card.findViewById<View>(R.id.backCardLayout)
         val backDesc = backLayout.findViewById<TextView>(R.id.fullDescriptionTextView)
         val backGithub = backLayout.findViewById<TextView>(R.id.githubLink)
-        val backTimeline = backLayout.findViewById<TextView>(R.id.timeline)
+        val backDifficulty = backLayout.findViewById<TextView>(R.id.difficulty)
         val backChips = backLayout.findViewById<ChipGroup>(R.id.projectTagsChipGroup)
         val likeButtonBack = backLayout.findViewById<View>(R.id.likeButtonBack)
         val dislikeButtonBack = backLayout.findViewById<View>(R.id.dislikeButtonBack)
 
         backDesc.text = idea.fullDescription
-        backGithub.text = "GitHub: https://github.com/yourproject"
-        backTimeline.text = "Timeline: 4–6 weeks"
+        backGithub.text = if (idea.githubLink.isNotEmpty()) "GitHub: ${idea.githubLink}" else "GitHub: Not available"
+        backDifficulty.text = "Difficulty: ${idea.difficulty}"
         backChips.removeAllViews()
         idea.tags.forEach { tag ->
             val chip = Chip(context).apply {

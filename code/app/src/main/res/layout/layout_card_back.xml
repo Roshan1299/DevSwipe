@@ -28,7 +28,6 @@
                 android:layout_height="32dp"
                 android:background="?attr/selectableItemBackgroundBorderless"
                 android:src="@drawable/ic_info"
-
                 android:layout_alignParentStart="true"
                 android:contentDescription="Flip Back" />
         </RelativeLayout>
@@ -54,12 +53,12 @@
             android:textColor="#444444"
             android:paddingBottom="12dp" />
 
-        <!-- Timeline -->
+        <!-- Difficulty -->
         <TextView
-            android:id="@+id/timeline"
+            android:id="@+id/difficulty"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="Timeline: 4–6 weeks"
+            android:text="Difficulty: Beginner"
             android:textSize="14sp"
             android:textColor="#555555"
             android:paddingBottom="8dp" />
@@ -69,9 +68,8 @@
             android:id="@+id/githubLink"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="GitHub: https://github.com/project"
             android:autoLink="web"
-            android:textColor="#1a0dab"
+            android:textColor="#000000"
             android:textSize="14sp" />
 
         <!-- Skills Header -->
