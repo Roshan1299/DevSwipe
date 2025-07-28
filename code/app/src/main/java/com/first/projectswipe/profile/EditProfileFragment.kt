@@ -12,7 +12,6 @@ import android.view.View
 import android.view.ViewGroup
 import android.view.inputmethod.EditorInfo
 import android.widget.Button
-import android.widget.EditText
 import android.widget.ImageButton
 import android.widget.Toast
 import androidx.appcompat.app.AlertDialog
@@ -23,6 +22,7 @@ import com.first.projectswipe.R
 import com.google.android.material.chip.Chip
 import com.google.android.material.chip.ChipGroup
 import com.google.android.material.imageview.ShapeableImageView
+import com.google.android.material.textfield.TextInputEditText
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.storage.FirebaseStorage
@@ -32,10 +32,11 @@ class EditProfileFragment : Fragment() {
 
     private lateinit var profileImageView: ShapeableImageView
     private lateinit var editImageButton: ImageButton
-    private lateinit var nameInput: EditText
-    private lateinit var universityInput: EditText
-    private lateinit var bioInput: EditText
-    private lateinit var addSkillInput: EditText
+    private lateinit var nameInput: TextInputEditText
+    private lateinit var universityInput: TextInputEditText
+    private lateinit var bioInput: TextInputEditText
+    private lateinit var addSkillInput: TextInputEditText
+    private lateinit var addInterestInput: TextInputEditText
     private lateinit var skillsChipGroup: ChipGroup
     private lateinit var interestsChipGroup: ChipGroup
     private lateinit var addSkillButton: ImageButton
@@ -61,7 +62,7 @@ class EditProfileFragment : Fragment() {
 
         initializeViews(view)
         setupClickListeners()
-        setupSkillInput()
+        setupInputListeners()
         loadUserData()
 
         return view
@@ -74,6 +75,7 @@ class EditProfileFragment : Fragment() {
         universityInput = view.findViewById(R.id.universityInput)
         bioInput = view.findViewById(R.id.bioInput)
         addSkillInput = view.findViewById(R.id.addSkillInput)
+        addInterestInput = view.findViewById(R.id.addInterestInput)
         skillsChipGroup = view.findViewById(R.id.skillsChipGroup)
         interestsChipGroup = view.findViewById(R.id.interestsChipGroup)
         addSkillButton = view.findViewById(R.id.addSkillButton)
@@ -104,8 +106,10 @@ class EditProfileFragment : Fragment() {
         }
 
         addInterestButton.setOnClickListener {
-            showAddItemDialog("Add Interest") { interest ->
+            val interest = addInterestInput.text.toString().trim()
+            if (interest.isNotEmpty()) {
                 addInterestChip(interest)
+                addInterestInput.setText("")
             }
         }
 
@@ -114,7 +118,7 @@ class EditProfileFragment : Fragment() {
         }
     }
 
-    private fun setupSkillInput() {
+    private fun setupInputListeners() {
         addSkillInput.setOnEditorActionListener { _, actionId, _ ->
             if (actionId == EditorInfo.IME_ACTION_DONE) {
                 val skill = addSkillInput.text.toString().trim()
@@ -125,23 +129,17 @@ class EditProfileFragment : Fragment() {
                 true
             } else false
         }
-    }
 
-    private fun showAddItemDialog(title: String, onAdd: (String) -> Unit) {
-        val input = EditText(requireContext())
-        input.hint = "Enter ${title.lowercase().replace("add ", "")}"
-
-        AlertDialog.Builder(requireContext())
-            .setTitle(title)
-            .setView(input)
-            .setPositiveButton("Add") { _, _ ->
-                val text = input.text.toString().trim()
-                if (text.isNotEmpty()) {
-                    onAdd(text)
+        addInterestInput.setOnEditorActionListener { _, actionId, _ ->
+            if (actionId == EditorInfo.IME_ACTION_DONE) {
+                val interest = addInterestInput.text.toString().trim()
+                if (interest.isNotEmpty()) {
+                    addInterestChip(interest)
+                    addInterestInput.setText("")
                 }
-            }
-            .setNegativeButton("Cancel", null)
-            .show()
+                true
+            } else false
+        }
     }
 
     private fun addSkillChip(skill: String) {
