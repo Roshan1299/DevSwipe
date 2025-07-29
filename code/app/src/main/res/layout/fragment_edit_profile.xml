@@ -32,7 +32,6 @@
                     android:background="?attr/selectableItemBackgroundBorderless"
                     android:contentDescription="Back" />
 
-
             </RelativeLayout>
 
             <!-- Profile Image Section -->
@@ -57,8 +56,7 @@
                 <FrameLayout
                     android:layout_width="36dp"
                     android:layout_height="36dp"
-                    android:layout_gravity="bottom|end"
-                    >
+                    android:layout_gravity="bottom|end">
 
                     <ImageButton
                         android:id="@+id/editImageButton"
@@ -151,125 +149,121 @@
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:orientation="horizontal"
-                android:gravity="center_vertical"
+                android:orientation="vertical"
                 android:layout_marginBottom="16dp">
 
-                <TextView
-                    android:layout_width="0dp"
-                    android:layout_height="wrap_content"
-                    android:layout_weight="1"
-                    android:text="Skills"
-                    android:textSize="18sp"
-                    android:textStyle="bold"
-                    android:textColor="@android:color/black" />
-
-                <ImageButton
-                    android:id="@+id/addSkillButton"
-                    android:layout_width="32dp"
-                    android:layout_height="32dp"
-                    android:src="@android:drawable/ic_input_add"
-                    android:background="@drawable/circle_blue_background"
-                    android:tint="@android:color/white"
-                    android:contentDescription="Add Skill" />
-
-            </LinearLayout>
-
-            <com.google.android.material.chip.ChipGroup
-                android:id="@+id/skillsChipGroup"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                app:singleSelection="false"
-                app:singleLine="false"
-                android:layout_marginBottom="8dp" />
-
-            <com.google.android.material.textfield.TextInputLayout
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginBottom="8dp"
-                android:hint="Add a skill and press enter"
-                app:boxStrokeColor="@color/blue_2196F3"
-                app:hintTextColor="@color/blue_2196F3"
-                app:boxCornerRadiusTopStart="12dp"
-                app:boxCornerRadiusTopEnd="12dp"
-                app:boxCornerRadiusBottomStart="12dp"
-                app:boxCornerRadiusBottomEnd="12dp"
-                style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox">
-
-                <com.google.android.material.textfield.TextInputEditText
-                    android:id="@+id/addSkillInput"
+                <com.google.android.material.textfield.TextInputLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:imeOptions="actionDone"
-                    android:inputType="text"
-                    android:textColor="@android:color/black"
-                    android:textSize="16sp"
-                    android:padding="16dp" />
+                    app:boxStrokeColor="@color/blue_2196F3"
+                    app:hintTextColor="@color/blue_2196F3"
+                    app:boxCornerRadiusTopStart="12dp"
+                    app:boxCornerRadiusTopEnd="12dp"
+                    app:boxCornerRadiusBottomStart="12dp"
+                    app:boxCornerRadiusBottomEnd="12dp"
+                    style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox">
 
-            </com.google.android.material.textfield.TextInputLayout>
+                    <RelativeLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content">
+
+                        <com.google.android.material.textfield.TextInputEditText
+                            android:id="@+id/addSkillInput"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:layout_marginEnd="40dp"
+                            android:background="@android:color/transparent"
+                            android:hint="Add a skill"
+                            android:imeOptions="actionDone"
+                            android:inputType="text"
+                            android:textColor="@android:color/black"
+                            android:textSize="16sp"
+                            android:padding="16dp" />
+
+                        <ImageButton
+                            android:id="@+id/addSkillButton"
+                            android:layout_width="24dp"
+                            android:layout_height="24dp"
+                            android:layout_alignParentEnd="true"
+                            android:layout_centerVertical="true"
+                            android:src="@android:drawable/ic_input_add"
+                            android:background="?attr/selectableItemBackgroundBorderless"
+                            android:contentDescription="Add Skill"
+                            android:tint="@color/blue_2196F3" />
+
+                    </RelativeLayout>
+
+                </com.google.android.material.textfield.TextInputLayout>
+
+                <com.google.android.material.chip.ChipGroup
+                    android:id="@+id/skillsChipGroup"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    app:singleSelection="false"
+                    app:singleLine="false"
+                    android:layout_marginTop="8dp" />
+
+            </LinearLayout>
 
             <!-- Interests Section -->
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:orientation="horizontal"
-                android:gravity="center_vertical"
-                android:layout_marginBottom="16dp">
+                android:orientation="vertical"
+                android:layout_marginBottom="32dp">
 
-                <TextView
-                    android:layout_width="0dp"
-                    android:layout_height="wrap_content"
-                    android:layout_weight="1"
-                    android:text="Interests"
-                    android:textSize="18sp"
-                    android:textStyle="bold"
-                    android:textColor="@android:color/black" />
-
-                <ImageButton
-                    android:id="@+id/addInterestButton"
-                    android:layout_width="32dp"
-                    android:layout_height="32dp"
-                    android:src="@android:drawable/ic_input_add"
-                    android:background="@drawable/circle_blue_background"
-                    android:tint="@android:color/white"
-                    android:contentDescription="Add Interest" />
-
-
-
-            </LinearLayout>
-
-            <com.google.android.material.chip.ChipGroup
-                android:id="@+id/interestsChipGroup"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                app:singleSelection="false"
-                app:singleLine="false"
-                android:layout_marginBottom="8dp" />
-
-            <com.google.android.material.textfield.TextInputLayout
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginBottom="32dp"
-                android:hint="Add an interest and press enter"
-                app:boxStrokeColor="@color/blue_2196F3"
-                app:hintTextColor="@color/blue_2196F3"
-                app:boxCornerRadiusTopStart="12dp"
-                app:boxCornerRadiusTopEnd="12dp"
-                app:boxCornerRadiusBottomStart="12dp"
-                app:boxCornerRadiusBottomEnd="12dp"
-                style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox">
-
-                <com.google.android.material.textfield.TextInputEditText
-                    android:id="@+id/addInterestInput"
+                <com.google.android.material.textfield.TextInputLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:imeOptions="actionDone"
-                    android:inputType="text"
-                    android:textColor="@android:color/black"
-                    android:textSize="16sp"
-                    android:padding="16dp" />
+                    app:boxStrokeColor="@color/blue_2196F3"
+                    app:hintTextColor="@color/blue_2196F3"
+                    app:boxCornerRadiusTopStart="12dp"
+                    app:boxCornerRadiusTopEnd="12dp"
+                    app:boxCornerRadiusBottomStart="12dp"
+                    app:boxCornerRadiusBottomEnd="12dp"
+                    style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox">
 
-            </com.google.android.material.textfield.TextInputLayout>
+                    <RelativeLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content">
+
+                        <com.google.android.material.textfield.TextInputEditText
+                            android:id="@+id/addInterestInput"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:layout_marginEnd="40dp"
+                            android:background="@android:color/transparent"
+                            android:hint="Add an interest"
+                            android:imeOptions="actionDone"
+                            android:inputType="text"
+                            android:textColor="@android:color/black"
+                            android:textSize="16sp"
+                            android:padding="16dp" />
+
+                        <ImageButton
+                            android:id="@+id/addInterestButton"
+                            android:layout_width="24dp"
+                            android:layout_height="24dp"
+                            android:layout_alignParentEnd="true"
+                            android:layout_centerVertical="true"
+                            android:src="@android:drawable/ic_input_add"
+                            android:background="?attr/selectableItemBackgroundBorderless"
+                            android:contentDescription="Add Interest"
+                            android:tint="@color/blue_2196F3" />
+
+                    </RelativeLayout>
+
+                </com.google.android.material.textfield.TextInputLayout>
+
+                <com.google.android.material.chip.ChipGroup
+                    android:id="@+id/interestsChipGroup"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    app:singleSelection="false"
+                    app:singleLine="false"
+                    android:layout_marginTop="8dp" />
+
+            </LinearLayout>
 
         </LinearLayout>
 
