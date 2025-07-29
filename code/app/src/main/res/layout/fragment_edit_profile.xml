@@ -28,7 +28,7 @@
                     android:layout_height="48dp"
                     android:layout_alignParentStart="true"
                     android:layout_centerVertical="true"
-                    android:src="@android:drawable/ic_menu_close_clear_cancel"
+                    android:src="@drawable/ic_back_arrow"
                     android:background="?attr/selectableItemBackgroundBorderless"
                     android:contentDescription="Back" />
 
@@ -90,7 +90,6 @@
                     android:id="@+id/nameInput"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:text="Leo Gramasali"
                     android:textColor="@android:color/black"
                     android:textSize="16sp"
                     android:padding="16dp" />
@@ -115,7 +114,6 @@
                     android:id="@+id/universityInput"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:text="Example University"
                     android:textColor="@android:color/black"
                     android:textSize="16sp"
                     android:padding="16dp" />
@@ -140,7 +138,6 @@
                     android:id="@+id/bioInput"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:text="Computer science student. Passionate about programming and open source."
                     android:textColor="@android:color/black"
                     android:textSize="16sp"
                     android:gravity="top"
