@@ -1,7 +1,7 @@
 # DevSwipe 🚀
 
 ![Project Status: Beta](https://img.shields.io/badge/status-beta-yellow.svg)
-[![Release](https://img.shields.io/badge/release-v0.1.0--beta-blue)](https://github.com/Roshan1299/DevSwipe/releases)
+[![Release](https://img.shields.io/github/v/release/Roshan1299/DevSwipe?label=release)](https://github.com/Roshan1299/DevSwipe/releases/latest)
 ![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)
 ![Kotlin](https://img.shields.io/badge/Made%20with-Kotlin-blueviolet.svg)
 ![Platform](https://img.shields.io/badge/platform-Android-green.svg)
