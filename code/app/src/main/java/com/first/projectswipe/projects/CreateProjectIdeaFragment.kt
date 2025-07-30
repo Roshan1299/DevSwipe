@@ -7,20 +7,16 @@ import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.Button
-import android.widget.EditText
-import android.widget.ImageView
-import android.widget.TextView
-import android.widget.Toast
+import android.widget.*
 import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
+import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.findNavController
 import com.first.projectswipe.R
 import com.google.android.flexbox.FlexboxLayout
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FieldValue
 import com.google.firebase.firestore.FirebaseFirestore
-import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.tasks.await
@@ -69,6 +65,9 @@ class CreatePostFragment : Fragment() {
         "C++"
     )
 
+    // If editing an existing project, this will be set (via Bundle/navigation args)
+    private var editingProjectId: String? = null
+
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
@@ -82,7 +81,6 @@ class CreatePostFragment : Fragment() {
         setupFocusListeners()
         setupTextLimits()
         setupTagInput()
-
         return view
     }
 
@@ -90,6 +88,14 @@ class CreatePostFragment : Fragment() {
         super.onViewCreated(view, savedInstanceState)
         // Bottom navigation is already hidden by MainActivity's navigation listener
         updateTagsDisplay() // Initialize tags display
+
+        // --- Start of the new logic for edit ---
+        val bundleProjectId = arguments?.getString("projectId") ?: ""
+        if (bundleProjectId.isNotBlank()) {
+            editingProjectId = bundleProjectId
+            loadProjectForEditing(editingProjectId!!)
+        }
+        // --- End of new logic for edit ---
     }
 
     private fun initializeViews(view: View) {
@@ -178,7 +184,7 @@ class CreatePostFragment : Fragment() {
         // Always show at least 8 popular tags (or all available if less than 8)
         // Filter out already selected tags and show up to 8 popular tags
         popularTags.filter { !selectedTags.contains(it) }
-            .take(8) // Always show up to 8 popular tags
+            .take(8)
             .forEach { tag ->
                 tagsContainer.addView(createPopularTagChip(tag))
             }
@@ -219,8 +225,6 @@ class CreatePostFragment : Fragment() {
                     val newText = dest.toString().substring(0, dstart) +
                             source.toString().substring(start, end) +
                             dest.toString().substring(dend)
-
-                    // Prevent more than 2 manual line breaks
                     return if (newText.split("\n").size > 2) "" else null
                 }
             }
@@ -286,7 +290,11 @@ class CreatePostFragment : Fragment() {
 
         saveButton.setOnClickListener {
             if (selectedTab == "Project Idea") {
-                saveProjectIdea()
+                if (editingProjectId == null) {
+                    saveProjectIdea()
+                } else {
+                    updateProjectIdea()
+                }
             } else {
                 Toast.makeText(context, "Collaboration Request not implemented yet", Toast.LENGTH_SHORT).show()
             }
@@ -384,14 +392,9 @@ class CreatePostFragment : Fragment() {
             "createdAt" to FieldValue.serverTimestamp()
         )
 
-        if (githubLink.isNotEmpty()) {
-            projectData["githubLink"] = githubLink
-        } else {
-            // Ensure githubLink field exists even if empty
-            projectData["githubLink"] = ""
-        }
+        projectData["githubLink"] = githubLink
 
-        CoroutineScope(Dispatchers.Main).launch {
+        lifecycleScope.launch(Dispatchers.Main) {
             try {
                 newDocRef.set(projectData).await()
                 Log.d("CreatePostFragment", "Project saved successfully: ${newDocRef.id}")
@@ -400,6 +403,79 @@ class CreatePostFragment : Fragment() {
             } catch (e: Exception) {
                 Log.e("CreatePostFragment", "Error saving project", e)
                 Toast.makeText(context, "Error: ${e.message}", Toast.LENGTH_SHORT).show()
+            }
+        }
+    }
+
+    // ---------- EDIT PROJECT LOGIC ----------
+    private fun loadProjectForEditing(projectId: String) {
+        lifecycleScope.launch(Dispatchers.Main) {
+            try {
+                val doc = db.collection("project_ideas").document(projectId).get().await()
+                if (doc.exists()) {
+                    val data = doc.data
+                    data?.let {
+                        projectTitleEditText.setText(data["title"] as? String ?: "")
+                        previewDescriptionEditText.setText(data["previewDescription"] as? String ?: "")
+                        fullDescriptionEditText.setText(data["fullDescription"] as? String ?: "")
+                        githubLinkEditText.setText(data["githubLink"] as? String ?: "")
+                        val tags = (data["tags"] as? List<*>)?.mapNotNull { it?.toString() } ?: emptyList()
+                        selectedTags.clear()
+                        selectedTags.addAll(tags)
+                        updateTagsDisplay()
+
+                        // Set difficulty
+                        val diff = data["difficulty"] as? String ?: "Beginner"
+                        currentDifficultyIndex = difficultyLevels.indexOf(diff).takeIf { it != -1 } ?: 0
+                        updateDifficultyDisplay()
+                    }
+                    // Update UI to reflect that we are editing (optional)
+                    saveButton.text = getString(R.string.update_project) // Update button label
+                } else {
+                    Toast.makeText(context, "Project not found!", Toast.LENGTH_SHORT).show()
+                }
+            } catch (e: Exception) {
+                Toast.makeText(context, "Failed to load project: ${e.message}", Toast.LENGTH_SHORT).show()
+            }
+        }
+    }
+
+    private fun updateProjectIdea() {
+        val projectId = editingProjectId ?: return
+        val title = projectTitleEditText.text.toString().trim()
+        val preview = previewDescriptionEditText.text.toString().trim()
+        val full = fullDescriptionEditText.text.toString().trim()
+        val githubLink = githubLinkEditText.text.toString().trim()
+
+        if (title.isEmpty() || preview.isEmpty() || full.isEmpty()) {
+            Toast.makeText(context, "Please fill in all required fields", Toast.LENGTH_SHORT).show()
+            return
+        }
+        if (selectedTags.isEmpty()) {
+            Toast.makeText(context, "Please add at least one tag", Toast.LENGTH_SHORT).show()
+            return
+        }
+        if (!isValidGitHubUrl(githubLink)) {
+            Toast.makeText(context, "Please enter a valid GitHub URL", Toast.LENGTH_SHORT).show()
+            return
+        }
+        val currentUser = auth.currentUser ?: return
+        val updatedData = mutableMapOf<String, Any>(
+            "title" to title,
+            "previewDescription" to preview,
+            "fullDescription" to full,
+            "tags" to selectedTags,
+            "difficulty" to selectedDifficulty,
+            "githubLink" to githubLink
+        )
+
+        lifecycleScope.launch(Dispatchers.Main) {
+            try {
+                db.collection("project_ideas").document(projectId).update(updatedData as Map<String, Any>).await()
+                Toast.makeText(context, "Project updated!", Toast.LENGTH_SHORT).show()
+                findNavController().popBackStack()
+            } catch (e: Exception) {
+                Toast.makeText(context, "Error updating: ${e.message}", Toast.LENGTH_SHORT).show()
             }
         }
     }

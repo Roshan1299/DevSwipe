@@ -87,6 +87,4 @@ class ProfilePostAdapter(
         }
         view.findNavController().navigate(R.id.createPostFragment, bundle)
     }
-
-
 }
