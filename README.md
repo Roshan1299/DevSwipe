@@ -1,10 +1,10 @@
 # DevSwipe 🚀
 
-![Project Status: Beta](https://img.shields.io/badge/status-beta-yellow.svg)
-[![Release](https://img.shields.io/badge/release-v0.1.0--beta-blue)](https://github.com/Roshan1299/DevSwipe/releases)
-![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)
-![Kotlin](https://img.shields.io/badge/Made%20with-Kotlin-blueviolet.svg)
-![Platform](https://img.shields.io/badge/platform-Android-green.svg)
+[![Kotlin](https://img.shields.io/badge/Kotlin-1.9.0-blueviolet?logo=kotlin)](https://kotlinlang.org)
+[![Platform](https://img.shields.io/badge/Android-13%2B-brightgreen?logo=android)](https://developer.android.com)
+[![License](https://img.shields.io/badge/License-MIT-blue?logo=opensourceinitiative)](https://opensource.org/licenses/MIT)
+[![CI](https://github.com/Roshan1299/DevSwipe/workflows/Android%20CI/badge.svg)](https://github.com/Roshan1299/DevSwipe/actions)
+[![Release](https://img.shields.io/github/v/release/Roshan1299/DevSwipe?include_prereleases&label=beta&logo=github)](https://github.com/Roshan1299/DevSwipe/releases)
 
 > **Discover side projects and find collaborators through an engaging Tinder-style interface**
 
@@ -106,11 +106,6 @@ We welcome contributions! Please read our [Contributing Guidelines](CONTRIBUTING
 ## 📄 License
 
 This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
-
-## 📞 Contact
-
-**Project Maintainer**: Roshan
-- GitHub: [Roshan1299](https://github.com/Roshan1299)
 
 ---
 
