@@ -26,6 +26,9 @@
         <action
             android:id="@+id/action_loginFragment_to_resetPasswordFragment"
             app:destination="@id/ResetPasswordFragment" />
+        <action
+            android:id="@+id/action_loginFragment_to_onboardingSkillsFragment"
+            app:destination="@id/onboardingSkillsFragment" />
     </fragment>
 
     <!-- Reset Password -->
@@ -49,6 +52,9 @@
         <action
             android:id="@+id/action_registerFragment_to_ideasFragment"
             app:destination="@id/homeFragment" />
+        <action
+            android:id="@+id/action_registerFragment_to_onboardingSkillsFragment"
+            app:destination="@id/onboardingSkillsFragment" />
     </fragment>
 
     <!-- Home Fragment (Ideas Feed) -->
@@ -108,6 +114,30 @@
             android:name="projectId"
             app:argType="string"
             android:defaultValue="" />
+    </fragment>
+
+    <!-- Onboarding Skills Fragment -->
+    <fragment
+        android:id="@+id/onboardingSkillsFragment"
+        android:name="com.first.projectswipe.onboarding.OnboardingSkillsFragment"
+        android:label="Skills Selection"
+        tools:layout="@layout/fragment_onboarding_skills">
+        <action
+            android:id="@+id/action_onboardingSkillsFragment_to_onboardingInterestsFragment"
+            app:destination="@id/onboardingInterestsFragment" />
+    </fragment>
+
+    <!-- Onboarding Interests Fragment -->
+    <fragment
+        android:id="@+id/onboardingInterestsFragment"
+        android:name="com.first.projectswipe.onboarding.OnboardingInterestsFragment"
+        android:label="Interests Selection"
+        tools:layout="@layout/fragment_onboarding_interests">
+        <action
+            android:id="@+id/action_onboardingInterestsFragment_to_homeFragment"
+            app:destination="@id/homeFragment"
+            app:popUpTo="@id/nav_graph"
+            app:popUpToInclusive="true" />
     </fragment>
 
     <!-- Uncomment these only if you add these fragments later -->
