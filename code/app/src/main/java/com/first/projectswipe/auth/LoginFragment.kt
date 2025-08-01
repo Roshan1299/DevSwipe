@@ -10,6 +10,7 @@ import android.view.ViewGroup
 import android.widget.Toast
 import androidx.core.widget.doOnTextChanged
 import androidx.fragment.app.Fragment
+import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.findNavController
 import com.first.projectswipe.R
 import com.first.projectswipe.databinding.FragmentLoginBinding
@@ -19,6 +20,10 @@ import com.google.android.gms.auth.api.signin.GoogleSignInOptions
 import com.google.android.gms.common.api.ApiException
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.GoogleAuthProvider
+import com.google.firebase.firestore.FirebaseFirestore
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.tasks.await
 
 class LoginFragment : Fragment() {
 
@@ -26,6 +31,7 @@ class LoginFragment : Fragment() {
     private val binding get() = _binding!!
     private lateinit var auth: FirebaseAuth
     private lateinit var googleSignInClient: GoogleSignInClient
+    private val db = FirebaseFirestore.getInstance()
     private val TAG = "LoginFragment"
 
     companion object {
@@ -157,8 +163,8 @@ class LoginFragment : Fragment() {
                     val user = auth.currentUser
                     showToast("Welcome back, ${user?.email}")
 
-                    // Navigate to main screen
-                    findNavController().navigate(R.id.action_loginFragment_to_ideasFragment)
+                    // Check if user needs onboarding
+                    checkOnboardingStatus()
                 } else {
                     Log.w(TAG, "signInWithEmail:failure", task.exception)
                     val errorMessage = when (task.exception?.message) {
@@ -206,13 +212,43 @@ class LoginFragment : Fragment() {
                     val user = auth.currentUser
                     showToast("Welcome, ${user?.displayName}")
 
-                    // Navigate to main screen
-                    findNavController().navigate(R.id.action_loginFragment_to_ideasFragment)
+                    // Check if user needs onboarding
+                    checkOnboardingStatus()
                 } else {
                     Log.w(TAG, "signInWithCredential:failure", task.exception)
                     showToast("Authentication failed")
                 }
             }
+    }
+
+    private fun checkOnboardingStatus() {
+        val currentUser = auth.currentUser ?: return
+
+        lifecycleScope.launch(Dispatchers.Main) {
+            try {
+                val userDoc = db.collection("users").document(currentUser.uid).get().await()
+
+                if (userDoc.exists()) {
+                    val onboardingCompleted = userDoc.getBoolean("onboardingCompleted") ?: false
+
+                    if (onboardingCompleted) {
+                        // User has completed onboarding, go to main app
+                        findNavController().navigate(R.id.action_loginFragment_to_ideasFragment)
+                    } else {
+                        // User needs to complete onboarding
+                        findNavController().navigate(R.id.action_loginFragment_to_onboardingSkillsFragment)
+                    }
+                } else {
+                    // User document doesn't exist, they might be new - go to onboarding
+                    findNavController().navigate(R.id.action_loginFragment_to_onboardingSkillsFragment)
+                }
+
+            } catch (e: Exception) {
+                Log.e(TAG, "Error checking onboarding status", e)
+                // On error, default to main app
+                findNavController().navigate(R.id.action_loginFragment_to_ideasFragment)
+            }
+        }
     }
 
     private fun showLoading(isLoading: Boolean) {
@@ -231,8 +267,8 @@ class LoginFragment : Fragment() {
         // Check if user is signed in and update UI accordingly
         val currentUser = auth.currentUser
         if (currentUser != null) {
-            // User is already signed in, navigate to main screen
-            findNavController().navigate(R.id.action_loginFragment_to_ideasFragment)
+            // User is already signed in, check onboarding status
+            checkOnboardingStatus()
         }
     }
 
