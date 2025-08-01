@@ -45,4 +45,15 @@
         vestibulum. Fusce dictum libero quis erat maximus, vitae volutpat diam dignissim.
     </string>
     <string name="default_web_client_id">999976668971-5ajruog1v3fak5rkn2ssngtto9sa5qsa.apps.googleusercontent.com</string>
+
+    <!-- Onboarding strings -->
+    <string name="select_skills">Select your skills</string>
+    <string name="select_interests">What are you interested in?</string>
+    <string name="skills_subtitle">Choose at least 3 skills that you\'re proficient in</string>
+    <string name="interests_subtitle">Choose at least 2 areas that interest you</string>
+    <string name="get_started">Get Started</string>
+    <string name="skip_for_now">Skip for now</string>
+    <string name="step_1_of_2">Step 1 of 2</string>
+    <string name="step_2_of_2">Step 2 of 2</string>
+    <string name="welcome_to_projectswipe">Welcome to ProjectSwipe!</string>
 </resources>
