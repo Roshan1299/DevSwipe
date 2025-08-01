@@ -84,7 +84,7 @@
             android:layout_marginTop="16dp">
 
             <!-- Finish Button -->
-            <Button
+            <com.google.android.material.button.MaterialButton
                 android:id="@+id/finishButton"
                 android:layout_width="match_parent"
                 android:layout_height="56dp"
@@ -92,9 +92,9 @@
                 android:textColor="@color/white"
                 android:textSize="16sp"
                 android:textStyle="bold"
-                android:background="@drawable/button_primary"
+                android:backgroundTint="@color/blue_2196F3"
+                app:cornerRadius="12dp"
                 android:enabled="false"
-                android:alpha="0.6"
                 android:layout_marginBottom="16dp" />
 
             <!-- Skip Button -->
