@@ -231,8 +231,8 @@ class RegisterFragment : Fragment() {
                 showLoading(false)
                 showSuccess("Account created successfully!")
 
-                // Navigate to main app or login screen
-                findNavController().navigate(R.id.action_registerFragment_to_loginFragment)
+                // Navigate to onboarding
+                findNavController().navigate(R.id.action_registerFragment_to_onboardingSkillsFragment)
             }
             .addOnFailureListener { exception ->
                 showLoading(false)
