@@ -1,0 +1,159 @@
+name: Dependency Updates
+
+on:
+  schedule:
+    - cron: '0 0 * * 0' # Weekly on Sunday
+  workflow_dispatch:
+
+jobs:
+  gradle-updates:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+          
+      - name: Configure Git
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+        
+      - name: Set up JDK 17
+        uses: actions/setup-java@v4
+        with:
+          java-version: '17'
+          distribution: 'temurin'
+          
+      - name: Cache Gradle dependencies
+        uses: actions/cache@v4
+        with:
+          path: |
+            ~/.gradle/caches
+            ~/.gradle/wrapper
+          key: ${{ runner.os }}-gradle-${{ hashFiles('code/**/*.gradle*', 'code/**/gradle-wrapper.properties') }}
+          restore-keys: |
+            ${{ runner.os }}-gradle-
+            
+      - name: Grant execute permission for gradlew
+        run: chmod +x code/gradlew
+        
+      - name: Add dependency update plugin temporarily
+        run: |
+          cd code
+          # Add the plugin to the root build.gradle.kts if not present
+          if ! grep -q "ben-manes.versions" build.gradle.kts; then
+            echo "Adding dependency update plugin..."
+            sed -i '/plugins {/a\    id("com.github.ben-manes.versions") version "0.50.0"' build.gradle.kts
+          fi
+        
+      - name: Update Gradle Wrapper
+        id: gradle_update
+        run: |
+          cd code
+          CURRENT_VERSION=$(./gradlew --version | grep "Gradle " | awk '{print $2}')
+          echo "Current Gradle version: $CURRENT_VERSION"
+          
+          # Update to latest Gradle version
+          ./gradlew wrapper --gradle-version=latest --distribution-type=bin
+          
+          NEW_VERSION=$(./gradlew --version | grep "Gradle " | awk '{print $2}')
+          echo "New Gradle version: $NEW_VERSION"
+          
+          if [ "$CURRENT_VERSION" != "$NEW_VERSION" ]; then
+            echo "gradle_updated=true" >> $GITHUB_OUTPUT
+            echo "gradle_old_version=$CURRENT_VERSION" >> $GITHUB_OUTPUT
+            echo "gradle_new_version=$NEW_VERSION" >> $GITHUB_OUTPUT
+          else
+            echo "gradle_updated=false" >> $GITHUB_OUTPUT
+          fi
+        
+      - name: Run Gradle Dependency Updates
+        run: cd code && ./gradlew dependencyUpdates -Drevision=release --no-daemon
+        
+      - name: Check for dependency updates
+        id: dep_updates
+        run: |
+          cd code
+          
+          # Check if there are any dependency updates available
+          if [ -f "build/dependencyUpdates/report.txt" ]; then
+            # Count outdated dependencies
+            OUTDATED_COUNT=$(grep -c "outdated" build/dependencyUpdates/report.txt || echo "0")
+            
+            if [ "$OUTDATED_COUNT" -gt "0" ]; then
+              echo "dependencies_updated=true" >> $GITHUB_OUTPUT
+              echo "outdated_count=$OUTDATED_COUNT" >> $GITHUB_OUTPUT
+              echo "Found $OUTDATED_COUNT outdated dependencies"
+            else
+              echo "dependencies_updated=false" >> $GITHUB_OUTPUT
+              echo "No outdated dependencies found"
+            fi
+          else
+            echo "dependencies_updated=false" >> $GITHUB_OUTPUT
+            echo "No dependency report generated"
+          fi
+        
+      - name: Remove temporary plugin addition
+        run: |
+          cd code
+          # Remove the temporarily added plugin line
+          sed -i '/id("com.github.ben-manes.versions")/d' build.gradle.kts
+        
+      - name: Commit Gradle wrapper update
+        if: steps.gradle_update.outputs.gradle_updated == 'true'
+        run: |
+          git add code/gradle/wrapper/gradle-wrapper.properties
+          git add code/gradlew
+          git add code/gradlew.bat
+          git commit -m "build: gradle wrapper update to ${{ steps.gradle_update.outputs.gradle_new_version }}"
+        
+      - name: Upload Dependency Report
+        if: steps.dep_updates.outputs.dependencies_updated == 'true'
+        uses: actions/upload-artifact@v4
+        with:
+          name: dependency-updates-$(date +%Y%m%d)
+          path: |
+            code/build/dependencyUpdates/
+            code/app/build/dependencyUpdates/
+          retention-days: 30
+          
+      - name: Push changes
+        run: |
+          # Check if there are any changes to push
+          if git diff --quiet HEAD; then
+            echo "No changes to push"
+          else
+            git push origin main
+            echo "Changes pushed to main"
+          fi
+          
+      - name: Create Summary
+        run: |
+          echo "## 📋 Dependency Update Report - $(date +%Y-%m-%d)" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          
+          if [ "${{ steps.gradle_update.outputs.gradle_updated }}" == "true" ]; then
+            echo "### ✅ Gradle Wrapper Updated" >> $GITHUB_STEP_SUMMARY
+            echo "- **From**: ${{ steps.gradle_update.outputs.gradle_old_version }}" >> $GITHUB_STEP_SUMMARY
+            echo "- **To**: ${{ steps.gradle_update.outputs.gradle_new_version }}" >> $GITHUB_STEP_SUMMARY
+            echo "" >> $GITHUB_STEP_SUMMARY
+          else
+            echo "### ℹ️ Gradle Wrapper" >> $GITHUB_STEP_SUMMARY
+            echo "Already up to date" >> $GITHUB_STEP_SUMMARY
+            echo "" >> $GITHUB_STEP_SUMMARY
+          fi
+          
+          if [ "${{ steps.dep_updates.outputs.dependencies_updated }}" == "true" ]; then
+            echo "### 📦 Dependencies" >> $GITHUB_STEP_SUMMARY
+            echo "Found ${{ steps.dep_updates.outputs.outdated_count }} outdated dependencies" >> $GITHUB_STEP_SUMMARY
+            echo "Check the uploaded artifact for details" >> $GITHUB_STEP_SUMMARY
+            echo "" >> $GITHUB_STEP_SUMMARY
+            echo "#### 📝 Manual Update Required" >> $GITHUB_STEP_SUMMARY
+            echo "Dependencies need to be updated manually in:" >> $GITHUB_STEP_SUMMARY
+            echo "- \`code/gradle/libs.versions.toml\`" >> $GITHUB_STEP_SUMMARY
+            echo "- \`code/app/build.gradle.kts\` (for direct dependencies)" >> $GITHUB_STEP_SUMMARY
+          else
+            echo "### ✅ Dependencies" >> $GITHUB_STEP_SUMMARY
+            echo "All dependencies are up to date" >> $GITHUB_STEP_SUMMARY
+          fi
