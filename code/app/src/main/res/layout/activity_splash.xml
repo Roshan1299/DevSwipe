@@ -1,0 +1,57 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/white">
+
+    <!-- Ball 1 - Cyan -->
+    <View
+        android:id="@+id/ball1"
+        android:layout_width="32dp"
+        android:layout_height="32dp"
+        android:background="@drawable/ball_cyan"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        android:alpha="0" />
+
+    <!-- Ball 2 - Light Cyan -->
+    <View
+        android:id="@+id/ball2"
+        android:layout_width="32dp"
+        android:layout_height="32dp"
+        android:background="@drawable/ball_light_cyan"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        android:alpha="0" />
+
+    <!-- Ball 3 - Dark Cyan -->
+    <View
+        android:id="@+id/ball3"
+        android:layout_width="32dp"
+        android:layout_height="32dp"
+        android:background="@drawable/ball_dark_cyan"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        android:alpha="0" />
+
+    <!-- Logo (appears after balls merge) -->
+    <ImageView
+        android:id="@+id/logoImageView"
+        android:layout_width="160dp"
+        android:layout_height="160dp"
+        android:src="@mipmap/ic_launcher"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        android:alpha="0" />
+
+</androidx.constraintlayout.widget.ConstraintLayout>
