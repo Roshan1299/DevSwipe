@@ -1,4 +1,4 @@
-package com.first.projectswipe.splash
+package com.first.projectswipe.ui.splash
 
 import android.animation.Animator
 import android.animation.AnimatorListenerAdapter
