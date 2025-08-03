@@ -51,13 +51,15 @@ jobs:
         id: gradle_update
         run: |
           cd code
-          CURRENT_VERSION=$(./gradlew --version | grep "Gradle " | awk '{print $2}')
+          # Get current Gradle version from wrapper properties file
+          CURRENT_VERSION=$(grep -E '^distributionUrl=.*-([0-9.]+)-' gradle/wrapper/gradle-wrapper.properties | sed -E 's/.*-([0-9.]+)-.*/\1/')
           echo "Current Gradle version: $CURRENT_VERSION"
           
           # Update to latest Gradle version
           ./gradlew wrapper --gradle-version=latest --distribution-type=bin
           
-          NEW_VERSION=$(./gradlew --version | grep "Gradle " | awk '{print $2}')
+          # Get new Gradle version from wrapper properties file
+          NEW_VERSION=$(grep -E '^distributionUrl=.*-([0-9.]+)-' gradle/wrapper/gradle-wrapper.properties | sed -E 's/.*-([0-9.]+)-.*/\1/')
           echo "New Gradle version: $NEW_VERSION"
           
           if [ "$CURRENT_VERSION" != "$NEW_VERSION" ]; then
