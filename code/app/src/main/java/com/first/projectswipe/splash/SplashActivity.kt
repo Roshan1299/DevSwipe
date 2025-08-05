@@ -12,6 +12,7 @@ import android.view.animation.BounceInterpolator
 import android.view.animation.OvershootInterpolator
 import android.widget.ImageView
 import androidx.appcompat.app.AppCompatActivity
+import androidx.core.view.WindowCompat
 import androidx.lifecycle.lifecycleScope
 import com.first.projectswipe.MainActivity
 import com.first.projectswipe.R
@@ -27,6 +28,10 @@ class SplashActivity : AppCompatActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+
+        // Force light status bar and navigation bar BEFORE setContentView
+        setupStatusBar()
+
         setContentView(R.layout.activity_splash)
 
         logoImage = findViewById(R.id.logoImageView)
@@ -39,6 +44,23 @@ class SplashActivity : AppCompatActivity() {
         setupInitialBallPositions()
 
         startAnimation()
+    }
+
+    private fun setupStatusBar() {
+        // Make status bar and navigation bar light
+        WindowCompat.setDecorFitsSystemWindows(window, false)
+
+        val windowInsetsController = WindowCompat.getInsetsController(window, window.decorView)
+        windowInsetsController?.let { controller ->
+            // Light status bar (dark icons on light background)
+            controller.isAppearanceLightStatusBars = true
+            // Light navigation bar (dark icons on light background)
+            controller.isAppearanceLightNavigationBars = true
+        }
+
+        // Set status bar and navigation bar colors to white
+        window.statusBarColor = resources.getColor(R.color.white, null)
+        window.navigationBarColor = resources.getColor(R.color.white, null)
     }
 
     private fun setupInitialBallPositions() {
@@ -208,5 +230,6 @@ class SplashActivity : AppCompatActivity() {
 
     override fun onBackPressed() {
         // Disable back button during splash
+        super.onBackPressed()
     }
 }
