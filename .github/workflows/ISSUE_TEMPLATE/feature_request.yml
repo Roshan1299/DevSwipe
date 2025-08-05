@@ -1,0 +1,116 @@
+name: Feature Request
+description: Suggest an idea for ProjectSwipe
+title: '[FEATURE] '
+labels: ['enhancement', 'triage']
+assignees: []
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Thanks for taking the time to suggest a new feature! 🚀
+        
+        Please search existing issues before creating a new one to avoid duplicates.
+
+  - type: checkboxes
+    id: platform
+    attributes:
+      label: Platform
+      description: Which platform(s) should this feature target?
+      options:
+        - label: Android
+        - label: Backend/API
+        - label: Web Interface
+        - label: All platforms
+
+  - type: textarea
+    id: problem-description
+    attributes:
+      label: 🤔 Is your feature request related to a problem?
+      description: A clear and concise description of what the problem is.
+      placeholder: I'm always frustrated when...
+    validations:
+      required: true
+
+  - type: textarea
+    id: solution-description
+    attributes:
+      label: 💡 Describe the solution you'd like
+      description: A clear and concise description of what you want to happen.
+      placeholder: I would like to see...
+    validations:
+      required: true
+
+  - type: textarea
+    id: alternatives
+    attributes:
+      label: 🔄 Describe alternatives you've considered
+      description: A clear and concise description of any alternative solutions or features you've considered.
+      placeholder: Alternative approaches could be...
+
+  - type: textarea
+    id: user-benefits
+    attributes:
+      label: 🎯 How would this feature benefit ProjectSwipe users?
+      description: Explain how this feature would improve the user experience or solve a common problem.
+      placeholder: This would help users by...
+    validations:
+      required: true
+
+  - type: textarea
+    id: use-cases
+    attributes:
+      label: 📋 Use Cases
+      description: Provide specific examples of how this feature would be used
+      placeholder: |
+        - As a user, I want to... so that...
+        - When using the app for..., this feature would...
+
+  - type: textarea
+    id: implementation-suggestions
+    attributes:
+      label: 🛠️ Implementation suggestions (optional)
+      description: If you have technical suggestions for how this could be implemented, please share them here.
+      placeholder: This could potentially be implemented by...
+
+  - type: dropdown
+    id: priority
+    attributes:
+      label: 📈 Priority
+      description: How important is this feature to you?
+      options:
+        - Low - Nice to have
+        - Medium - Would improve user experience
+        - High - Important for user adoption
+        - Critical - Blocking core functionality
+    validations:
+      required: true
+
+  - type: dropdown
+    id: complexity
+    attributes:
+      label: 🧩 Estimated Complexity
+      description: How complex do you think this feature would be to implement?
+      options:
+        - Simple - Small change or addition
+        - Medium - Moderate development effort
+        - Complex - Significant development effort
+        - I'm not sure
+
+  - type: textarea
+    id: additional-context
+    attributes:
+      label: 📝 Additional context
+      description: Add any other context, screenshots, mockups, or examples about the feature request here.
+      placeholder: Any additional information, mockups, or examples...
+
+  - type: checkboxes
+    id: checklist
+    attributes:
+      label: ✅ Checklist
+      options:
+        - label: I have searched existing issues to ensure this is not a duplicate
+          required: true
+        - label: I have provided a clear description of the problem and solution
+          required: true
+        - label: I am willing to help with testing when this feature is implemented
+          required: false
