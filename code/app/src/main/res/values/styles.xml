@@ -26,9 +26,9 @@
         <item name="android:alpha">1.0</item>
     </style>
 
-    <style name="Theme.ProjectSwipe.Splash" parent="Theme.MaterialComponents.DayNight.NoActionBar">
-        <item name="android:windowBackground">@color/white</item>
-        <item name="android:windowFullscreen">true</item>
-    </style>
+<!--    <style name="Theme.ProjectSwipe.Splash" parent="Theme.MaterialComponents.DayNight.NoActionBar">-->
+<!--        <item name="android:windowBackground">@color/white</item>-->
+<!--        <item name="android:windowFullscreen">true</item>-->
+<!--    </style>-->
 
 </resources>
