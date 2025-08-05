@@ -51,15 +51,13 @@ jobs:
         id: gradle_update
         run: |
           cd code
-          # Get current Gradle version from wrapper properties file
-          CURRENT_VERSION=$(grep -E '^distributionUrl=.*-([0-9.]+)-' gradle/wrapper/gradle-wrapper.properties | sed -E 's/.*-([0-9.]+)-.*/\1/')
+          CURRENT_VERSION=$(./gradlew --version | grep "Gradle " | awk '{print $2}')
           echo "Current Gradle version: $CURRENT_VERSION"
           
           # Update to latest Gradle version
           ./gradlew wrapper --gradle-version=latest --distribution-type=bin
           
-          # Get new Gradle version from wrapper properties file
-          NEW_VERSION=$(grep -E '^distributionUrl=.*-([0-9.]+)-' gradle/wrapper/gradle-wrapper.properties | sed -E 's/.*-([0-9.]+)-.*/\1/')
+          NEW_VERSION=$(./gradlew --version | grep "Gradle " | awk '{print $2}')
           echo "New Gradle version: $NEW_VERSION"
           
           if [ "$CURRENT_VERSION" != "$NEW_VERSION" ]; then
@@ -105,10 +103,8 @@ jobs:
       - name: Commit Gradle wrapper update
         if: steps.gradle_update.outputs.gradle_updated == 'true'
         run: |
-          git add code/gradle/wrapper/gradle-wrapper.properties
-          git add code/gradlew
-          git add code/gradlew.bat
-          git commit -m "build: gradle wrapper update to ${{ steps.gradle_update.outputs.gradle_new_version }}"
+          echo "Gradle wrapper updates are disabled to avoid compatibility issues"
+          echo "Current version: ${{ steps.gradle_update.outputs.gradle_current_version }}"
         
       - name: Upload Dependency Report
         if: steps.dep_updates.outputs.dependencies_updated == 'true'
@@ -142,7 +138,12 @@ jobs:
             echo "" >> $GITHUB_STEP_SUMMARY
           else
             echo "### ℹ️ Gradle Wrapper" >> $GITHUB_STEP_SUMMARY
-            echo "Already up to date" >> $GITHUB_STEP_SUMMARY
+            echo "**Current Version**: ${{ steps.gradle_update.outputs.gradle_current_version }}" >> $GITHUB_STEP_SUMMARY
+            if [ "${{ steps.gradle_update.outputs.gradle_needs_update }}" == "true" ]; then
+              echo "⚠️ Consider updating manually (current version is quite old)" >> $GITHUB_STEP_SUMMARY
+            else
+              echo "✅ Version is reasonable (auto-updates disabled for stability)" >> $GITHUB_STEP_SUMMARY
+            fi
             echo "" >> $GITHUB_STEP_SUMMARY
           fi
           
