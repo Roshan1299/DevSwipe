@@ -34,12 +34,20 @@ class HomeFragment : Fragment() {
     private lateinit var navigationView: NavigationView
     private lateinit var cardContainer: FrameLayout
 
-    // Card stack manager is recreated on data changes
+    // Card stack manager, recreated when data changes or filters apply
     private var cardStackManager: CardStackManager? = null
 
     private val db = FirebaseFirestore.getInstance()
-    private var allIdeas: List<ProjectIdea> = emptyList() // all fetched ideas from server
-    private var displayedIdeas: List<ProjectIdea> = emptyList() // filtered/currently shown ideas
+
+    // Master list of all fetched ideas (unfiltered)
+    private var allIdeas: List<ProjectIdea> = emptyList()
+
+    // Currently displayed ideas after filtering (or allIdeas)
+    private var displayedIdeas: List<ProjectIdea> = emptyList()
+
+    // Store last applied filter selections to keep them persistent in the filter sheet
+    private var lastSelectedDifficulty: String? = null
+    private var lastSelectedTags: Set<String> = emptySet()
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -62,8 +70,8 @@ class HomeFragment : Fragment() {
     }
 
     private fun setupToolbar(view: View) {
-        val toolbar = view.findViewById<View>(R.id.toolbar)
-        (requireActivity() as? AppCompatActivity)?.setSupportActionBar(toolbar as androidx.appcompat.widget.Toolbar)
+        val toolbar = view.findViewById<View>(R.id.toolbar) as androidx.appcompat.widget.Toolbar
+        (requireActivity() as? AppCompatActivity)?.setSupportActionBar(toolbar)
         val hamburgerButton = toolbar.findViewById<ImageButton>(R.id.hamburgerButton)
         hamburgerButton.setOnClickListener {
             drawerLayout.openDrawer(GravityCompat.START)
@@ -87,9 +95,16 @@ class HomeFragment : Fragment() {
     private fun setupFilterButton(view: View) {
         val filterButton = view.findViewById<ImageButton>(R.id.filterButton)
         filterButton.setOnClickListener {
-            val sheet = FilterBottomSheet.newInstance()
+            // Open filter bottom sheet passing current filter selections to preserve UI state
+            val sheet = FilterBottomSheet.newInstance(lastSelectedDifficulty, lastSelectedTags)
             sheet.setFilterListener(object : FilterBottomSheet.FilterListener {
                 override fun onFiltersSelected(filterMap: Map<String, Any?>) {
+                    // Save current filter selections for persistence
+                    lastSelectedDifficulty = filterMap["difficulty"] as? String
+                    lastSelectedTags =
+                        (filterMap["tags"] as? List<*>)?.filterIsInstance<String>()?.toSet() ?: emptySet()
+
+                    // Apply filters to update cards
                     applyFilters(filterMap)
                 }
             })
@@ -112,6 +127,9 @@ class HomeFragment : Fragment() {
                 Log.d("HomeFragment", "Fetched ${allIdeas.size} projects")
 
                 if (allIdeas.isNotEmpty()) {
+                    // On first load, reset filters selections so all are shown
+                    lastSelectedDifficulty = null
+                    lastSelectedTags = emptySet()
                     showCards(allIdeas)
                 } else {
                     showEmptyState()
@@ -133,17 +151,16 @@ class HomeFragment : Fragment() {
             container = cardContainer,
             allIdeas = displayedIdeas,
             startingIndex = 0,
-            onCardSwiped = { idea, direction ->
+            onCardSwiped = { _, _ ->
                 saveSwipePosition(cardStackManager?.currentTopIndex ?: 0)
             }
         ).also { it.showInitialCards() }
-        // Save the stack's swipe position
         saveSwipePosition(0)
     }
 
-    /** Applies difficulty/tags filters and shows only filtered projects */
+    /** Applies difficulty/tags filters and shows filtered projects */
     fun applyFilters(filters: Map<String, Any?>) {
-        // If empty, show all projects
+        // If no filters, show all projects
         if (filters.isEmpty()) {
             showCards(allIdeas)
             return
