@@ -1,3 +1,5 @@
+// File: com/first/projectswipe/home/HomeFragment.kt
+
 package com.first.projectswipe.home
 
 import android.content.Context
@@ -6,7 +8,6 @@ import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.Button
 import android.widget.FrameLayout
 import android.widget.ImageButton
 import android.widget.Toast
@@ -22,19 +23,35 @@ import com.google.android.material.navigation.NavigationView
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.firestore.Query
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.tasks.await
 
 class HomeFragment : Fragment() {
 
     private lateinit var drawerLayout: DrawerLayout
     private lateinit var navigationView: NavigationView
     private lateinit var cardContainer: FrameLayout
-    private lateinit var cardStackManager: CardStackManager
+
+    // Card stack manager, recreated when data changes or filters apply
+    private var cardStackManager: CardStackManager? = null
 
     private val db = FirebaseFirestore.getInstance()
-    private val projectIdeas = mutableListOf<ProjectIdea>()
+
+    // Master list of all fetched ideas (unfiltered)
+    private var allIdeas: List<ProjectIdea> = emptyList()
+
+    // Currently displayed ideas after filtering (or allIdeas)
+    private var displayedIdeas: List<ProjectIdea> = emptyList()
+
+    // Store last applied filter selections to keep them persistent in the filter sheet
+    private var lastSelectedDifficulty: String? = null
+    private var lastSelectedTags: Set<String> = emptySet()
 
     override fun onCreateView(
-        inflater: LayoutInflater, container: ViewGroup?,
+        inflater: LayoutInflater,
+        container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View {
         val view = inflater.inflate(R.layout.fragment_home, container, false)
@@ -42,14 +59,26 @@ class HomeFragment : Fragment() {
         drawerLayout = view.findViewById(R.id.homeDrawerLayout)
         navigationView = view.findViewById(R.id.navigationView)
         cardContainer = view.findViewById(R.id.cardStackContainer)
-        val toolbar = view.findViewById<View>(R.id.toolbar)
-        val hamburgerButton = toolbar.findViewById<ImageButton>(R.id.hamburgerButton)
-        (requireActivity() as AppCompatActivity).setSupportActionBar(toolbar as androidx.appcompat.widget.Toolbar)
 
+        setupToolbar(view)
+        setupNavigationDrawer()
+        setupFilterButton(view)
+
+        loadIdeas()
+
+        return view
+    }
+
+    private fun setupToolbar(view: View) {
+        val toolbar = view.findViewById<View>(R.id.toolbar) as androidx.appcompat.widget.Toolbar
+        (requireActivity() as? AppCompatActivity)?.setSupportActionBar(toolbar)
+        val hamburgerButton = toolbar.findViewById<ImageButton>(R.id.hamburgerButton)
         hamburgerButton.setOnClickListener {
             drawerLayout.openDrawer(GravityCompat.START)
         }
+    }
 
+    private fun setupNavigationDrawer() {
         navigationView.setNavigationItemSelectedListener { menuItem ->
             when (menuItem.itemId) {
                 R.id.nav_profile -> Log.d("Drawer", "Profile selected")
@@ -57,96 +86,121 @@ class HomeFragment : Fragment() {
                     FirebaseAuth.getInstance().signOut()
                     findNavController().navigate(R.id.action_global_loginFragment)
                 }
-                else -> Log.d("Drawer", "Clicked: ${menuItem.title}")
             }
             drawerLayout.closeDrawer(GravityCompat.START)
             true
         }
-
-        loadIdeas()
-        return view
     }
 
+    private fun setupFilterButton(view: View) {
+        val filterButton = view.findViewById<ImageButton>(R.id.filterButton)
+        filterButton.setOnClickListener {
+            // Open filter bottom sheet passing current filter selections to preserve UI state
+            val sheet = FilterBottomSheet.newInstance(lastSelectedDifficulty, lastSelectedTags)
+            sheet.setFilterListener(object : FilterBottomSheet.FilterListener {
+                override fun onFiltersSelected(filterMap: Map<String, Any?>) {
+                    // Save current filter selections for persistence
+                    lastSelectedDifficulty = filterMap["difficulty"] as? String
+                    lastSelectedTags =
+                        (filterMap["tags"] as? List<*>)?.filterIsInstance<String>()?.toSet() ?: emptySet()
+
+                    // Apply filters to update cards
+                    applyFilters(filterMap)
+                }
+            })
+            sheet.show(parentFragmentManager, FilterBottomSheet.TAG)
+        }
+    }
+
+    /** Loads all project ideas from Firestore and shows the card stack. */
     private fun loadIdeas() {
-        Log.d("HomeFragment", "Starting to load project ideas...")
+        CoroutineScope(Dispatchers.Main).launch {
+            try {
+                val result = db.collection("project_ideas")
+                    .orderBy("title", Query.Direction.ASCENDING)
+                    .get()
+                    .await()
 
-        db.collection("project_ideas")
-            .orderBy("title", Query.Direction.ASCENDING) // Add ordering to ensure consistent results
-            .get()
-            .addOnSuccessListener { result ->
-                Log.d("HomeFragment", "Firestore query successful. Documents found: ${result.size()}")
-
-                if (result.isEmpty) {
-                    Log.w("HomeFragment", "No project ideas found in database")
-                    Toast.makeText(requireContext(), "No project ideas found. Try creating some!", Toast.LENGTH_LONG).show()
-                    return@addOnSuccessListener
+                allIdeas = result.documents.mapNotNull { document ->
+                    document.toObject(ProjectIdea::class.java)?.copy(id = document.id)
                 }
+                Log.d("HomeFragment", "Fetched ${allIdeas.size} projects")
 
-                projectIdeas.clear()
-
-                // Convert documents to ProjectIdea objects with error handling
-                for (document in result) {
-                    try {
-                        val projectIdea = document.toObject(ProjectIdea::class.java)
-
-                        // Ensure the document has required fields
-                        if (projectIdea.title.isNotEmpty() && projectIdea.previewDescription.isNotEmpty()) {
-                            // If the document doesn't have an ID, create a new object with the document ID
-                            val finalProjectIdea = if (projectIdea.id.isEmpty()) {
-                                projectIdea.copy(id = document.id)
-                            } else {
-                                projectIdea
-                            }
-
-                            projectIdeas.add(finalProjectIdea)
-                            Log.d("HomeFragment", "Added project: ${finalProjectIdea.title} with ID: ${finalProjectIdea.id}")
-                        } else {
-                            Log.w("HomeFragment", "Skipping document ${document.id} - missing required fields")
-                        }
-                    } catch (e: Exception) {
-                        Log.e("HomeFragment", "Error converting document ${document.id} to ProjectIdea", e)
-                    }
-                }
-
-                Log.d("HomeFragment", "Successfully loaded ${projectIdeas.size} project ideas")
-
-                if (projectIdeas.isNotEmpty()) {
-                    // Restore saved swipe position for app persistence
-                    val prefs = requireContext().getSharedPreferences("SwipePrefs", Context.MODE_PRIVATE)
-                    val savedIndex = prefs.getInt("swipe_index", 0)
-
-                    // Ensure savedIndex is within bounds
-                    val startingIndex = if (savedIndex < projectIdeas.size) savedIndex else 0
-
-                    Log.d("HomeFragment", "Restoring swipe position: $startingIndex (saved: $savedIndex)")
-
-                    // Initialize CardStackManager with the loaded data and saved position
-                    cardStackManager = CardStackManager(
-                        context = requireContext(),
-                        container = cardContainer,
-                        allIdeas = projectIdeas,
-                        startingIndex = startingIndex,
-                        onCardSwiped = { idea, direction ->
-                            Log.d("Swipe", if (direction > 0) "Liked: ${idea.title}" else "Disliked: ${idea.title}")
-                        }
-                    )
-
-                    cardStackManager.showInitialCards()
-                    Log.d("HomeFragment", "CardStackManager initialized and cards displayed")
+                if (allIdeas.isNotEmpty()) {
+                    // On first load, reset filters selections so all are shown
+                    lastSelectedDifficulty = null
+                    lastSelectedTags = emptySet()
+                    showCards(allIdeas)
                 } else {
-                    Log.w("HomeFragment", "No valid project ideas after filtering")
-                    Toast.makeText(requireContext(), "No valid project ideas found", Toast.LENGTH_SHORT).show()
+                    showEmptyState()
                 }
+            } catch (e: Exception) {
+                Toast.makeText(context, "Error loading projects: ${e.message}", Toast.LENGTH_SHORT).show()
+                Log.e("HomeFragment", "Error loading projects", e)
+                showEmptyState()
             }
-            .addOnFailureListener { exception ->
-                Log.e("HomeFragment", "Failed to load project ideas", exception)
-                Toast.makeText(requireContext(), "Failed to load projects: ${exception.message}", Toast.LENGTH_SHORT).show()
-            }
+        }
     }
 
-    override fun onResume() {
-        super.onResume()
-        // Reload ideas when returning to this fragment to show any new posts
-        loadIdeas()
+    /** Rebuilds the card stack UI with [ideas]. */
+    private fun showCards(ideas: List<ProjectIdea>) {
+        displayedIdeas = ideas
+        cardContainer.removeAllViews()
+        cardStackManager = CardStackManager(
+            context = requireContext(),
+            container = cardContainer,
+            allIdeas = displayedIdeas,
+            startingIndex = 0,
+            onCardSwiped = { _, _ ->
+                saveSwipePosition(cardStackManager?.currentTopIndex ?: 0)
+            }
+        ).also { it.showInitialCards() }
+        saveSwipePosition(0)
+    }
+
+    /** Applies difficulty/tags filters and shows filtered projects */
+    fun applyFilters(filters: Map<String, Any?>) {
+        // If no filters, show all projects
+        if (filters.isEmpty()) {
+            showCards(allIdeas)
+            return
+        }
+
+        val filtered = allIdeas.filter { idea ->
+            val difficultyMatch = filters["difficulty"]?.let { diff ->
+                idea.difficulty.equals(diff.toString(), ignoreCase = true)
+            } ?: true
+
+            val tagsMatch = filters["tags"]?.let { tagList ->
+                if (tagList is List<*> && tagList.isNotEmpty()) {
+                    val selectedTags = tagList.filterIsInstance<String>()
+                    selectedTags.isEmpty() || idea.tags.any { tag -> selectedTags.contains(tag) }
+                } else true
+            } ?: true
+
+            difficultyMatch && tagsMatch
+        }
+
+        if (filtered.isNotEmpty()) {
+            showCards(filtered)
+        } else {
+            showEmptyState()
+        }
+    }
+
+    /** Shows the empty state view if there are no projects */
+    private fun showEmptyState() {
+        cardContainer.removeAllViews()
+        val emptyView = LayoutInflater.from(context)
+            .inflate(R.layout.empty_state_view, cardContainer, false)
+        cardContainer.addView(emptyView)
+    }
+
+    /** Save the card stack position for restoring on return */
+    private fun saveSwipePosition(index: Int) {
+        requireContext().getSharedPreferences("SwipePrefs", Context.MODE_PRIVATE)
+            .edit()
+            .putInt("swipe_index", index)
+            .apply()
     }
 }
