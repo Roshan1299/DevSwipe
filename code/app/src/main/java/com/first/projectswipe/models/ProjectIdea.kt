@@ -1,3 +1,5 @@
+// File: com/first/projectswipe/models/ProjectIdea.kt
+
 package com.first.projectswipe.models
 
 data class ProjectIdea(
@@ -5,11 +7,14 @@ data class ProjectIdea(
     val title: String = "",
     val previewDescription: String = "",
     val fullDescription: String = "",
-    val createdBy: String = "",  // UID or email of the creator
+    val createdBy: String = "",
     val tags: List<String> = emptyList(),
     val createdByName: String = "",
-    val difficulty: String = "Beginner",
+    val difficulty: String = "",
     val githubLink: String = "",
     val timeline: String = ""
-//    val createdAt: Timestamp = Timestamp.now(),
-)
+) {
+    override fun toString(): String {
+        return "ProjectIdea(title='$title', difficulty='$difficulty', tags=$tags)"
+    }
+}
