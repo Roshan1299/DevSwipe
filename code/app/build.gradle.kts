@@ -6,7 +6,7 @@ plugins {
 }
 
 android {
-    namespace = "com.first.projectswipe"
+    namespace = "com.first.android"
     compileSdk = 35
 
     defaultConfig {
@@ -42,6 +42,31 @@ android {
         viewBinding = true
         dataBinding = true
     }
+
+    testOptions {
+        unitTests {
+            isIncludeAndroidResources = true
+            isReturnDefaultValues = true
+        }
+    }
+
+    // Add this to fix Kapt issues with tests
+    kapt {
+        correctErrorTypes = true
+        useBuildCache = false // Disable for debugging
+    }
+
+    packaging {
+        resources {
+            excludes += setOf(
+                "META-INF/LICENSE.md",
+                "META-INF/LICENSE",
+                "META-INF/LICENSE.txt",
+                "META-INF/NOTICE",
+                "META-INF/NOTICE.txt"
+            )
+        }
+    }
 }
 
 dependencies {
@@ -53,7 +78,8 @@ dependencies {
     implementation(libs.androidx.navigation.ui.ktx)
 
     // Firebase (Use BOM to manage versions)
-    implementation(platform("com.google.firebase:firebase-bom:33.1.0")) // Updated to latest BOM
+    implementation(platform("com.google.firebase:firebase-bom:33.1.0"))
+    implementation("com.google.android.gms:play-services-auth:21.0.0")
     implementation("com.google.firebase:firebase-auth-ktx")
     implementation("com.google.firebase:firebase-firestore-ktx")
     implementation("com.google.firebase:firebase-storage-ktx")
@@ -70,8 +96,40 @@ dependencies {
     // Flexbox
     implementation("com.google.android.flexbox:flexbox:3.0.0")
 
-    // Testing
-    testImplementation(libs.junit)
-    androidTestImplementation(libs.androidx.junit)
-    androidTestImplementation(libs.androidx.espresso.core)
+    // Unit Testing Dependencies
+    testImplementation("junit:junit:4.13.2")
+    testImplementation("io.mockk:mockk:1.13.8") // Updated version
+    testImplementation("org.robolectric:robolectric:4.11.1") // Updated version
+    testImplementation("androidx.test:core:1.5.0")
+    testImplementation("androidx.test.ext:junit:1.1.5")
+    testImplementation("androidx.arch.core:core-testing:2.2.0")
+    testImplementation("org.jetbrains.kotlinx:kotlinx-coroutines-test:1.8.1")
+    testImplementation("androidx.navigation:navigation-testing:2.7.6")
+
+    // Add these for better testing support
+    testImplementation("androidx.test:runner:1.5.2")
+    testImplementation("androidx.test:rules:1.5.0")
+
+
+    // Android Instrumented Testing Dependencies
+    androidTestImplementation("androidx.test.ext:junit:1.1.5")
+    androidTestImplementation("androidx.fragment:fragment-testing:1.6.2") // or latest stable
+    androidTestImplementation("androidx.test.espresso:espresso-core:3.5.1")
+    androidTestImplementation("androidx.test.espresso:espresso-contrib:3.5.1")
+    androidTestImplementation("androidx.test.espresso:espresso-intents:3.5.1")
+    androidTestImplementation("androidx.test:runner:1.5.2")
+    androidTestImplementation("androidx.test:rules:1.5.0")
+    androidTestImplementation("androidx.navigation:navigation-testing:2.7.6")
+    androidTestImplementation("io.mockk:mockk-android:1.13.8")
+
+//     Firebase Testing - Remove these as they can cause conflicts
+//     testImplementation("com.google.firebase:firebase-auth")
+//     androidTestImplementation("com.google.firebase:firebase-auth")
+
+    // Debug implementations for testing
+    debugImplementation("androidx.fragment:fragment-testing:1.6.2")
+
+    // Add this to avoid kapt issues with testing
+    kaptTest("com.github.bumptech.glide:compiler:4.16.0")
+    kaptAndroidTest("com.github.bumptech.glide:compiler:4.16.0")
 }
