@@ -6,7 +6,7 @@ plugins {
 }
 
 android {
-    namespace = "com.first.android"
+    namespace = "com.first.projectswipe"
     compileSdk = 35
 
     defaultConfig {
