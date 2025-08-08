@@ -1,6 +1,6 @@
 // File: com/first/projectswipe/models/ProjectIdea.kt
 
-package com.first.projectswipe.models
+package com.first.projectswipe.data.models
 
 data class ProjectIdea(
     val id: String = "",

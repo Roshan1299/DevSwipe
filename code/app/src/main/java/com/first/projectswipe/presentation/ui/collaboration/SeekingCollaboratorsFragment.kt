@@ -1,4 +1,4 @@
-package com.first.projectswipe
+package com.first.projectswipe.presentation.ui.collaboration
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View

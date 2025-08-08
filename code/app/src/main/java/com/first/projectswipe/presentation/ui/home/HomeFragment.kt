@@ -1,6 +1,6 @@
 // File: com/first/projectswipe/home/HomeFragment.kt
 
-package com.first.projectswipe.home
+package com.first.projectswipe.presentation.ui.home
 
 import android.content.Context
 import android.os.Bundle
@@ -17,7 +17,7 @@ import androidx.drawerlayout.widget.DrawerLayout
 import androidx.fragment.app.Fragment
 import androidx.navigation.fragment.findNavController
 import com.first.projectswipe.R
-import com.first.projectswipe.models.ProjectIdea
+import com.first.projectswipe.data.models.ProjectIdea
 import com.first.projectswipe.utils.CardStackManager
 import com.google.android.material.navigation.NavigationView
 import com.google.firebase.auth.FirebaseAuth

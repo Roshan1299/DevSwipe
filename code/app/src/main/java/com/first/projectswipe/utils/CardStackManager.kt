@@ -8,7 +8,7 @@ import android.view.View
 import android.view.animation.OvershootInterpolator
 import android.widget.FrameLayout
 import com.first.projectswipe.R
-import com.first.projectswipe.models.ProjectIdea
+import com.first.projectswipe.data.models.ProjectIdea
 
 class CardStackManager(
     private val context: Context,

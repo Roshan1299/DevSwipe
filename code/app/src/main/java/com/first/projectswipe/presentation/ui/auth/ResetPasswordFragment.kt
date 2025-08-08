@@ -1,4 +1,4 @@
-package com.first.projectswipe.auth
+package com.first.projectswipe.presentation.ui.auth
 
 import android.os.Bundle
 import android.util.Log

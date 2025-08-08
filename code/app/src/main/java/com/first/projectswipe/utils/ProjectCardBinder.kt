@@ -9,7 +9,7 @@ import android.widget.ImageView
 import android.widget.TextView
 import com.bumptech.glide.Glide
 import com.first.projectswipe.R
-import com.first.projectswipe.models.ProjectIdea
+import com.first.projectswipe.data.models.ProjectIdea
 import com.google.android.material.chip.Chip
 import com.google.android.material.chip.ChipGroup
 

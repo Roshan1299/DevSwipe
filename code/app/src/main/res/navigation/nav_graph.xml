@@ -15,7 +15,7 @@
     <!-- Login Fragment -->
     <fragment
         android:id="@+id/loginFragment"
-        android:name="com.first.projectswipe.auth.LoginFragment"
+        android:name="com.first.projectswipe.presentation.ui.auth.LoginFragment"
         tools:layout="@layout/fragment_login">
         <action
             android:id="@+id/action_loginFragment_to_registerFragment"
@@ -34,7 +34,7 @@
     <!-- Reset Password -->
     <fragment
         android:id="@+id/ResetPasswordFragment"
-        android:name="com.first.projectswipe.auth.ResetPasswordFragment"
+        android:name="com.first.projectswipe.presentation.ui.auth.ResetPasswordFragment"
         tools:layout="@layout/fragment_reset_password">
         <action
             android:id="@+id/action_resetPasswordFragment_to_loginFragment"
@@ -44,7 +44,7 @@
     <!-- Register Fragment -->
     <fragment
         android:id="@+id/registerFragment"
-        android:name="com.first.projectswipe.auth.RegisterFragment"
+        android:name="com.first.projectswipe.presentation.ui.auth.RegisterFragment"
         tools:layout="@layout/fragment_register">
         <action
             android:id="@+id/action_registerFragment_to_loginFragment"
@@ -60,7 +60,7 @@
     <!-- Home Fragment (Ideas Feed) -->
     <fragment
         android:id="@+id/homeFragment"
-        android:name="com.first.projectswipe.home.HomeFragment"
+        android:name="com.first.projectswipe.presentation.ui.home.HomeFragment"
         android:label="Ideas"
         tools:layout="@layout/fragment_home">
         <action
@@ -71,7 +71,7 @@
     <!-- Profile Fragment -->
     <fragment
         android:id="@+id/profileFragment"
-        android:name="com.first.projectswipe.profile.ProfileFragment"
+        android:name="com.first.projectswipe.presentation.ui.profile.ProfileFragment"
         android:label="Profile"
         tools:layout="@layout/fragment_profile">
         <action
@@ -90,7 +90,7 @@
     <!-- Edit Profile -->
     <fragment
         android:id="@+id/editProfileFragment"
-        android:name="com.first.projectswipe.profile.EditProfileFragment"
+        android:name="com.first.projectswipe.presentation.ui.profile.EditProfileFragment"
         android:label="Edit Profile"
         tools:layout="@layout/fragment_edit_profile">
         <action
@@ -101,7 +101,7 @@
     <!-- Create Post -->
     <fragment
         android:id="@+id/createPostFragment"
-        android:name="com.first.projectswipe.projects.CreatePostFragment"
+        android:name="com.first.projectswipe.presentation.ui.projects.CreatePostFragment"
         android:label="Create Post"
         tools:layout="@layout/fragment_create_post">
         <action
@@ -119,7 +119,7 @@
     <!-- Onboarding Skills Fragment -->
     <fragment
         android:id="@+id/onboardingSkillsFragment"
-        android:name="com.first.projectswipe.onboarding.OnboardingSkillsFragment"
+        android:name="com.first.projectswipe.presentation.ui.onboarding.OnboardingSkillsFragment"
         android:label="Skills Selection"
         tools:layout="@layout/fragment_onboarding_skills">
         <action
@@ -130,7 +130,7 @@
     <!-- Onboarding Interests Fragment -->
     <fragment
         android:id="@+id/onboardingInterestsFragment"
-        android:name="com.first.projectswipe.onboarding.OnboardingInterestsFragment"
+        android:name="com.first.projectswipe.presentation.ui.onboarding.OnboardingInterestsFragment"
         android:label="Interests Selection"
         tools:layout="@layout/fragment_onboarding_interests">
         <action

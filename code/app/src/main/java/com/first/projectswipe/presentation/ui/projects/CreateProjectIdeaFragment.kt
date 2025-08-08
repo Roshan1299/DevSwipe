@@ -1,4 +1,4 @@
-package com.first.projectswipe.projects
+package com.first.projectswipe.presentation.ui.projects
 
 import android.os.Bundle
 import android.text.InputFilter

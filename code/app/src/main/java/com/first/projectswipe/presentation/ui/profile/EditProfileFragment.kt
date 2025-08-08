@@ -1,4 +1,4 @@
-package com.first.projectswipe.profile
+package com.first.projectswipe.presentation.ui.profile
 
 import android.Manifest
 import android.app.Activity

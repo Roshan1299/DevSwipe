@@ -1,6 +1,6 @@
 // File: com/first/projectswipe/home/FilterBottomSheet.kt
 
-package com.first.projectswipe.home
+package com.first.projectswipe.presentation.ui.home
 
 import android.os.Bundle
 import android.util.Log

@@ -1,4 +1,4 @@
-package com.first.projectswipe.adapters
+package com.first.projectswipe.presentation.adapters
 
 import android.os.Bundle
 import android.view.LayoutInflater
@@ -10,7 +10,7 @@ import android.widget.TextView
 import androidx.navigation.findNavController
 import androidx.recyclerview.widget.RecyclerView
 import com.first.projectswipe.R
-import com.first.projectswipe.models.ProjectIdea
+import com.first.projectswipe.data.models.ProjectIdea
 import com.google.android.material.chip.Chip
 import com.google.android.material.chip.ChipGroup
 import com.google.firebase.firestore.FirebaseFirestore

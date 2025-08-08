@@ -1,4 +1,4 @@
-package com.first.projectswipe.profile
+package com.first.projectswipe.presentation.ui.profile
 import android.graphics.Color
 import android.os.Bundle
 import android.view.LayoutInflater
@@ -12,8 +12,8 @@ import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.first.projectswipe.R
-import com.first.projectswipe.adapters.ProfilePostAdapter
-import com.first.projectswipe.models.ProjectIdea
+import com.first.projectswipe.presentation.adapters.ProfilePostAdapter
+import com.first.projectswipe.data.models.ProjectIdea
 import com.google.android.material.chip.Chip
 import com.google.android.material.chip.ChipGroup
 import com.google.firebase.auth.FirebaseAuth

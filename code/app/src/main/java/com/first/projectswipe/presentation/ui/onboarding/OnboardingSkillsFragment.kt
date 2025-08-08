@@ -1,4 +1,4 @@
-package com.first.projectswipe.onboarding
+package com.first.projectswipe.presentation.ui.onboarding
 
 import android.os.Bundle
 import android.view.LayoutInflater
