@@ -6,6 +6,8 @@
 [![CI](https://github.com/Roshan1299/DevSwipe/workflows/Android%20CI/badge.svg)](https://github.com/Roshan1299/DevSwipe/actions)
 [![Release](https://img.shields.io/github/v/release/Roshan1299/DevSwipe?include_prereleases&label=beta&logo=github)](https://github.com/Roshan1299/DevSwipe/releases)
 
+<!-- <img width="1536" height="1024" alt="DevSwipe Marketing banner" src="https://github.com/user-attachments/assets/dfe2efb0-ab55-4020-a645-bef61207580e" /> -->
+
 > **Discover side projects and find collaborators through an engaging Tinder-style interface**
 
 DevSwipe is a mobile Android app designed for university students to discover exciting side project ideas and connect with peers for collaboration. Say goodbye to endless scrolling through forums – just swipe, match, and build together!
@@ -77,21 +79,18 @@ University students aged 18-25 interested in:
 
 ## 📦 Installation
 
-Download the latest APK from [Releases](https://github.com/Roshan1299/DevSwipe/releases) or build from source - see [Developer Setup](docs/SETUP.md) for detailed instructions.
+### 📱 For Users
+- Download the latest APK from [Releases](https://github.com/Roshan1299/DevSwipe/releases)
+- Enable "Install from Unknown Sources" in Android settings
+- Install and enjoy!
 
-## 🛣️ Roadmap
+### 👨‍💻 For Developers
+1. Clone the repository
+2. Open in Android Studio Arctic Fox+
+3. Set up Firebase (see [Firebase Setup](docs/FIREBASE_SETUP.md))
+4. Build and run
 
-### Phase 1: MVP (Current) ✅
-Core swiping functionality and project discovery
-
-### Phase 2: Collaboration 🔄
-- Collaborator matching and messaging
-- Advanced filtering and recommendations
-
-### Phase 3: Scale & Enhance 📈
-- PostgreSQL migration
-- University integration
-- Advanced project management features
+See our [Development Guide](docs/SETUP.md) for detailed setup instructions.
 
 ## 🤝 Contributing
 
@@ -99,9 +98,9 @@ We welcome contributions! Please read our [Contributing Guidelines](CONTRIBUTING
 
 ## 📚 Documentation
 
-- [Developer Setup Guide](docs/SETUP.md) - How to build and run the project
-- [API Documentation](docs/API.md) - Firebase integration and data models  
-- [UI/UX Guidelines](docs/DESIGN.md) - Design principles and component usage
+- [Architecture Overview](docs/ARCHITECTURE.md) - High-level system architecture and component interactions  
+- [Database Schema](docs/DATABASE_SCHEMA.md) - Detailed data model and Firestore schema design
+
 
 ## 📄 License
 
