@@ -1,8 +1,8 @@
-# Contributing to ProjectSwipe
+# Contributing to DevSwipe
 
-First off, thank you for considering contributing to ProjectSwipe! 🎉
+First off, thank you for considering contributing to DevSwipe! 🎉
 
-ProjectSwipe is an open-source Android application that helps university students discover side project ideas through a Tinder-style interface. We welcome contributions from developers of all skill levels.
+DevSwipe is an open-source Android application that helps university students discover side project ideas through a Tinder-style interface. We welcome contributions from developers of all skill levels.
 
 ## 📋 Table of Contents
 
@@ -61,12 +61,12 @@ Before contributing, ensure you have:
 1. **Fork the repository** on GitHub
 2. **Clone your fork** locally:
    ```bash
-   git clone https://github.com/YOUR_USERNAME/ProjectSwipe.git
-   cd ProjectSwipe
+   git clone https://github.com/YOUR_USERNAME/DevSwipe.git
+   cd DevSwipe
    ```
 3. **Add upstream remote**:
    ```bash
-   git remote add upstream https://github.com/ORIGINAL_OWNER/ProjectSwipe.git
+   git remote add upstream https://github.com/ORIGINAL_OWNER/DevSwipe.git
    ```
 4. **Follow the setup guide**: See [SETUP.md](SETUP.md) for detailed instructions
 5. **Configure Firebase**: Follow [FIREBASE_SETUP.md](FIREBASE_SETUP.md)
@@ -125,16 +125,6 @@ Then create a Pull Request on GitHub.
 - Use Android Studio's built-in formatter
 - Format code before committing: `Ctrl+Alt+L` (Windows/Linux) or `Cmd+Option+L` (Mac)
 - Configure ktlint for consistent formatting
-
-### File Structure
-```
-app/src/main/java/com/yourname/projectswipe/
-├── data/           # Data layer (repositories, models)
-├── domain/         # Business logic (use cases)
-├── presentation/   # UI layer (activities, fragments, viewmodels)
-├── di/            # Dependency injection
-└── utils/         # Utility classes
-```
 
 ### Naming Conventions
 - **Classes**: PascalCase (`ProjectRepository`)
@@ -291,7 +281,7 @@ Help us improve by contributing to:
 
 ## 🎉 Thank You!
 
-Your contributions make ProjectSwipe better for university students worldwide. Every bug fix, feature addition, and documentation improvement helps students discover and collaborate on amazing projects.
+Your contributions make DevSwipe better for university students worldwide. Every bug fix, feature addition, and documentation improvement helps students discover and collaborate on amazing projects.
 
 ---
 
