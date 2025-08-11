@@ -14,8 +14,8 @@ data class User(
     @GeneratedValue(strategy = GenerationType.UUID)
     val id: UUID? = null,
 
-    @Column(unique = true, nullable = false)
-    val username: String,
+    @Column(name = "username", unique = true, nullable = false)
+    val displayUsername: String, // Using displayUsername to avoid conflict
 
     @Column(unique = true, nullable = false)
     val email: String,
@@ -40,7 +40,7 @@ data class User(
     }
 
     override fun getPassword(): String = passwordHash
-    override fun getUsername(): String = email // Using email as username for authentication
+    override fun getUsername(): String = email // Using email as username for Spring Security
     override fun isAccountNonExpired(): Boolean = true
     override fun isAccountNonLocked(): Boolean = true
     override fun isCredentialsNonExpired(): Boolean = true
