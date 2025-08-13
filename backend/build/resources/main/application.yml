@@ -1,0 +1,36 @@
+spring:
+  application:
+    name: backend
+
+  # Database config (we'll set up PostgreSQL next)
+  datasource:
+    url: jdbc:postgresql://localhost:5432/devswipe_db
+    username: ${DB_USERNAME:devswipe}
+    password: ${DB_PASSWORD:password}
+    driver-class-name: org.postgresql.Driver
+
+  jpa:
+    hibernate:
+      ddl-auto: validate
+    show-sql: false
+    properties:
+      hibernate:
+        dialect: org.hibernate.dialect.PostgreSQLDialect
+        format_sql: true
+
+  flyway:
+    locations: classpath:db/migration
+    baseline-on-migrate: true
+
+server:
+  port: 8080
+
+# JWT Configuration
+jwt:
+  secret: ${JWT_SECRET:your-super-secret-key-change-this-in-production-make-it-very-long}
+  expiration: 86400000 # 24 hours
+  refresh-expiration: 604800000 # 7 days
+
+logging:
+  level:
+    com.first.devswipe: DEBUG
