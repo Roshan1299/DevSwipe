@@ -30,12 +30,12 @@ android {
     }
 
     compileOptions {
-        sourceCompatibility = JavaVersion.VERSION_11
-        targetCompatibility = JavaVersion.VERSION_11
+        sourceCompatibility = JavaVersion.VERSION_17
+        targetCompatibility = JavaVersion.VERSION_17
     }
 
     kotlinOptions {
-        jvmTarget = "11"
+        jvmTarget = "17"
     }
 
     buildFeatures {
@@ -59,12 +59,17 @@ android {
     packaging {
         resources {
             excludes += setOf(
+                "META-INF/LICENSE-notice.md",  // Add this line (matches your error)
                 "META-INF/LICENSE.md",
-                "META-INF/LICENSE",
                 "META-INF/LICENSE.txt",
-                "META-INF/NOTICE",
-                "META-INF/NOTICE.txt"
+                "META-INF/NOTICE.md",
+                "META-INF/NOTICE.txt",
+                "META-INF/AL2.0",
+                "META-INF/LGPL2.1",
+                "/META-INF/{AL2.0,LGPL2.1}", // For coroutines
+                "**/attach_hotspot_windows.dll" // Windows-specific (if needed)
             )
+            merges += setOf("META-INF/INDEX.LIST") // Optional: merge instead of exclude
         }
     }
 }
