@@ -9,10 +9,16 @@ import java.util.*
 
 @Repository
 interface ProjectRepository : JpaRepository<Project, UUID> {
-    fun findByCreatedBy(createdBy: UUID): List<Project>
+    fun findByCreatedByOrderByCreatedAtDesc(createdBy: UUID): List<Project>
+
+    fun findByDifficultyOrderByCreatedAtDesc(difficulty: String): List<Project>
+
+    @Query("SELECT p FROM Project p WHERE p.title ILIKE %:query% OR p.fullDescription ILIKE %:query% OR p.previewDescription ILIKE %:query%")
+    fun searchProjects(@Param("query") query: String): List<Project>
 
     @Query(value = "SELECT * FROM projects WHERE :tag = ANY(tags)", nativeQuery = true)
-    fun findByTag(@Param("tag") tag: String): List<Project>
+    fun findByTagsContaining(@Param("tag") tag: String): List<Project>
 
-    fun findByDifficulty(difficulty: String): List<Project>
+    @Query("SELECT p FROM Project p WHERE p.createdBy = :userId")
+    fun findByUserId(@Param("userId") userId: UUID): List<Project>
 }
