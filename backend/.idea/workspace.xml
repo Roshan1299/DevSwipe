@@ -1,0 +1,242 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="AutoImportSettings">
+    <option name="autoReloadType" value="NONE" />
+  </component>
+  <component name="ChangeListManager">
+    <list default="true" id="788ed65b-853a-41da-814d-84812ee7d0af" name="Changes" comment="refactor: migrate user-project relationships to JPA" />
+    <option name="SHOW_DIALOG" value="false" />
+    <option name="HIGHLIGHT_CONFLICTS" value="true" />
+    <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
+    <option name="LAST_RESOLUTION" value="IGNORE" />
+  </component>
+  <component name="ClangdSettings">
+    <option name="formatViaClangd" value="false" />
+  </component>
+  <component name="ExternalProjectsData">
+    <projectState path="$PROJECT_DIR$">
+      <ProjectState />
+    </projectState>
+  </component>
+  <component name="FileTemplateManagerImpl">
+    <option name="RECENT_TEMPLATES">
+      <list>
+        <option value="Kotlin Class" />
+      </list>
+    </option>
+  </component>
+  <component name="Git.Settings">
+    <option name="RECENT_BRANCH_BY_REPOSITORY">
+      <map>
+        <entry key="$PROJECT_DIR$/.." value="migration/resi-api" />
+      </map>
+    </option>
+    <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$/.." />
+  </component>
+  <component name="GitHubPullRequestSearchHistory">{
+  &quot;lastFilter&quot;: {
+    &quot;state&quot;: &quot;OPEN&quot;,
+    &quot;assignee&quot;: &quot;Roshan1299&quot;
+  }
+}</component>
+  <component name="GithubPullRequestsUISettings">{
+  &quot;selectedUrlAndAccountId&quot;: {
+    &quot;url&quot;: &quot;https://github.com/Roshan1299/ProjectSwipe.git&quot;,
+    &quot;accountId&quot;: &quot;3494d9be-35cd-4bd1-886a-89cd041a320b&quot;
+  }
+}</component>
+  <component name="ProjectColorInfo">{
+  &quot;associatedIndex&quot;: 1
+}</component>
+  <component name="ProjectId" id="315F3jLuVdRqmc2wwYqD7cACufo" />
+  <component name="ProjectLevelVcsManager">
+    <ConfirmationsSetting value="1" id="Add" />
+  </component>
+  <component name="ProjectViewState">
+    <option name="hideEmptyMiddlePackages" value="true" />
+    <option name="showLibraryContents" value="true" />
+  </component>
+  <component name="PropertiesComponent"><![CDATA[{
+  "keyToString": {
+    "ModuleVcsDetector.initialDetectionPerformed": "true",
+    "RunOnceActivity.ShowReadmeOnStart": "true",
+    "RunOnceActivity.cidr.known.project.marker": "true",
+    "RunOnceActivity.git.unshallow": "true",
+    "RunOnceActivity.readMode.enableVisualFormatting": "true",
+    "cf.first.check.clang-format": "false",
+    "cidr.known.project.marker": "true",
+    "git-widget-placeholder": "main",
+    "kotlin-language-version-configured": "true",
+    "last_opened_file_path": "/Users/roshan/Github/ProjectSwipe/ProjectSwipe/backend"
+  }
+}]]></component>
+  <component name="TaskManager">
+    <task active="true" id="Default" summary="Default task">
+      <changelist id="788ed65b-853a-41da-814d-84812ee7d0af" name="Changes" comment="" />
+      <created>1754805829897</created>
+      <option name="number" value="Default" />
+      <option name="presentableId" value="Default" />
+      <updated>1754805829897</updated>
+    </task>
+    <task id="LOCAL-00001" summary="initial backend setup">
+      <option name="closed" value="true" />
+      <created>1754807621851</created>
+      <option name="number" value="00001" />
+      <option name="presentableId" value="LOCAL-00001" />
+      <option name="project" value="LOCAL" />
+      <updated>1754807621851</updated>
+    </task>
+    <task id="LOCAL-00002" summary="added springboot and postgresql dependencies">
+      <option name="closed" value="true" />
+      <created>1754807698101</created>
+      <option name="number" value="00002" />
+      <option name="presentableId" value="LOCAL-00002" />
+      <option name="project" value="LOCAL" />
+      <updated>1754807698101</updated>
+    </task>
+    <task id="LOCAL-00003" summary="other imp additions for backend">
+      <option name="closed" value="true" />
+      <created>1754807715783</created>
+      <option name="number" value="00003" />
+      <option name="presentableId" value="LOCAL-00003" />
+      <option name="project" value="LOCAL" />
+      <updated>1754807715783</updated>
+    </task>
+    <task id="LOCAL-00004" summary="chore">
+      <option name="closed" value="true" />
+      <created>1754890274408</created>
+      <option name="number" value="00004" />
+      <option name="presentableId" value="LOCAL-00004" />
+      <option name="project" value="LOCAL" />
+      <updated>1754890274408</updated>
+    </task>
+    <task id="LOCAL-00005" summary="feat: Added database schema and basic backend class">
+      <option name="closed" value="true" />
+      <created>1754890304207</created>
+      <option name="number" value="00005" />
+      <option name="presentableId" value="LOCAL-00005" />
+      <option name="project" value="LOCAL" />
+      <updated>1754890304207</updated>
+    </task>
+    <task id="LOCAL-00006" summary="feat: Added entities to match our database schema">
+      <option name="closed" value="true" />
+      <created>1754891316286</created>
+      <option name="number" value="00006" />
+      <option name="presentableId" value="LOCAL-00006" />
+      <option name="project" value="LOCAL" />
+      <updated>1754891316286</updated>
+    </task>
+    <task id="LOCAL-00007" summary="feat: Added user repository to match our database schema">
+      <option name="closed" value="true" />
+      <created>1754891335646</created>
+      <option name="number" value="00007" />
+      <option name="presentableId" value="LOCAL-00007" />
+      <option name="project" value="LOCAL" />
+      <updated>1754891335646</updated>
+    </task>
+    <task id="LOCAL-00008" summary="feat: set up JWT authentication infrastructure">
+      <option name="closed" value="true" />
+      <created>1754896960173</created>
+      <option name="number" value="00008" />
+      <option name="presentableId" value="LOCAL-00008" />
+      <option name="project" value="LOCAL" />
+      <updated>1754896960173</updated>
+    </task>
+    <task id="LOCAL-00009" summary="feat: feat: configure Spring Security with JWT">
+      <option name="closed" value="true" />
+      <created>1754896992103</created>
+      <option name="number" value="00009" />
+      <option name="presentableId" value="LOCAL-00009" />
+      <option name="project" value="LOCAL" />
+      <updated>1754896992103</updated>
+    </task>
+    <task id="LOCAL-00010" summary="feat: implement authentication endpoints">
+      <option name="closed" value="true" />
+      <created>1754897015731</created>
+      <option name="number" value="00010" />
+      <option name="presentableId" value="LOCAL-00010" />
+      <option name="project" value="LOCAL" />
+      <updated>1754897015731</updated>
+    </task>
+    <task id="LOCAL-00011" summary="chore: configure outputs and small changes">
+      <option name="closed" value="true" />
+      <created>1754897656318</created>
+      <option name="number" value="00011" />
+      <option name="presentableId" value="LOCAL-00011" />
+      <option name="project" value="LOCAL" />
+      <updated>1754897656318</updated>
+    </task>
+    <task id="LOCAL-00012" summary="fix: Protected Endpoint">
+      <option name="closed" value="true" />
+      <created>1755065780982</created>
+      <option name="number" value="00012" />
+      <option name="presentableId" value="LOCAL-00012" />
+      <option name="project" value="LOCAL" />
+      <updated>1755065780982</updated>
+    </task>
+    <task id="LOCAL-00013" summary="feat: implement user profile REST API endpoints">
+      <option name="closed" value="true" />
+      <created>1755067488997</created>
+      <option name="number" value="00013" />
+      <option name="presentableId" value="LOCAL-00013" />
+      <option name="project" value="LOCAL" />
+      <updated>1755067488997</updated>
+    </task>
+    <task id="LOCAL-00014" summary="feat: add project creation and management API">
+      <option name="closed" value="true" />
+      <created>1755067511679</created>
+      <option name="number" value="00014" />
+      <option name="presentableId" value="LOCAL-00014" />
+      <option name="project" value="LOCAL" />
+      <updated>1755067511679</updated>
+    </task>
+    <task id="LOCAL-00015" summary="test: add API integration tests for core workflows">
+      <option name="closed" value="true" />
+      <created>1755067537273</created>
+      <option name="number" value="00015" />
+      <option name="presentableId" value="LOCAL-00015" />
+      <option name="project" value="LOCAL" />
+      <updated>1755067537273</updated>
+    </task>
+    <task id="LOCAL-00016" summary="refactor: migrate user-project relationships to JPA">
+      <option name="closed" value="true" />
+      <created>1755067559294</created>
+      <option name="number" value="00016" />
+      <option name="presentableId" value="LOCAL-00016" />
+      <option name="project" value="LOCAL" />
+      <updated>1755067559294</updated>
+    </task>
+    <option name="localTasksCounter" value="17" />
+    <servers />
+  </component>
+  <component name="Vcs.Log.Tabs.Properties">
+    <option name="TAB_STATES">
+      <map>
+        <entry key="MAIN">
+          <value>
+            <State />
+          </value>
+        </entry>
+      </map>
+    </option>
+  </component>
+  <component name="VcsManagerConfiguration">
+    <MESSAGE value="initial backend setup" />
+    <MESSAGE value="added springboot and postgresql dependencies" />
+    <MESSAGE value="other imp additions for backend" />
+    <MESSAGE value="chore" />
+    <MESSAGE value="feat: Added database schema and basic backend class" />
+    <MESSAGE value="feat: Added entities to match our database schema" />
+    <MESSAGE value="feat: Added user repository to match our database schema" />
+    <MESSAGE value="feat: set up JWT authentication infrastructure" />
+    <MESSAGE value="feat: feat: configure Spring Security with JWT" />
+    <MESSAGE value="feat: implement authentication endpoints" />
+    <MESSAGE value="chore: configure outputs and small changes" />
+    <MESSAGE value="fix: Protected Endpoint" />
+    <MESSAGE value="feat: implement user profile REST API endpoints" />
+    <MESSAGE value="feat: add project creation and management API" />
+    <MESSAGE value="test: add API integration tests for core workflows" />
+    <MESSAGE value="refactor: migrate user-project relationships to JPA" />
+    <option name="LAST_COMMIT_MESSAGE" value="refactor: migrate user-project relationships to JPA" />
+  </component>
+</project>
