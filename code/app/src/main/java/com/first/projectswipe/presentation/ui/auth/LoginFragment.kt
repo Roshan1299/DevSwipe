@@ -12,8 +12,8 @@ import androidx.fragment.app.Fragment
 import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.findNavController
 import com.first.projectswipe.R
-import com.first.projectswipe.auth.AuthManager
-import com.first.projectswipe.auth.AuthResult
+import com.first.projectswipe.presentation.ui.auth.AuthManager
+import com.first.projectswipe.presentation.ui.auth.AuthResult
 import com.first.projectswipe.databinding.FragmentLoginBinding
 import com.first.projectswipe.network.NetworkModule
 import kotlinx.coroutines.launch
@@ -154,26 +154,38 @@ class LoginFragment : Fragment() {
             try {
                 when (val result = authManager.login(email, password)) {
                     is AuthResult.Success -> {
-                        showLoading(false)
-                        Log.d(TAG, "Login successful")
-                        showToast("Welcome back!")
+                        // Check if fragment is still attached before updating UI
+                        if (isAdded && _binding != null) {
+                            showLoading(false)
+                            Log.d(TAG, "Login successful")
+                            showToast("Welcome back!")
+                        }
                         // Navigation will be handled by observeAuthState()
                     }
                     is AuthResult.Error -> {
-                        showLoading(false)
-                        Log.e(TAG, "Login failed: ${result.message}")
-                        showToast(result.message)
+                        // Check if fragment is still attached before updating UI
+                        if (isAdded && _binding != null) {
+                            showLoading(false)
+                            Log.e(TAG, "Login failed: ${result.message}")
+                            showToast(result.message)
+                        }
                     }
                 }
             } catch (e: Exception) {
-                showLoading(false)
-                Log.e(TAG, "Login error: ${e.message}", e)
-                showToast("Login failed. Please try again.")
+                // Check if fragment is still attached before updating UI
+                if (isAdded && _binding != null) {
+                    showLoading(false)
+                    Log.e(TAG, "Login error: ${e.message}", e)
+                    showToast("Login failed. Please try again.")
+                }
             }
         }
     }
 
     private fun showLoading(isLoading: Boolean) {
+        // Check if binding is available before using it
+        if (_binding == null) return
+
         binding.progressIndicator.visibility = if (isLoading) View.VISIBLE else View.GONE
         binding.loginButton.isEnabled = !isLoading
         binding.emailInput.isEnabled = !isLoading
@@ -188,7 +200,10 @@ class LoginFragment : Fragment() {
     }
 
     private fun showToast(message: String) {
-        Toast.makeText(context, message, Toast.LENGTH_SHORT).show()
+        // Only show toast if context is available
+        context?.let { ctx ->
+            Toast.makeText(ctx, message, Toast.LENGTH_SHORT).show()
+        }
     }
 
     override fun onStart() {
