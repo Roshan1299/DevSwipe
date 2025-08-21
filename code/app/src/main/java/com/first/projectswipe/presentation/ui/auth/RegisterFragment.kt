@@ -1,6 +1,7 @@
 package com.first.projectswipe.presentation.ui.auth
 
 import android.os.Bundle
+import android.util.Log
 import android.util.Patterns
 import android.view.LayoutInflater
 import android.view.View
@@ -8,21 +9,21 @@ import android.view.ViewGroup
 import android.widget.ArrayAdapter
 import android.widget.AutoCompleteTextView
 import android.widget.Toast
+import androidx.core.widget.doOnTextChanged
 import androidx.fragment.app.Fragment
+import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.findNavController
 import com.first.projectswipe.R
 import com.first.projectswipe.databinding.FragmentRegisterBinding
-import com.google.firebase.auth.FirebaseAuth
-import com.google.firebase.auth.ktx.auth
-import com.google.firebase.firestore.FirebaseFirestore
-import com.google.firebase.ktx.Firebase
+import com.first.projectswipe.network.NetworkModule
+import kotlinx.coroutines.launch
 
 class RegisterFragment : Fragment() {
 
     private var _binding: FragmentRegisterBinding? = null
     private val binding get() = _binding!!
-    private lateinit var auth: FirebaseAuth
-    private lateinit var db: FirebaseFirestore
+    private lateinit var authManager: AuthManager
+    private val TAG = "RegisterFragment"
 
     // List of universities - you can expand this
     private val universities = arrayOf(
@@ -65,11 +66,18 @@ class RegisterFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        auth = Firebase.auth
-        db = FirebaseFirestore.getInstance()
-
+        setupAuth()
         setupUniversityDropdown()
         setupClickListeners()
+        setupTextWatchers()
+        observeAuthState()
+    }
+
+    private fun setupAuth() {
+        authManager = AuthManager.getInstance(requireContext())
+        val apiService = NetworkModule.provideApiService(requireContext())
+        authManager.initialize(apiService)
+        Log.d(TAG, "Auth manager initialized successfully")
     }
 
     private fun setupUniversityDropdown() {
@@ -86,15 +94,70 @@ class RegisterFragment : Fragment() {
             val university = binding.universityInput.text.toString().trim()
 
             if (validateInputs(fullName, email, password, confirmPassword, university)) {
-                showLoading(true)
-                registerWithFirebase(fullName, email, password, university)
+                registerUser(fullName, email, password, university)
             }
         }
 
         binding.loginPrompt.setOnClickListener {
-            // Navigate to login screen - adjust the action based on your navigation graph
             findNavController().navigate(R.id.action_registerFragment_to_loginFragment)
         }
+    }
+
+    private fun setupTextWatchers() {
+        binding.fullNameInput.doOnTextChanged { _, _, _, _ ->
+            updateRegisterButtonState()
+            clearFullNameError()
+        }
+
+        binding.emailInput.doOnTextChanged { _, _, _, _ ->
+            updateRegisterButtonState()
+            clearEmailError()
+        }
+
+        binding.passwordInput.doOnTextChanged { _, _, _, _ ->
+            updateRegisterButtonState()
+            clearPasswordError()
+        }
+
+        binding.confirmPasswordInput.doOnTextChanged { _, _, _, _ ->
+            updateRegisterButtonState()
+            clearConfirmPasswordError()
+        }
+
+        binding.universityInput.doOnTextChanged { _, _, _, _ ->
+            updateRegisterButtonState()
+            clearUniversityError()
+        }
+    }
+
+    private fun observeAuthState() {
+        authManager.isLoggedIn.observe(viewLifecycleOwner) { isLoggedIn ->
+            if (isLoggedIn) {
+                // Navigate to onboarding (skills selection)
+                try {
+                    findNavController().navigate(R.id.action_registerFragment_to_onboardingSkillsFragment)
+                } catch (e: Exception) {
+                    Log.e(TAG, "Navigation error: ${e.message}", e)
+                    // Fallback to home
+                    findNavController().navigate(R.id.homeFragment)
+                }
+            }
+        }
+    }
+
+    private fun updateRegisterButtonState() {
+        val fullName = binding.fullNameInput.text.toString().trim()
+        val email = binding.emailInput.text.toString().trim()
+        val password = binding.passwordInput.text.toString()
+        val confirmPassword = binding.confirmPasswordInput.text.toString()
+        val university = binding.universityInput.text.toString().trim()
+
+        val isEnabled = fullName.isNotEmpty() && email.isNotEmpty() &&
+                password.isNotEmpty() && confirmPassword.isNotEmpty() &&
+                university.isNotEmpty()
+
+        binding.registerButton.isEnabled = isEnabled
+        binding.registerButton.alpha = if (isEnabled) 1.0f else 0.6f
     }
 
     private fun validateInputs(
@@ -106,15 +169,16 @@ class RegisterFragment : Fragment() {
     ): Boolean {
 
         // Clear any previous errors
-        binding.fullNameLayout.error = null
-        binding.emailLayout.error = null
-        binding.passwordLayout.error = null
-        binding.confirmPasswordLayout.error = null
-        binding.universityLayout.error = null
+        clearAllErrors()
 
         when {
             fullName.isEmpty() -> {
                 binding.fullNameLayout.error = "Full name is required"
+                return false
+            }
+
+            fullName.length < 2 -> {
+                binding.fullNameLayout.error = "Full name must be at least 2 characters"
                 return false
             }
 
@@ -133,8 +197,8 @@ class RegisterFragment : Fragment() {
                 return false
             }
 
-            password.length < 6 -> {
-                binding.passwordLayout.error = "Password must be at least 6 characters"
+            password.length < 8 -> {
+                binding.passwordLayout.error = "Password must be at least 8 characters"
                 return false
             }
 
@@ -176,6 +240,12 @@ class RegisterFragment : Fragment() {
     }
 
     private fun isValidUniversityEmail(email: String, university: String): Boolean {
+        // For demonstration, we'll skip strict university email validation
+        // You can enable this if needed
+        return true
+
+        // Uncomment below for strict validation:
+        /*
         // If "Other" is selected, check for general university email patterns
         if (university == "Other") {
             return email.contains(".edu") ||
@@ -188,62 +258,99 @@ class RegisterFragment : Fragment() {
 
         // For specific universities, check against their domains
         val acceptedDomains = universityDomains[university] ?: return false
-
         return acceptedDomains.any { domain ->
             email.endsWith("@$domain")
         }
+        */
     }
 
-    private fun registerWithFirebase(fullName: String, email: String, password: String, university: String) {
-        auth.createUserWithEmailAndPassword(email, password)
-            .addOnCompleteListener(requireActivity()) { task ->
-                if (task.isSuccessful) {
-                    val uid = auth.currentUser?.uid
-                    if (uid != null) {
-                        saveUserProfileToFirestore(uid, fullName, email, university)
-                    } else {
-                        showLoading(false)
-                        showError("Registration failed: User ID not found")
+    private fun registerUser(
+        fullName: String,
+        email: String,
+        password: String,
+        university: String
+    ) {
+        showLoading(true)
+
+        // Extract first and last name
+        val nameParts = fullName.split(" ", limit = 2)
+        val firstName = nameParts.getOrNull(0) ?: ""
+        val lastName = nameParts.getOrNull(1) ?: ""
+
+        // Create username from email (part before @)
+        val username = email.substringBefore("@")
+
+        lifecycleScope.launch {
+            try {
+                when (val result = authManager.register(
+                    username = username,
+                    email = email,
+                    password = password,
+                    firstName = firstName.ifEmpty { null },
+                    lastName = lastName.ifEmpty { null }
+                )) {
+                    is AuthResult.Success -> {
+                        // Check if fragment is still attached before updating UI
+                        if (isAdded && _binding != null) {
+                            showLoading(false)
+                            Log.d(TAG, "Registration successful")
+                            showToast("Account created successfully!")
+                        }
+                        // Navigation will be handled by observeAuthState()
                     }
-                } else {
+
+                    is AuthResult.Error -> {
+                        // Check if fragment is still attached before updating UI
+                        if (isAdded && _binding != null) {
+                            showLoading(false)
+                            Log.e(TAG, "Registration failed: ${result.message}")
+                            showToast(result.message)
+                        }
+                    }
+                }
+            } catch (e: Exception) {
+                // Check if fragment is still attached before updating UI
+                if (isAdded && _binding != null) {
                     showLoading(false)
-                    val errorMessage = task.exception?.message ?: "Registration failed"
-                    showError(errorMessage)
+                    Log.e(TAG, "Registration error: ${e.message}", e)
+                    showToast("Registration failed. Please try again.")
                 }
             }
+        }
     }
 
-    private fun saveUserProfileToFirestore(uid: String, fullName: String, email: String, university: String) {
-        val user = hashMapOf(
-            "name" to fullName,
-            "email" to email,
-            "university" to university,
-            "bio" to "",
-            "skills" to listOf<String>(),
-            "interests" to listOf<String>(),
-            "profileImageUrl" to "",
-            "createdAt" to System.currentTimeMillis()
-        )
+    private fun clearAllErrors() {
+        binding.fullNameLayout.error = null
+        binding.emailLayout.error = null
+        binding.passwordLayout.error = null
+        binding.confirmPasswordLayout.error = null
+        binding.universityLayout.error = null
+    }
 
-        db.collection("users").document(uid)
-            .set(user)
-            .addOnSuccessListener {
-                showLoading(false)
-                showSuccess("Account created successfully!")
+    private fun clearFullNameError() {
+        binding.fullNameLayout.error = null
+    }
 
-                // Navigate to onboarding
-                findNavController().navigate(R.id.action_registerFragment_to_onboardingSkillsFragment)
-            }
-            .addOnFailureListener { exception ->
-                showLoading(false)
-                showError("Failed to save profile: ${exception.message}")
+    private fun clearEmailError() {
+        binding.emailLayout.error = null
+    }
 
-                // Delete the auth user if Firestore fails
-                auth.currentUser?.delete()
-            }
+    private fun clearPasswordError() {
+        binding.passwordLayout.error = null
+    }
+
+    private fun clearConfirmPasswordError() {
+        binding.confirmPasswordLayout.error = null
+    }
+
+    private fun clearUniversityError() {
+        binding.universityLayout.error = null
     }
 
     private fun showLoading(isLoading: Boolean) {
+        // Check if binding is available before using it
+        if (_binding == null) return
+
         binding.progressIndicator.visibility = if (isLoading) View.VISIBLE else View.GONE
         binding.registerButton.isEnabled = !isLoading
 
@@ -253,14 +360,20 @@ class RegisterFragment : Fragment() {
         binding.passwordInput.isEnabled = !isLoading
         binding.confirmPasswordInput.isEnabled = !isLoading
         binding.universityInput.isEnabled = !isLoading
+
+        // Update button appearance when loading
+        if (isLoading) {
+            binding.registerButton.alpha = 0.6f
+        } else {
+            updateRegisterButtonState()
+        }
     }
 
-    private fun showError(message: String) {
-        Toast.makeText(context, message, Toast.LENGTH_LONG).show()
-    }
-
-    private fun showSuccess(message: String) {
-        Toast.makeText(context, message, Toast.LENGTH_SHORT).show()
+    private fun showToast(message: String) {
+        // Only show toast if context is available
+        context?.let { ctx ->
+            Toast.makeText(ctx, message, Toast.LENGTH_SHORT).show()
+        }
     }
 
     override fun onDestroyView() {

@@ -1,6 +1,5 @@
 package com.first.projectswipe.presentation.ui.auth
 
-import android.content.Intent
 import android.os.Bundle
 import android.util.Log
 import android.util.Patterns
@@ -13,30 +12,18 @@ import androidx.fragment.app.Fragment
 import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.findNavController
 import com.first.projectswipe.R
+import com.first.projectswipe.presentation.ui.auth.AuthManager
+import com.first.projectswipe.presentation.ui.auth.AuthResult
 import com.first.projectswipe.databinding.FragmentLoginBinding
-import com.google.android.gms.auth.api.signin.GoogleSignIn
-import com.google.android.gms.auth.api.signin.GoogleSignInClient
-import com.google.android.gms.auth.api.signin.GoogleSignInOptions
-import com.google.android.gms.common.api.ApiException
-import com.google.firebase.auth.FirebaseAuth
-import com.google.firebase.auth.GoogleAuthProvider
-import com.google.firebase.firestore.FirebaseFirestore
-import kotlinx.coroutines.Dispatchers
+import com.first.projectswipe.network.NetworkModule
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.tasks.await
 
 class LoginFragment : Fragment() {
 
     private var _binding: FragmentLoginBinding? = null
     private val binding get() = _binding!!
-    private lateinit var auth: FirebaseAuth
-    private lateinit var googleSignInClient: GoogleSignInClient
-    private val db = FirebaseFirestore.getInstance()
+    private lateinit var authManager: AuthManager
     private val TAG = "LoginFragment"
-
-    companion object {
-        private const val RC_SIGN_IN = 9001
-    }
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -50,27 +37,22 @@ class LoginFragment : Fragment() {
         super.onViewCreated(view, savedInstanceState)
 
         try {
-            setupFirebaseAuth()
+            setupAuth()
             setupUI()
             setupClickListeners()
             setupTextWatchers()
+            observeAuthState()
         } catch (e: Exception) {
             Log.e(TAG, "Error in LoginFragment initialization: ${e.message}", e)
             showToast("Login initialization failed: ${e.message}")
         }
     }
 
-    private fun setupFirebaseAuth() {
-        // Get Firebase Auth instance
-        auth = FirebaseAuth.getInstance()
-        Log.d(TAG, "Firebase Auth instance obtained successfully")
-
-        // Configure Google Sign-In
-        val gso = GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
-            .requestIdToken(getString(R.string.default_web_client_id))
-            .requestEmail()
-            .build()
-        googleSignInClient = GoogleSignIn.getClient(requireActivity(), gso)
+    private fun setupAuth() {
+        authManager = AuthManager.getInstance(requireContext())
+        val apiService = NetworkModule.provideApiService(requireContext())
+        authManager.initialize(apiService)
+        Log.d(TAG, "Auth manager initialized successfully")
     }
 
     private fun setupUI() {
@@ -84,7 +66,7 @@ class LoginFragment : Fragment() {
             val password = binding.passwordInput.text.toString()
 
             if (validateInputs(email, password)) {
-                loginWithFirebase(email, password)
+                loginUser(email, password)
             }
         }
 
@@ -109,13 +91,27 @@ class LoginFragment : Fragment() {
         }
     }
 
+    private fun observeAuthState() {
+        authManager.isLoggedIn.observe(viewLifecycleOwner) { isLoggedIn ->
+            if (isLoggedIn) {
+                // Navigate to home screen
+                try {
+                    // For now, navigate directly to home. Later we can add onboarding check
+                    findNavController().navigate(R.id.action_loginFragment_to_ideasFragment)
+                } catch (e: Exception) {
+                    Log.e(TAG, "Navigation error: ${e.message}", e)
+                    // Fallback navigation
+                    findNavController().navigate(R.id.homeFragment)
+                }
+            }
+        }
+    }
+
     private fun updateLoginButtonState() {
         val email = binding.emailInput.text.toString().trim()
         val password = binding.passwordInput.text.toString()
 
         binding.loginButton.isEnabled = email.isNotEmpty() && password.isNotEmpty()
-
-        // Update button appearance based on state
         binding.loginButton.alpha = if (binding.loginButton.isEnabled) 1.0f else 0.6f
     }
 
@@ -151,124 +147,71 @@ class LoginFragment : Fragment() {
         binding.passwordLayout.error = null
     }
 
-    private fun loginWithFirebase(email: String, password: String) {
+    private fun loginUser(email: String, password: String) {
         showLoading(true)
 
-        auth.signInWithEmailAndPassword(email, password)
-            .addOnCompleteListener { task ->
-                showLoading(false)
-
-                if (task.isSuccessful) {
-                    Log.d(TAG, "signInWithEmail:success")
-                    val user = auth.currentUser
-                    showToast("Welcome back, ${user?.email}")
-
-                    // Check if user needs onboarding
-                    checkOnboardingStatus()
-                } else {
-                    Log.w(TAG, "signInWithEmail:failure", task.exception)
-                    val errorMessage = when (task.exception?.message) {
-                        "The email address is badly formatted." -> "Please enter a valid email address"
-                        "There is no user record corresponding to this identifier. The user may have been deleted." -> "No account found with this email"
-                        "The password is invalid or the user does not have a password." -> "Incorrect password"
-                        else -> "Login failed. Please try again."
-                    }
-                    showToast(errorMessage)
-                }
-            }
-    }
-
-    private fun signInWithGoogle() {
-        val signInIntent = googleSignInClient.signInIntent
-        startActivityForResult(signInIntent, RC_SIGN_IN)
-    }
-
-    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
-        super.onActivityResult(requestCode, resultCode, data)
-
-        if (requestCode == RC_SIGN_IN) {
-            val task = GoogleSignIn.getSignedInAccountFromIntent(data)
+        lifecycleScope.launch {
             try {
-                val account = task.getResult(ApiException::class.java)
-                Log.d(TAG, "firebaseAuthWithGoogle:" + account.id)
-                account?.idToken?.let { firebaseAuthWithGoogle(it) }
-            } catch (e: ApiException) {
-                Log.w(TAG, "Google sign in failed", e)
-                showToast("Google Sign-In failed")
-            }
-        }
-    }
-
-    private fun firebaseAuthWithGoogle(idToken: String) {
-        showLoading(true)
-
-        val credential = GoogleAuthProvider.getCredential(idToken, null)
-        auth.signInWithCredential(credential)
-            .addOnCompleteListener(requireActivity()) { task ->
-                showLoading(false)
-
-                if (task.isSuccessful) {
-                    Log.d(TAG, "signInWithCredential:success")
-                    val user = auth.currentUser
-                    showToast("Welcome, ${user?.displayName}")
-
-                    // Check if user needs onboarding
-                    checkOnboardingStatus()
-                } else {
-                    Log.w(TAG, "signInWithCredential:failure", task.exception)
-                    showToast("Authentication failed")
-                }
-            }
-    }
-
-    private fun checkOnboardingStatus() {
-        val currentUser = auth.currentUser ?: return
-
-        lifecycleScope.launch(Dispatchers.Main) {
-            try {
-                val userDoc = db.collection("users").document(currentUser.uid).get().await()
-
-                if (userDoc.exists()) {
-                    val onboardingCompleted = userDoc.getBoolean("onboardingCompleted") ?: false
-
-                    if (onboardingCompleted) {
-                        // User has completed onboarding, go to main app
-                        findNavController().navigate(R.id.action_loginFragment_to_ideasFragment)
-                    } else {
-                        // User needs to complete onboarding
-                        findNavController().navigate(R.id.action_loginFragment_to_onboardingSkillsFragment)
+                when (val result = authManager.login(email, password)) {
+                    is AuthResult.Success -> {
+                        // Check if fragment is still attached before updating UI
+                        if (isAdded && _binding != null) {
+                            showLoading(false)
+                            Log.d(TAG, "Login successful")
+                            showToast("Welcome back!")
+                        }
+                        // Navigation will be handled by observeAuthState()
                     }
-                } else {
-                    // User document doesn't exist, they might be new - go to onboarding
-                    findNavController().navigate(R.id.action_loginFragment_to_onboardingSkillsFragment)
+                    is AuthResult.Error -> {
+                        // Check if fragment is still attached before updating UI
+                        if (isAdded && _binding != null) {
+                            showLoading(false)
+                            Log.e(TAG, "Login failed: ${result.message}")
+                            showToast(result.message)
+                        }
+                    }
                 }
-
             } catch (e: Exception) {
-                Log.e(TAG, "Error checking onboarding status", e)
-                // On error, default to main app
-                findNavController().navigate(R.id.action_loginFragment_to_ideasFragment)
+                // Check if fragment is still attached before updating UI
+                if (isAdded && _binding != null) {
+                    showLoading(false)
+                    Log.e(TAG, "Login error: ${e.message}", e)
+                    showToast("Login failed. Please try again.")
+                }
             }
         }
     }
 
     private fun showLoading(isLoading: Boolean) {
+        // Check if binding is available before using it
+        if (_binding == null) return
+
         binding.progressIndicator.visibility = if (isLoading) View.VISIBLE else View.GONE
         binding.loginButton.isEnabled = !isLoading
         binding.emailInput.isEnabled = !isLoading
         binding.passwordInput.isEnabled = !isLoading
+
+        // Update button appearance when loading
+        if (isLoading) {
+            binding.loginButton.alpha = 0.6f
+        } else {
+            updateLoginButtonState()
+        }
     }
 
     private fun showToast(message: String) {
-        Toast.makeText(context, message, Toast.LENGTH_SHORT).show()
+        // Only show toast if context is available
+        context?.let { ctx ->
+            Toast.makeText(ctx, message, Toast.LENGTH_SHORT).show()
+        }
     }
 
     override fun onStart() {
         super.onStart()
-        // Check if user is signed in and update UI accordingly
-        val currentUser = auth.currentUser
-        if (currentUser != null) {
-            // User is already signed in, check onboarding status
-            checkOnboardingStatus()
+        // Check if user is already signed in
+        if (authManager.isUserLoggedIn()) {
+            Log.d(TAG, "User already logged in, navigating to home")
+            // Navigation will be handled by observeAuthState()
         }
     }
 

@@ -1,7 +1,8 @@
 plugins {
     alias(libs.plugins.android.application)
     alias(libs.plugins.kotlin.android)
-    alias(libs.plugins.google.services)
+    // Remove Firebase plugin
+    // alias(libs.plugins.google.services)
     id("kotlin-kapt")
 }
 
@@ -82,24 +83,49 @@ dependencies {
     implementation(libs.androidx.navigation.fragment.ktx)
     implementation(libs.androidx.navigation.ui.ktx)
 
-    // Firebase (Use BOM to manage versions)
-    implementation(platform("com.google.firebase:firebase-bom:33.1.0"))
-    implementation("com.google.android.gms:play-services-auth:21.0.0")
-    implementation("com.google.firebase:firebase-auth-ktx")
-    implementation("com.google.firebase:firebase-firestore-ktx")
-    implementation("com.google.firebase:firebase-storage-ktx")
-    implementation("com.google.android.gms:play-services-auth")
+    // ===== REMOVE ALL FIREBASE DEPENDENCIES =====
+    // Remove Firebase BOM and all Firebase dependencies:
+    // implementation(platform("com.google.firebase:firebase-bom:33.1.0"))
+    // implementation("com.google.android.gms:play-services-auth:21.0.0")
+    // implementation("com.google.firebase:firebase-auth-ktx")
+    // implementation("com.google.firebase:firebase-firestore-ktx")
+    // implementation("com.google.firebase:firebase-storage-ktx")
+    // implementation("com.google.android.gms:play-services-auth")
 
+    // ===== ADD NETWORKING DEPENDENCIES =====
+    // Retrofit for REST API calls
+    implementation("com.squareup.retrofit2:retrofit:2.9.0")
+    implementation("com.squareup.retrofit2:converter-gson:2.9.0")
+
+    // OkHttp for HTTP client and logging
+    implementation("com.squareup.okhttp3:okhttp:4.12.0")
+    implementation("com.squareup.okhttp3:logging-interceptor:4.12.0")
+
+    // Gson for JSON serialization
+    implementation("com.google.code.gson:gson:2.10.1")
+
+    // ===== KEEP EXISTING DEPENDENCIES =====
     // Image Loading
     implementation("com.github.bumptech.glide:glide:4.16.0")
     kapt("com.github.bumptech.glide:compiler:4.16.0")
     implementation("com.squareup.picasso:picasso:2.71828")
 
-    // Coroutines
+    // Coroutines (keep existing)
     implementation("org.jetbrains.kotlinx:kotlinx-coroutines-play-services:1.8.1")
+    implementation("org.jetbrains.kotlinx:kotlinx-coroutines-android:1.8.1")
 
     // Flexbox
     implementation("com.google.android.flexbox:flexbox:3.0.0")
+
+    // ===== LIFECYCLE COMPONENTS =====
+    // Add lifecycle components for better ViewModel and LiveData support
+    implementation("androidx.lifecycle:lifecycle-viewmodel-ktx:2.7.0")
+    implementation("androidx.lifecycle:lifecycle-livedata-ktx:2.7.0")
+    implementation("androidx.lifecycle:lifecycle-runtime-ktx:2.7.0")
+
+    // ===== SECURITY =====
+    // Add security library for encrypted shared preferences (optional but recommended)
+    implementation("androidx.security:security-crypto:1.1.0-alpha06")
 
     // Unit Testing Dependencies
     testImplementation("junit:junit:4.13.2")
@@ -115,7 +141,6 @@ dependencies {
     testImplementation("androidx.test:runner:1.5.2")
     testImplementation("androidx.test:rules:1.5.0")
 
-
     // Android Instrumented Testing Dependencies
     androidTestImplementation("androidx.test.ext:junit:1.1.5")
     androidTestImplementation("androidx.fragment:fragment-testing:1.6.2") // or latest stable
@@ -126,10 +151,6 @@ dependencies {
     androidTestImplementation("androidx.test:rules:1.5.0")
     androidTestImplementation("androidx.navigation:navigation-testing:2.7.6")
     androidTestImplementation("io.mockk:mockk-android:1.13.8")
-
-//     Firebase Testing - Remove these as they can cause conflicts
-//     testImplementation("com.google.firebase:firebase-auth")
-//     androidTestImplementation("com.google.firebase:firebase-auth")
 
     // Debug implementations for testing
     debugImplementation("androidx.fragment:fragment-testing:1.6.2")

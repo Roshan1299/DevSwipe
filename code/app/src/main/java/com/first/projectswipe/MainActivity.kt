@@ -6,14 +6,15 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.navigation.NavController
 import androidx.navigation.NavOptions
 import androidx.navigation.fragment.NavHostFragment
+import com.first.projectswipe.presentation.ui.auth.AuthManager
 import com.first.projectswipe.databinding.ActivityMainBinding
-import com.google.firebase.auth.FirebaseAuth
+import com.first.projectswipe.network.NetworkModule
 
 class MainActivity : AppCompatActivity() {
 
     private lateinit var binding: ActivityMainBinding
     private lateinit var navController: NavController
-    private lateinit var auth: FirebaseAuth
+    private lateinit var authManager: AuthManager
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -24,6 +25,9 @@ class MainActivity : AppCompatActivity() {
         val navHostFragment = supportFragmentManager
             .findFragmentById(R.id.nav_host_fragment) as NavHostFragment
         navController = navHostFragment.navController
+
+        // Initialize Auth Manager
+        setupAuth()
 
         // Setup custom bottom navigation
         setupBottomNavigation()
@@ -48,29 +52,36 @@ class MainActivity : AppCompatActivity() {
             }
         }
 
-        auth = FirebaseAuth.getInstance()
-        val currentUser = auth.currentUser
+        // Check authentication status and navigate accordingly
+        checkAuthenticationStatus(savedInstanceState)
+    }
 
-        // Navigate directly to ideas (home) if already logged in
-        if (currentUser != null && savedInstanceState == null) {
-            navController.navigate(
-                R.id.homeFragment, // Changed to ideasFragment as default
-                null,
-                NavOptions.Builder()
-                    .setPopUpTo(R.id.nav_graph, true)
-                    .build()
-            )
+    private fun setupAuth() {
+        authManager = AuthManager.getInstance(this)
+        val apiService = NetworkModule.provideApiService(this)
+        authManager.initialize(apiService)
+    }
+
+    private fun checkAuthenticationStatus(savedInstanceState: Bundle?) {
+        // Only check auth on initial app launch, not on configuration changes
+        if (savedInstanceState == null) {
+            if (authManager.isUserLoggedIn()) {
+                // User is logged in, navigate to home
+                navController.navigate(
+                    R.id.homeFragment,
+                    null,
+                    NavOptions.Builder()
+                        .setPopUpTo(R.id.nav_graph, true)
+                        .build()
+                )
+            }
+            // If user is not logged in, stay on the current fragment (login screen)
         }
     }
 
     private fun setupBottomNavigation() {
         // Set initial selected state
         updateBottomNavSelection(R.id.homeFragment)
-
-        // Collaborate button
-//        binding.collaborateButton.setOnClickListener {
-//            navigateToFragment(R.id.collaborateFragment)
-//        }
 
         // Ideas button
         binding.ideasButton.setOnClickListener {
@@ -79,14 +90,8 @@ class MainActivity : AppCompatActivity() {
 
         // Add button (floating action button)
         binding.addButtons.setOnClickListener {
-//            navigateToFragment(R.id.createPostFragment)
             handleAddButtonClick()
         }
-
-        // Chat button
-//        binding.chatButton.setOnClickListener {
-//            navigateToFragment(R.id.chatFragment)
-//        }
 
         // Profile button
         binding.profileButton.setOnClickListener {
@@ -157,21 +162,11 @@ class MainActivity : AppCompatActivity() {
 
         // Set selected button
         when (selectedId) {
-//            R.id.collaborateFragment -> {
-//                binding.collaborateButton.isSelected = true
-//                binding.collaborateText.isSelected = true
-//                binding.collaborateIcon.isSelected = true
-//            }
             R.id.homeFragment -> {
                 binding.ideasButton.isSelected = true
                 binding.ideasText.isSelected = true
                 binding.ideasIcon.isSelected = true
             }
-//            R.id.chatFragment -> {
-//                binding.chatButton.isSelected = true
-//                binding.chatText.isSelected = true
-//                binding.chatIcon.isSelected = true
-//            }
             R.id.profileFragment -> {
                 binding.profileButton.isSelected = true
                 binding.profileText.isSelected = true
