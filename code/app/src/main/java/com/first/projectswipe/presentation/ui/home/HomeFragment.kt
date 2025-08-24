@@ -228,12 +228,18 @@ import com.first.projectswipe.data.models.ProjectIdea
 import com.first.projectswipe.network.ApiService
 import com.google.android.material.navigation.NavigationView
 import kotlinx.coroutines.launch
+import dagger.hilt.android.AndroidEntryPoint
+import javax.inject.Inject
 
+@AndroidEntryPoint
 class HomeFragment : Fragment() {
 
-    // We'll initialize these manually instead of using Dagger Hilt for now
-    private lateinit var authManager: AuthManager
-    private lateinit var apiService: ApiService
+    // Inject dependencies using Hilt
+    @Inject
+    lateinit var authManager: AuthManager
+    
+    @Inject
+    lateinit var apiService: ApiService
 
     private lateinit var drawerLayout: DrawerLayout
     private lateinit var navigationView: NavigationView
@@ -256,9 +262,7 @@ class HomeFragment : Fragment() {
     ): View {
         val view = inflater.inflate(R.layout.fragment_home, container, false)
 
-        // Initialize dependencies manually
-        authManager = AuthManager.getInstance(requireContext())
-        // apiService = ApiService.getInstance() // We'll implement this later
+        // Dependencies are injected via Hilt
 
         drawerLayout = view.findViewById(R.id.homeDrawerLayout)
         navigationView = view.findViewById(R.id.navigationView)
