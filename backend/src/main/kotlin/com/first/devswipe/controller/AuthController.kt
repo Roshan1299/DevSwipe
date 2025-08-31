@@ -2,7 +2,9 @@ package com.first.devswipe.controller
 
 import com.first.devswipe.dto.*
 import com.first.devswipe.entity.User
+import com.first.devswipe.entity.UserProfile  // Add this import
 import com.first.devswipe.repository.UserRepository
+import com.first.devswipe.repository.UserProfileRepository  // Add this import
 import com.first.devswipe.security.JwtUtil
 import org.springframework.http.ResponseEntity
 import org.springframework.security.authentication.AuthenticationManager
@@ -15,6 +17,7 @@ import jakarta.validation.Valid
 @RequestMapping("/api/auth")
 class AuthController(
     private val userRepository: UserRepository,
+    private val userProfileRepository: UserProfileRepository,  // Add this line
     private val passwordEncoder: PasswordEncoder,
     private val jwtUtil: JwtUtil,
     private val authenticationManager: AuthenticationManager
@@ -40,6 +43,20 @@ class AuthController(
         )
 
         val savedUser = userRepository.save(user)
+
+        val defaultProfile = UserProfile(
+            userId = savedUser.id!!,
+            name = "${savedUser.firstName ?: ""} ${savedUser.lastName ?: ""}".trim()
+                .ifEmpty { savedUser.displayUsername ?: "User" },
+            bio = null,
+            skills = emptyArray(),
+            interests = emptyArray(),
+            university = request.university,
+            profileImageUrl = null,
+            onboardingCompleted = false
+        )
+        userProfileRepository.save(defaultProfile)
+
         val token = jwtUtil.generateToken(savedUser)
 
         return ResponseEntity.ok(
