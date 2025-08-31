@@ -1,11 +1,13 @@
 package com.first.devswipe.controller
 
+import com.first.devswipe.dto.UpdateProfileRequest
+import com.first.devswipe.dto.UserProfileResponse
+import com.first.devswipe.dto.toUserProfileResponse
 import com.first.devswipe.entity.UserProfile
 import com.first.devswipe.repository.UserRepository
 import com.first.devswipe.repository.UserProfileRepository
 import jakarta.validation.Valid
 import org.springframework.http.ResponseEntity
-import com.first.devswipe.dto.UpdateProfileRequest
 import org.springframework.security.core.Authentication
 import org.springframework.web.bind.annotation.*
 import java.time.LocalDateTime
@@ -19,21 +21,36 @@ class UserProfileController(
 ) {
 
     @GetMapping
-    fun getCurrentUserProfile(authentication: Authentication): ResponseEntity<UserProfile> {
+    fun getCurrentUserProfile(authentication: Authentication): ResponseEntity<UserProfileResponse> {
         val user = userRepository.findByEmail(authentication.name)
             ?: throw RuntimeException("User not found")
 
-        val profile = userProfileRepository.findByUserId(user.id!!)
+        var profile = userProfileRepository.findByUserId(user.id!!)
             ?: throw RuntimeException("Profile not found. Please create your profile first.")
 
-        return ResponseEntity.ok(profile)
+        if (profile == null) {
+            profile = UserProfile(
+                userId = user.id!!,
+                name = "${user.firstName ?: ""} ${user.lastName ?: ""}".trim()
+                    .ifEmpty { user.displayUsername ?: "User" },
+                bio = null,
+                skills = emptyArray(),
+                interests = emptyArray(),
+                university = null,
+                profileImageUrl = null,
+                onboardingCompleted = false
+            )
+            profile = userProfileRepository.save(profile)
+        }
+
+        return ResponseEntity.ok(profile.toUserProfileResponse())
     }
 
     @PostMapping
     fun createOrUpdateProfile(
         @Valid @RequestBody request: UpdateProfileRequest,
         authentication: Authentication
-    ): ResponseEntity<UserProfile> {
+    ): ResponseEntity<UserProfileResponse> {
         val user = userRepository.findByEmail(authentication.name)
             ?: throw RuntimeException("User not found")
 
@@ -60,18 +77,18 @@ class UserProfileController(
         )
 
         val savedProfile = userProfileRepository.save(profile)
-        return ResponseEntity.ok(savedProfile)
+        return ResponseEntity.ok(savedProfile.toUserProfileResponse())
     }
 
     @GetMapping("/{userId}")
-    fun getUserProfile(@PathVariable userId: UUID): ResponseEntity<UserProfile> {
+    fun getUserProfile(@PathVariable userId: UUID): ResponseEntity<UserProfileResponse> {
         val profile = userProfileRepository.findByUserId(userId)
             ?: throw RuntimeException("Profile not found")
-        return ResponseEntity.ok(profile)
+        return ResponseEntity.ok(profile.toUserProfileResponse())
     }
 
     @PutMapping("/complete-onboarding")
-    fun completeOnboarding(authentication: Authentication): ResponseEntity<UserProfile> {
+    fun completeOnboarding(authentication: Authentication): ResponseEntity<UserProfileResponse> {
         val user = userRepository.findByEmail(authentication.name)
             ?: throw RuntimeException("User not found")
 
@@ -84,18 +101,18 @@ class UserProfileController(
         )
 
         val savedProfile = userProfileRepository.save(updatedProfile)
-        return ResponseEntity.ok(savedProfile)
+        return ResponseEntity.ok(savedProfile.toUserProfileResponse())
     }
 
     @GetMapping("/search/skills/{skill}")
-    fun getUsersBySkill(@PathVariable skill: String): ResponseEntity<List<UserProfile>> {
+    fun getUsersBySkill(@PathVariable skill: String): ResponseEntity<List<UserProfileResponse>> {
         val profiles = userProfileRepository.findBySkillsContaining(skill)
-        return ResponseEntity.ok(profiles)
+        return ResponseEntity.ok(profiles.map { it.toUserProfileResponse() })
     }
 
     @GetMapping("/search/interests/{interest}")
-    fun getUsersByInterest(@PathVariable interest: String): ResponseEntity<List<UserProfile>> {
+    fun getUsersByInterest(@PathVariable interest: String): ResponseEntity<List<UserProfileResponse>> {
         val profiles = userProfileRepository.findByInterestsContaining(interest)
-        return ResponseEntity.ok(profiles)
+        return ResponseEntity.ok(profiles.map { it.toUserProfileResponse() })
     }
 }
