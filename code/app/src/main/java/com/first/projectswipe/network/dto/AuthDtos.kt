@@ -1,7 +1,19 @@
+// network/dto/AuthDtos.kt
 package com.first.projectswipe.network.dto
 
-import java.util.*
+import com.google.gson.annotations.SerializedName
 
+/**
+ * Login request DTO
+ */
+data class LoginRequest(
+    val email: String,
+    val password: String
+)
+
+/**
+ * Registration request DTO
+ */
 data class RegisterRequest(
     val username: String,
     val email: String,
@@ -10,44 +22,56 @@ data class RegisterRequest(
     val lastName: String? = null
 )
 
-data class LoginRequest(
-    val email: String,
-    val password: String
-)
-
-data class AuthResponse(
-    val token: String,
-    val user: UserDto
-)
-
+/**
+ * UserDto - for API responses
+ */
 data class UserDto(
-    val id: UUID,
+    val id: String,
     val username: String,
     val email: String,
     val firstName: String? = null,
     val lastName: String? = null,
     val bio: String? = null,
-    val skills: List<String>? = null,
-    val interests: List<String>? = null,
-    val onboardingCompleted: Boolean? = null,
+    val skills: List<String>? = null, // Nullable to handle API responses that don't include these
+    val interests: List<String>? = null, // Nullable to handle API responses that don't include these
+    val onboardingCompleted: Boolean = false,
     val profileImageUrl: String? = null,
-    val createdAt: Long? = null
+    val createdAt: Long? = null,
+    val university: String? = null,
+    val updatedAt: String? = null
 )
 
+/**
+ * Authentication response DTO
+ */
+data class AuthResponse(
+    val token: String,
+    val user: UserDto,
+    val message: String? = null
+)
+
+/**
+ * Update user request DTO
+ */
 data class UpdateUserRequest(
+    val username: String? = null,
+    val email: String? = null,
     val firstName: String? = null,
     val lastName: String? = null,
     val bio: String? = null,
-    val skills: List<String>? = null,
-    val interests: List<String>? = null,
-    val onboardingCompleted: Boolean? = null,
     val profileImageUrl: String? = null
 )
 
+/**
+ * Update skills request DTO
+ */
 data class UpdateSkillsRequest(
     val skills: List<String>
 )
 
+/**
+ * Update interests request DTO
+ */
 data class UpdateInterestsRequest(
     val interests: List<String>
 )
