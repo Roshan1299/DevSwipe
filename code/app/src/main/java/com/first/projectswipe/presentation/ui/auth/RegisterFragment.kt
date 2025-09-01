@@ -11,18 +11,28 @@ import android.widget.AutoCompleteTextView
 import android.widget.Toast
 import androidx.core.widget.doOnTextChanged
 import androidx.fragment.app.Fragment
+import androidx.fragment.app.viewModels
 import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.findNavController
 import com.first.projectswipe.R
 import com.first.projectswipe.databinding.FragmentRegisterBinding
-import com.first.projectswipe.network.NetworkModule
+import com.first.projectswipe.network.ApiService
+import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.launch
+import javax.inject.Inject
 
+@AndroidEntryPoint
 class RegisterFragment : Fragment() {
 
     private var _binding: FragmentRegisterBinding? = null
     private val binding get() = _binding!!
-    private lateinit var authManager: AuthManager
+
+    @Inject
+    lateinit var authManager: AuthManager
+    
+    @Inject
+    lateinit var apiService: ApiService
+
     private val TAG = "RegisterFragment"
 
     // List of universities - you can expand this
@@ -66,18 +76,10 @@ class RegisterFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        setupAuth()
         setupUniversityDropdown()
         setupClickListeners()
         setupTextWatchers()
         observeAuthState()
-    }
-
-    private fun setupAuth() {
-        authManager = AuthManager.getInstance(requireContext())
-        val apiService = NetworkModule.provideApiService(requireContext())
-        authManager.initialize(apiService)
-        Log.d(TAG, "Auth manager initialized successfully")
     }
 
     private fun setupUniversityDropdown() {
