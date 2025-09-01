@@ -31,4 +31,20 @@ interface ApiService {
 
     @PATCH("api/users/{userId}/onboarding")
     suspend fun completeOnboarding(@Path("userId") userId: String): Response<UserDto>
+
+    // Profile endpoints - add these to your existing ApiService
+    @GET("api/profile")
+    suspend fun getCurrentProfile(): Response<UserProfileResponse>
+
+    @POST("api/profile")
+    suspend fun createOrUpdateProfile(@Body request: UpdateProfileRequest): Response<UserProfileResponse>
+
+    @PUT("api/profile/complete-onboarding")
+    suspend fun completeOnboarding(): Response<UserProfileResponse>
+
+    @GET("api/profile/search/skills/{skill}")
+    suspend fun getUsersBySkill(@Path("skill") skill: String): Response<List<UserProfileResponse>>
+
+    @GET("api/profile/search/interests/{interest}")
+    suspend fun getUsersByInterest(@Path("interest") interest: String): Response<List<UserProfileResponse>>
 }
