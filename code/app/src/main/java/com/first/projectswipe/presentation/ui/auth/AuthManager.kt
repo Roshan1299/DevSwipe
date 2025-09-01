@@ -11,8 +11,15 @@ import com.first.projectswipe.network.dto.*
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import retrofit2.Response
+import javax.inject.Inject
+import javax.inject.Singleton
+import dagger.hilt.android.qualifiers.ApplicationContext
 
-class AuthManager private constructor(private val context: Context) {
+@Singleton
+class AuthManager @Inject constructor(
+    @ApplicationContext private val context: Context,
+    private val apiService: ApiService
+) {
     private val TAG = "AuthManager"
     private val prefs: SharedPreferences = context.getSharedPreferences("auth_prefs", Context.MODE_PRIVATE)
 
@@ -25,11 +32,18 @@ class AuthManager private constructor(private val context: Context) {
     private val _authState = MutableLiveData<AuthState>()
     val authState: LiveData<AuthState> = _authState
 
-    private lateinit var apiService: ApiService
+    init {
+        // Check if user is already logged in on initialization
+        val token = getToken()
+        if (token != null) {
+            loadUserFromPrefs()
+            _isLoggedIn.value = true
+        } else {
+            _isLoggedIn.value = false
+        }
+    }
 
     companion object {
-        @Volatile
-        private var INSTANCE: AuthManager? = null
         private const val KEY_TOKEN = "jwt_token"
         private const val KEY_USER_ID = "user_id"
         private const val KEY_USER_EMAIL = "user_email"
@@ -39,12 +53,6 @@ class AuthManager private constructor(private val context: Context) {
         private const val KEY_USER_SKILLS = "user_skills"
         private const val KEY_USER_INTERESTS = "user_interests"
         private const val KEY_ONBOARDING_COMPLETE = "onboarding_complete"
-
-        fun getInstance(context: Context): AuthManager {
-            return INSTANCE ?: synchronized(this) {
-                INSTANCE ?: AuthManager(context.applicationContext).also { INSTANCE = it }
-            }
-        }
     }
 
     sealed class AuthState {
@@ -52,18 +60,6 @@ class AuthManager private constructor(private val context: Context) {
         object Loading : AuthState()
         data class Success(val user: User) : AuthState()
         data class Error(val message: String) : AuthState()
-    }
-
-    fun initialize(apiService: ApiService) {
-        this.apiService = apiService
-        // Check if user is already logged in
-        val token = getToken()
-        if (token != null) {
-            loadUserFromPrefs()
-            _isLoggedIn.value = true
-        } else {
-            _isLoggedIn.value = false
-        }
     }
 
     // Authentication Methods
@@ -284,43 +280,47 @@ class AuthManager private constructor(private val context: Context) {
         return prefs.getBoolean(KEY_ONBOARDING_COMPLETE, false)
     }
 
+    // Add missing method
+    fun getCurrentUserId(): String? {
+        return prefs.getString(KEY_USER_ID, null)
+    }
+
     // Private Methods
     private fun saveUserSession(authResponse: AuthResponse) {
         val user = authResponse.user
 
         prefs.edit().apply {
             putString(KEY_TOKEN, authResponse.token)
-            putString(KEY_USER_ID, user.id.toString())
+            putString(KEY_USER_ID, user.id) // user.id is already String
             putString(KEY_USER_EMAIL, user.email)
             putString(KEY_USER_NAME, user.username)
             putString(KEY_USER_FIRST_NAME, user.firstName ?: "")
             putString(KEY_USER_LAST_NAME, user.lastName ?: "")
 
-            // Save skills and interests if available
-            user.skills?.let { skills ->
-                putString(KEY_USER_SKILLS, skills.joinToString(","))
-            }
-            user.interests?.let { interests ->
-                putString(KEY_USER_INTERESTS, interests.joinToString(","))
-            }
+            // Save skills and interests if available (handle null case)
+            val skills = user.skills ?: emptyList()
+            val interests = user.interests ?: emptyList()
+
+            putString(KEY_USER_SKILLS, skills.joinToString(","))
+            putString(KEY_USER_INTERESTS, interests.joinToString(","))
 
             // Save onboarding status
-            putBoolean(KEY_ONBOARDING_COMPLETE, user.onboardingCompleted ?: false)
+            putBoolean(KEY_ONBOARDING_COMPLETE, user.onboardingCompleted)
 
             apply()
         }
 
         val appUser = User(
-            id = user.id.toString(),
+            id = user.id, // user.id is already String
             name = "${user.firstName ?: ""} ${user.lastName ?: ""}".trim().ifEmpty { user.username },
             email = user.email,
             username = user.username,
             firstName = user.firstName,
             lastName = user.lastName,
             bio = user.bio ?: "",
-            skills = user.skills ?: emptyList(),
-            interests = user.interests ?: emptyList(),
-            onboardingCompleted = user.onboardingCompleted ?: false,
+            skills = user.skills ?: emptyList(), // Handle null case
+            interests = user.interests ?: emptyList(), // Handle null case
+            onboardingCompleted = user.onboardingCompleted,
             profileImageUrl = user.profileImageUrl ?: "",
             createdAt = user.createdAt ?: System.currentTimeMillis()
         )
