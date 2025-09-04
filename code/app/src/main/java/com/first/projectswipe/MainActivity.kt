@@ -1,3 +1,4 @@
+// MainActivity.kt
 package com.first.projectswipe
 
 import android.os.Bundle
@@ -8,13 +9,18 @@ import androidx.navigation.NavOptions
 import androidx.navigation.fragment.NavHostFragment
 import com.first.projectswipe.presentation.ui.auth.AuthManager
 import com.first.projectswipe.databinding.ActivityMainBinding
-import com.first.projectswipe.network.NetworkModule
+import dagger.hilt.android.AndroidEntryPoint
+import javax.inject.Inject
 
+@AndroidEntryPoint
 class MainActivity : AppCompatActivity() {
 
     private lateinit var binding: ActivityMainBinding
     private lateinit var navController: NavController
-    private lateinit var authManager: AuthManager
+
+    // Inject AuthManager using Hilt
+    @Inject
+    lateinit var authManager: AuthManager
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -25,9 +31,6 @@ class MainActivity : AppCompatActivity() {
         val navHostFragment = supportFragmentManager
             .findFragmentById(R.id.nav_host_fragment) as NavHostFragment
         navController = navHostFragment.navController
-
-        // Initialize Auth Manager
-        setupAuth()
 
         // Setup custom bottom navigation
         setupBottomNavigation()
@@ -54,12 +57,6 @@ class MainActivity : AppCompatActivity() {
 
         // Check authentication status and navigate accordingly
         checkAuthenticationStatus(savedInstanceState)
-    }
-
-    private fun setupAuth() {
-        authManager = AuthManager.getInstance(this)
-        val apiService = NetworkModule.provideApiService(this)
-        authManager.initialize(apiService)
     }
 
     private fun checkAuthenticationStatus(savedInstanceState: Bundle?) {
