@@ -15,7 +15,7 @@ data class User(
     val id: UUID? = null,
 
     @Column(name = "username", unique = true, nullable = false)
-    val displayUsername: String, // Using displayUsername to avoid conflict
+    val displayName: String,
 
     @Column(unique = true, nullable = false)
     val email: String,
@@ -33,14 +33,23 @@ data class User(
     val createdAt: LocalDateTime = LocalDateTime.now(),
 
     @Column(name = "updated_at")
-    val updatedAt: LocalDateTime = LocalDateTime.now()
+    val updatedAt: LocalDateTime = LocalDateTime.now(),
+
+    @Column(name = "profile_picture_url")
+    val profilePictureUrl: String? = null,
+
+    @Column(name = "bio")
+    val bio: String? = null,
+
+    @Column(name = "university")
+    val university: String? = null
 ) : UserDetails {
     override fun getAuthorities(): Collection<GrantedAuthority> {
         return listOf(SimpleGrantedAuthority("ROLE_USER"))
     }
 
     override fun getPassword(): String = passwordHash
-    override fun getUsername(): String = email // Using email as username for Spring Security
+    override fun getUsername(): String = email // Use email as the username for Spring Security
     override fun isAccountNonExpired(): Boolean = true
     override fun isAccountNonLocked(): Boolean = true
     override fun isCredentialsNonExpired(): Boolean = true
