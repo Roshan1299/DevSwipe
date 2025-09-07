@@ -1,0 +1,4 @@
+
+ALTER TABLE users ADD COLUMN bio TEXT;
+ALTER TABLE users ADD COLUMN university VARCHAR(255);
+ALTER TABLE users ADD COLUMN profile_picture_url VARCHAR(255);
