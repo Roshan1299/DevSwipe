@@ -8,9 +8,11 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.first.projectswipe.network.ApiService
 import com.first.projectswipe.network.dto.UpdateUserRequest
+import com.first.projectswipe.network.dto.UserProfileResponse
 import com.first.projectswipe.network.dto.UserDto
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.launch
+import okhttp3.RequestBody
 import okhttp3.MediaType.Companion.toMediaTypeOrNull
 import okhttp3.MultipartBody
 import okhttp3.RequestBody.Companion.toRequestBody
@@ -22,16 +24,16 @@ class EditProfileViewModel @Inject constructor(
     private val apiService: ApiService
 ) : ViewModel() {
 
-    private val _userProfile = MutableLiveData<UserDto>()
-    val userProfile: LiveData<UserDto> = _userProfile
+    private val _userProfile = MutableLiveData<UserProfileResponse>()
+    val userProfile: LiveData<UserProfileResponse> = _userProfile
 
     private val _uploadUrl = MutableLiveData<String>()
     val uploadUrl: LiveData<String> = _uploadUrl
 
-    fun getUserProfile(userId: String) {
+    fun getUserProfile() {
         viewModelScope.launch {
             try {
-                val response = apiService.getUserProfile(userId)
+                val response = apiService.getCurrentProfile()
                 if (response.isSuccessful) {
                     _userProfile.postValue(response.body())
                 }
@@ -41,10 +43,10 @@ class EditProfileViewModel @Inject constructor(
         }
     }
 
-    fun updateUser(userId: String, updateUserRequest: UpdateUserRequest) {
+    fun updateUser(updateUserRequest: UpdateUserRequest) {
         viewModelScope.launch {
             try {
-                apiService.updateUser(userId, updateUserRequest)
+                apiService.createOrUpdateProfile(updateUserRequest)
             } catch (e: Exception) {
                 // Handle error
             }
@@ -54,7 +56,7 @@ class EditProfileViewModel @Inject constructor(
     fun uploadProfilePicture(imageUri: Uri, file: File) {
         viewModelScope.launch {
             try {
-                val requestFile = file.toRequestBody("image/jpeg".toMediaTypeOrNull())
+                val requestFile = RequestBody.create("image/jpeg".toMediaTypeOrNull(), file)
                 val body = MultipartBody.Part.createFormData("file", file.name, requestFile)
                 val response = apiService.uploadFile(body)
                 if (response.isSuccessful) {
