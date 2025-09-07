@@ -19,27 +19,10 @@ data class RegisterRequest(
     val email: String,
     val password: String,
     val firstName: String? = null,
-    val lastName: String? = null
+    val lastName: String? = null,
+    val university: String? = null
 )
 
-/**
- * UserDto - for API responses
- */
-data class UserDto(
-    val id: String,
-    val username: String,
-    val email: String,
-    val firstName: String? = null,
-    val lastName: String? = null,
-    val bio: String? = null,
-    val skills: List<String>? = null, // Nullable to handle API responses that don't include these
-    val interests: List<String>? = null, // Nullable to handle API responses that don't include these
-    val onboardingCompleted: Boolean = false,
-    val profileImageUrl: String? = null,
-    val createdAt: Long? = null,
-    val university: String? = null,
-    val updatedAt: String? = null
-)
 
 /**
  * Authentication response DTO
@@ -50,17 +33,6 @@ data class AuthResponse(
     val message: String? = null
 )
 
-/**
- * Update user request DTO
- */
-data class UpdateUserRequest(
-    val username: String? = null,
-    val email: String? = null,
-    val firstName: String? = null,
-    val lastName: String? = null,
-    val bio: String? = null,
-    val profileImageUrl: String? = null
-)
 
 /**
  * Update skills request DTO
