@@ -53,6 +53,7 @@ class AuthManager @Inject constructor(
         private const val KEY_USER_SKILLS = "user_skills"
         private const val KEY_USER_INTERESTS = "user_interests"
         private const val KEY_ONBOARDING_COMPLETE = "onboarding_complete"
+        private const val KEY_USER_UNIVERSITY = "user_university"
     }
 
     sealed class AuthState {
@@ -100,7 +101,8 @@ class AuthManager @Inject constructor(
         email: String,
         password: String,
         firstName: String? = null,
-        lastName: String? = null
+        lastName: String? = null,
+        university: String? = null
     ): AuthResult {
         return withContext(Dispatchers.IO) {
             try {
@@ -111,7 +113,8 @@ class AuthManager @Inject constructor(
                     email = email,
                     password = password,
                     firstName = firstName,
-                    lastName = lastName
+                    lastName = lastName,
+                    university = university
                 )
 
                 val response = apiService.register(registerRequest)
@@ -307,6 +310,9 @@ class AuthManager @Inject constructor(
             // Save onboarding status
             putBoolean(KEY_ONBOARDING_COMPLETE, user.onboardingCompleted)
 
+            // Save university
+            putString(KEY_USER_UNIVERSITY, user.university ?: "")
+
             apply()
         }
 
@@ -322,7 +328,8 @@ class AuthManager @Inject constructor(
             interests = user.interests ?: emptyList(), // Handle null case
             onboardingCompleted = user.onboardingCompleted,
             profileImageUrl = user.profileImageUrl ?: "",
-            createdAt = user.createdAt ?: System.currentTimeMillis()
+            createdAt = user.createdAt ?: System.currentTimeMillis(),
+            university = user.university ?: ""
         )
 
         _currentUser.postValue(appUser)
@@ -338,6 +345,7 @@ class AuthManager @Inject constructor(
         val skillsString = prefs.getString(KEY_USER_SKILLS, null)
         val interestsString = prefs.getString(KEY_USER_INTERESTS, null)
         val onboardingComplete = prefs.getBoolean(KEY_ONBOARDING_COMPLETE, false)
+        val university = prefs.getString(KEY_USER_UNIVERSITY, "") ?: ""
 
         if (userId != null && email != null && username != null) {
             val skills = skillsString?.split(",")?.filter { it.isNotBlank() } ?: emptyList()
@@ -355,7 +363,8 @@ class AuthManager @Inject constructor(
                 interests = interests,
                 onboardingCompleted = onboardingComplete,
                 profileImageUrl = "",
-                createdAt = System.currentTimeMillis()
+                createdAt = System.currentTimeMillis(),
+                university = university
             )
 
             _currentUser.postValue(user)
