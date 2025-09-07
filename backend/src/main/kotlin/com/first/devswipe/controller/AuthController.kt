@@ -67,7 +67,8 @@ class AuthController(
                     username = savedUser.displayName,
                     email = savedUser.email,
                     firstName = savedUser.firstName,
-                    lastName = savedUser.lastName
+                    lastName = savedUser.lastName,
+                    university = defaultProfile.university
                 )
             )
         )
@@ -85,6 +86,8 @@ class AuthController(
 
         val token = jwtUtil.generateToken(user)
 
+        val userProfile = userProfileRepository.findByUserId(user.id!!)
+
         return ResponseEntity.ok(
             AuthResponse(
                 token = token,
@@ -93,7 +96,8 @@ class AuthController(
                     username = user.displayName,
                     email = user.email,
                     firstName = user.firstName,
-                    lastName = user.lastName
+                    lastName = user.lastName,
+                    university = userProfile?.university
                 )
             )
         )
@@ -107,13 +111,16 @@ class AuthController(
         val user = userRepository.findByEmail(email)
             ?: return ResponseEntity.notFound().build()
 
+        val userProfile = userProfileRepository.findByUserId(user.id!!)
+
         return ResponseEntity.ok(
             UserDto(
                 id = user.id!!,
                 username = user.displayName,
                 email = user.email,
                 firstName = user.firstName,
-                lastName = user.lastName
+                lastName = user.lastName,
+                university = userProfile?.university
             )
         )
     }
