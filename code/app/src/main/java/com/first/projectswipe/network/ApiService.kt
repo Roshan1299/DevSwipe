@@ -1,6 +1,7 @@
 package com.first.projectswipe.network
 
 import com.first.projectswipe.network.dto.*
+import okhttp3.MultipartBody
 import retrofit2.Response
 import retrofit2.http.*
 
@@ -37,7 +38,7 @@ interface ApiService {
     suspend fun getCurrentProfile(): Response<UserProfileResponse>
 
     @POST("api/profile")
-    suspend fun createOrUpdateProfile(@Body request: UpdateProfileRequest): Response<UserProfileResponse>
+    suspend fun createOrUpdateProfile(@Body request: UpdateUserRequest): Response<UserProfileResponse>
 
     @PUT("api/profile/complete-onboarding")
     suspend fun completeOnboarding(): Response<UserProfileResponse>
@@ -47,4 +48,8 @@ interface ApiService {
 
     @GET("api/profile/search/interests/{interest}")
     suspend fun getUsersByInterest(@Path("interest") interest: String): Response<List<UserProfileResponse>>
+
+    @Multipart
+    @POST("api/upload")
+    suspend fun uploadFile(@Part file: MultipartBody.Part): Response<Map<String, String>>
 }
