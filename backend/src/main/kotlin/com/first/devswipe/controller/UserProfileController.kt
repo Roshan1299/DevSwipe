@@ -32,7 +32,7 @@ class UserProfileController(
             profile = UserProfile(
                 userId = user.id!!,
                 name = "${user.firstName ?: ""} ${user.lastName ?: ""}".trim()
-                    .ifEmpty { user.displayUsername ?: "User" },
+                    .ifEmpty { user.username ?: "User" },
                 bio = null,
                 skills = emptyArray(),
                 interests = emptyArray(),
