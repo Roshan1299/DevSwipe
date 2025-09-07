@@ -29,13 +29,13 @@ class AuthController(
         if (userRepository.existsByEmail(request.email)) {
             return ResponseEntity.badRequest().build()
         }
-        if (userRepository.existsByDisplayUsername(request.username)) {
+        if (userRepository.existsByDisplayName(request.username)) {
             return ResponseEntity.badRequest().build()
         }
 
         // Create new user
         val user = User(
-            displayUsername = request.username,
+            displayName = request.username,
             email = request.email,
             passwordHash = passwordEncoder.encode(request.password),
             firstName = request.firstName,
@@ -47,7 +47,7 @@ class AuthController(
         val defaultProfile = UserProfile(
             userId = savedUser.id!!,
             name = "${savedUser.firstName ?: ""} ${savedUser.lastName ?: ""}".trim()
-                .ifEmpty { savedUser.displayUsername ?: "User" },
+                .ifEmpty { savedUser.displayName ?: "User" },
             bio = null,
             skills = emptyArray(),
             interests = emptyArray(),
@@ -64,7 +64,7 @@ class AuthController(
                 token = token,
                 user = UserDto(
                     id = savedUser.id!!,
-                    username = savedUser.displayUsername,
+                    username = savedUser.displayName,
                     email = savedUser.email,
                     firstName = savedUser.firstName,
                     lastName = savedUser.lastName
@@ -90,7 +90,7 @@ class AuthController(
                 token = token,
                 user = UserDto(
                     id = user.id!!,
-                    username = user.displayUsername,
+                    username = user.displayName,
                     email = user.email,
                     firstName = user.firstName,
                     lastName = user.lastName
@@ -110,7 +110,7 @@ class AuthController(
         return ResponseEntity.ok(
             UserDto(
                 id = user.id!!,
-                username = user.displayUsername,
+                username = user.displayName,
                 email = user.email,
                 firstName = user.firstName,
                 lastName = user.lastName
