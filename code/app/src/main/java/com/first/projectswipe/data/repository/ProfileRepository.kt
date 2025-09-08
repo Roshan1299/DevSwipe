@@ -67,7 +67,7 @@ class ProfileRepository @Inject constructor(
     /**
      * Update user profile using /api/profile endpoint
      */
-    suspend fun updateProfile(request: UpdateProfileRequest): Result<UserProfileResponse> = withContext(Dispatchers.IO) {
+    suspend fun updateProfile(request: UpdateUserRequest): Result<UserProfileResponse> = withContext(Dispatchers.IO) {
         return@withContext try {
             val response = apiService.createOrUpdateProfile(request)
             if (response.isSuccessful && response.body() != null) {
