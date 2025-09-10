@@ -289,7 +289,8 @@ class RegisterFragment : Fragment() {
                     email = email,
                     password = password,
                     firstName = firstName.ifEmpty { null },
-                    lastName = lastName.ifEmpty { null }
+                    lastName = lastName.ifEmpty { null },
+                    university = university
                 )) {
                     is AuthResult.Success -> {
                         // Check if fragment is still attached before updating UI
