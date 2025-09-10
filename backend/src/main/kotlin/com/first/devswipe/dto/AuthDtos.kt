@@ -19,7 +19,8 @@ data class RegisterRequest(
     val password: String,
 
     val firstName: String? = null,
-    val lastName: String? = null
+    val lastName: String? = null,
+    val university: String? = null
 )
 
 data class LoginRequest(

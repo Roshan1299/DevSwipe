@@ -12,7 +12,8 @@ data class User(
     val interests: List<String> = emptyList(),
     val onboardingCompleted: Boolean = false,
     val profileImageUrl: String = "",
-    val createdAt: Long = 0L
+    val createdAt: Long = 0L,
+    val university: String = ""
 ) {
     // Helper methods
     val displayName: String

@@ -4,6 +4,7 @@ plugins {
     // Remove Firebase plugin
     // alias(libs.plugins.google.services)
     id("kotlin-kapt")
+    id("dagger.hilt.android.plugin")
 }
 
 android {
@@ -96,6 +97,8 @@ dependencies {
     // Retrofit for REST API calls
     implementation("com.squareup.retrofit2:retrofit:2.9.0")
     implementation("com.squareup.retrofit2:converter-gson:2.9.0")
+    implementation("com.google.dagger:hilt-android:2.48")
+    kapt("com.google.dagger:hilt-compiler:2.48")
 
     // OkHttp for HTTP client and logging
     implementation("com.squareup.okhttp3:okhttp:4.12.0")

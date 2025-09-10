@@ -1,3 +1,4 @@
+// presentation/ui/auth/LoginFragment.kt
 package com.first.projectswipe.presentation.ui.auth
 
 import android.os.Bundle
@@ -12,17 +13,21 @@ import androidx.fragment.app.Fragment
 import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.findNavController
 import com.first.projectswipe.R
-import com.first.projectswipe.presentation.ui.auth.AuthManager
-import com.first.projectswipe.presentation.ui.auth.AuthResult
 import com.first.projectswipe.databinding.FragmentLoginBinding
-import com.first.projectswipe.network.NetworkModule
+import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.launch
+import javax.inject.Inject
 
+@AndroidEntryPoint
 class LoginFragment : Fragment() {
 
     private var _binding: FragmentLoginBinding? = null
     private val binding get() = _binding!!
-    private lateinit var authManager: AuthManager
+
+    // Inject AuthManager using Hilt
+    @Inject
+    lateinit var authManager: AuthManager
+
     private val TAG = "LoginFragment"
 
     override fun onCreateView(
@@ -37,7 +42,6 @@ class LoginFragment : Fragment() {
         super.onViewCreated(view, savedInstanceState)
 
         try {
-            setupAuth()
             setupUI()
             setupClickListeners()
             setupTextWatchers()
@@ -46,13 +50,6 @@ class LoginFragment : Fragment() {
             Log.e(TAG, "Error in LoginFragment initialization: ${e.message}", e)
             showToast("Login initialization failed: ${e.message}")
         }
-    }
-
-    private fun setupAuth() {
-        authManager = AuthManager.getInstance(requireContext())
-        val apiService = NetworkModule.provideApiService(requireContext())
-        authManager.initialize(apiService)
-        Log.d(TAG, "Auth manager initialized successfully")
     }
 
     private fun setupUI() {
@@ -101,7 +98,11 @@ class LoginFragment : Fragment() {
                 } catch (e: Exception) {
                     Log.e(TAG, "Navigation error: ${e.message}", e)
                     // Fallback navigation
-                    findNavController().navigate(R.id.homeFragment)
+                    try {
+                        findNavController().navigate(R.id.homeFragment)
+                    } catch (navError: Exception) {
+                        Log.e(TAG, "Fallback navigation also failed: ${navError.message}", navError)
+                    }
                 }
             }
         }

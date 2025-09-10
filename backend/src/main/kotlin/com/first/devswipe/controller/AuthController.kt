@@ -2,7 +2,9 @@ package com.first.devswipe.controller
 
 import com.first.devswipe.dto.*
 import com.first.devswipe.entity.User
+import com.first.devswipe.entity.UserProfile  // Add this import
 import com.first.devswipe.repository.UserRepository
+import com.first.devswipe.repository.UserProfileRepository  // Add this import
 import com.first.devswipe.security.JwtUtil
 import org.springframework.http.ResponseEntity
 import org.springframework.security.authentication.AuthenticationManager
@@ -15,6 +17,7 @@ import jakarta.validation.Valid
 @RequestMapping("/api/auth")
 class AuthController(
     private val userRepository: UserRepository,
+    private val userProfileRepository: UserProfileRepository,  // Add this line
     private val passwordEncoder: PasswordEncoder,
     private val jwtUtil: JwtUtil,
     private val authenticationManager: AuthenticationManager
@@ -26,13 +29,13 @@ class AuthController(
         if (userRepository.existsByEmail(request.email)) {
             return ResponseEntity.badRequest().build()
         }
-        if (userRepository.existsByDisplayUsername(request.username)) {
+        if (userRepository.existsByDisplayName(request.username)) {
             return ResponseEntity.badRequest().build()
         }
 
         // Create new user
         val user = User(
-            displayUsername = request.username,
+            displayName = request.username,
             email = request.email,
             passwordHash = passwordEncoder.encode(request.password),
             firstName = request.firstName,
@@ -40,6 +43,20 @@ class AuthController(
         )
 
         val savedUser = userRepository.save(user)
+
+        val defaultProfile = UserProfile(
+            userId = savedUser.id!!,
+            name = "${savedUser.firstName ?: ""} ${savedUser.lastName ?: ""}".trim()
+                .ifEmpty { savedUser.displayName ?: "User" },
+            bio = null,
+            skills = emptyArray(),
+            interests = emptyArray(),
+            university = request.university,
+            profileImageUrl = null,
+            onboardingCompleted = false
+        )
+        userProfileRepository.save(defaultProfile)
+
         val token = jwtUtil.generateToken(savedUser)
 
         return ResponseEntity.ok(
@@ -47,10 +64,11 @@ class AuthController(
                 token = token,
                 user = UserDto(
                     id = savedUser.id!!,
-                    username = savedUser.displayUsername,
+                    username = savedUser.displayName,
                     email = savedUser.email,
                     firstName = savedUser.firstName,
-                    lastName = savedUser.lastName
+                    lastName = savedUser.lastName,
+                    university = defaultProfile.university
                 )
             )
         )
@@ -68,15 +86,18 @@ class AuthController(
 
         val token = jwtUtil.generateToken(user)
 
+        val userProfile = userProfileRepository.findByUserId(user.id!!)
+
         return ResponseEntity.ok(
             AuthResponse(
                 token = token,
                 user = UserDto(
                     id = user.id!!,
-                    username = user.displayUsername,
+                    username = user.displayName,
                     email = user.email,
                     firstName = user.firstName,
-                    lastName = user.lastName
+                    lastName = user.lastName,
+                    university = userProfile?.university
                 )
             )
         )
@@ -90,13 +111,16 @@ class AuthController(
         val user = userRepository.findByEmail(email)
             ?: return ResponseEntity.notFound().build()
 
+        val userProfile = userProfileRepository.findByUserId(user.id!!)
+
         return ResponseEntity.ok(
             UserDto(
                 id = user.id!!,
-                username = user.displayUsername,
+                username = user.displayName,
                 email = user.email,
                 firstName = user.firstName,
-                lastName = user.lastName
+                lastName = user.lastName,
+                university = userProfile?.university
             )
         )
     }
