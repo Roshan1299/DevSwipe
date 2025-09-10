@@ -258,7 +258,10 @@ import com.first.projectswipe.R
 import com.first.projectswipe.presentation.ui.auth.AuthManager
 import com.google.android.flexbox.FlexboxLayout
 import kotlinx.coroutines.launch
+import dagger.hilt.android.AndroidEntryPoint
+import javax.inject.Inject
 
+@AndroidEntryPoint
 class OnboardingInterestsFragment : Fragment() {
 
     private lateinit var stepIndicator: TextView
@@ -269,7 +272,8 @@ class OnboardingInterestsFragment : Fragment() {
     private lateinit var skipButton: TextView
     private lateinit var progressBar: ProgressBar
 
-    private lateinit var authManager: AuthManager
+    @Inject
+    lateinit var authManager: AuthManager
 
     private val selectedInterests = mutableListOf<String>()
     private val maxInterests = 8
@@ -305,7 +309,6 @@ class OnboardingInterestsFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        authManager = AuthManager.getInstance(requireContext())
         initializeViews(view)
         setupClickListeners()
         setupInterestsDisplay()
