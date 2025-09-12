@@ -42,5 +42,6 @@ data class UserDto(
     val username: String,
     val email: String,
     val firstName: String?,
-    val lastName: String?
+    val lastName: String?,
+    val university: String?
 )
