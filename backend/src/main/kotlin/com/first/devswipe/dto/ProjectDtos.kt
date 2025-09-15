@@ -1,12 +1,25 @@
 package com.first.devswipe.dto
 
-data class CreateProjectRequest(
+import java.util.UUID
+
+data class ProjectCreateRequest(
     val title: String,
-    val fullDescription: String,
     val previewDescription: String,
+    val fullDescription: String,
+    val githubLink: String?,
     val tags: List<String>,
-    val difficulty: String? = null,
-    val githubLink: String? = null
+    val difficulty: String
+)
+
+data class ProjectResponse(
+    val id: UUID,
+    val title: String,
+    val previewDescription: String,
+    val fullDescription: String,
+    val githubLink: String?,
+    val tags: List<String>,
+    val difficulty: String,
+    val createdBy: UserDto
 )
 
 data class UpdateProjectRequest(
