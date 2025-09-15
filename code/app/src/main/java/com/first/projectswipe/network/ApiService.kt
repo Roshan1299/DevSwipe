@@ -52,4 +52,7 @@ interface ApiService {
     @Multipart
     @POST("api/upload")
     suspend fun uploadFile(@Part file: MultipartBody.Part): Response<Map<String, String>>
+
+    @POST("api/projects")
+    suspend fun createProject(@Body request: ProjectCreateRequest): Response<ProjectResponse>
 }
