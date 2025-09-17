@@ -47,3 +47,12 @@ data class UpdateSkillsRequest(
 data class UpdateInterestsRequest(
     val interests: List<String>
 )
+
+data class UserDto(
+    val id: String,
+    val username: String,
+    val email: String,
+    val firstName: String?,
+    val lastName: String?,
+    val university: String? = null
+)
