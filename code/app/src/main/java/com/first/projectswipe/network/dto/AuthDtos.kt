@@ -54,5 +54,12 @@ data class UserDto(
     val email: String,
     val firstName: String?,
     val lastName: String?,
-    val university: String? = null
+    val university: String? = null,
+    val bio: String? = null,
+    val skills: List<String>? = null,
+    val interests: List<String>? = null,
+    val onboardingCompleted: Boolean = false,
+    val profileImageUrl: String? = null,
+    val createdAt: Long? = null,
+    val updatedAt: String? = null
 )
