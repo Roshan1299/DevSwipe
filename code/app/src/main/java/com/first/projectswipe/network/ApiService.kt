@@ -19,19 +19,19 @@ interface ApiService {
 
     // User profile and onboarding endpoints
     @GET("api/users/{userId}")
-    suspend fun getUserProfile(@Path("userId") userId: String): Response<UserDto>
+    suspend fun getUserProfile(@Path("userId") userId: String): Response<UserProfileResponse>
 
     @PUT("api/users/{userId}")
-    suspend fun updateUser(@Path("userId") userId: String, @Body updateRequest: UpdateUserRequest): Response<UserDto>
+    suspend fun updateUser(@Path("userId") userId: String, @Body updateRequest: UpdateUserRequest): Response<UserProfileResponse>
 
     @PATCH("api/users/{userId}/skills")
-    suspend fun updateUserSkills(@Path("userId") userId: String, @Body skillsRequest: UpdateSkillsRequest): Response<UserDto>
+    suspend fun updateUserSkills(@Path("userId") userId: String, @Body skillsRequest: UpdateSkillsRequest): Response<UserProfileResponse>
 
     @PATCH("api/users/{userId}/interests")
-    suspend fun updateUserInterests(@Path("userId") userId: String, @Body interestsRequest: UpdateInterestsRequest): Response<UserDto>
+    suspend fun updateUserInterests(@Path("userId") userId: String, @Body interestsRequest: UpdateInterestsRequest): Response<UserProfileResponse>
 
     @PATCH("api/users/{userId}/onboarding")
-    suspend fun completeOnboarding(@Path("userId") userId: String): Response<UserDto>
+    suspend fun completeOnboarding(@Path("userId") userId: String): Response<UserProfileResponse>
 
     // Profile endpoints - add these to your existing ApiService
     @GET("api/profile")
