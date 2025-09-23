@@ -13,7 +13,11 @@ import androidx.fragment.app.Fragment
 import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.findNavController
 import com.first.projectswipe.R
+import com.first.projectswipe.network.ApiService
 import com.first.projectswipe.network.dto.ProjectCreateRequest
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.GlobalScope
+import kotlinx.coroutines.launch
 
 
 
