@@ -9,7 +9,7 @@ import androidx.lifecycle.viewModelScope
 import com.first.projectswipe.network.ApiService
 import com.first.projectswipe.network.dto.UpdateUserRequest
 import com.first.projectswipe.network.dto.UserProfileResponse
-import com.first.projectswipe.network.dto.UserDto
+
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.launch
 import okhttp3.RequestBody
