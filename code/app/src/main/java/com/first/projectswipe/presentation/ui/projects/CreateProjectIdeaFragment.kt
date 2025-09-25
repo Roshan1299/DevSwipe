@@ -15,6 +15,7 @@ import androidx.navigation.fragment.findNavController
 import com.first.projectswipe.R
 import com.first.projectswipe.network.ApiService
 import com.first.projectswipe.network.dto.ProjectCreateRequest
+import com.first.projectswipe.network.dto.UpdateProjectRequest
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
@@ -46,6 +47,7 @@ class CreateProjectIdeaFragment : Fragment() {
     private lateinit var difficultyDownArrow: ImageView
     private lateinit var saveButton: Button
     private lateinit var closeButton: ImageView
+    private lateinit var loadingProgressBar: ProgressBar
 
 
 
@@ -100,9 +102,44 @@ class CreateProjectIdeaFragment : Fragment() {
         val bundleProjectId = arguments?.getString("projectId") ?: ""
         if (bundleProjectId.isNotBlank()) {
             editingProjectId = bundleProjectId
-            // TODO: Load project for editing from the backend
+            loadProjectForEditing(editingProjectId!!)
         }
         // --- End of new logic for edit ---
+    }
+
+    private fun loadProjectForEditing(projectId: String) {
+        lifecycleScope.launch(Dispatchers.Main) {
+            loadingProgressBar.visibility = View.VISIBLE
+            try {
+                val response = apiService.getProject(projectId)
+                if (response.isSuccessful) {
+                    val project = response.body()
+                    if (project != null) {
+                        projectTitleEditText.setText(project.title)
+                        previewDescriptionEditText.setText(project.previewDescription)
+                        fullDescriptionEditText.setText(project.fullDescription)
+                        githubLinkEditText.setText(project.githubLink)
+                        selectedTags.clear()
+                        selectedTags.addAll(project.tags)
+                        updateTagsDisplay()
+                        val difficultyIndex = difficultyLevels.indexOf(project.difficulty)
+                        if (difficultyIndex != -1) {
+                            currentDifficultyIndex = difficultyIndex
+                            updateDifficultyDisplay()
+                        }
+                    }
+                } else {
+                    val errorBody = response.errorBody()?.string()
+                    Log.e("CreateProjectIdeaFragment", "Error loading project: $errorBody")
+                    handleError(errorBody)
+                }
+            } catch (e: Exception) {
+                Log.e("CreateProjectIdeaFragment", "Error loading project", e)
+                Toast.makeText(context, "Error: ${e.message}", Toast.LENGTH_SHORT).show()
+            } finally {
+                loadingProgressBar.visibility = View.GONE
+            }
+        }
     }
 
     private fun initializeViews(view: View) {
@@ -121,8 +158,25 @@ class CreateProjectIdeaFragment : Fragment() {
         difficultyDownArrow = view.findViewById(R.id.difficultyDownArrow)
         saveButton = view.findViewById(R.id.saveProjectButton)
         closeButton = view.findViewById(R.id.closeButton)
+        loadingProgressBar = view.findViewById(R.id.loadingProgressBar)
 
         updateDifficultyDisplay()
+    }
+
+    private fun handleError(errorBody: String?) {
+        if (errorBody != null) {
+            try {
+                val errorResponse = com.google.gson.Gson().fromJson(errorBody, Map::class.java)
+                val message = errorResponse["message"] as? String
+                if (message != null) {
+                    Toast.makeText(context, message, Toast.LENGTH_LONG).show()
+                    return
+                }
+            } catch (e: Exception) {
+                Log.e("CreateProjectIdeaFragment", "Error parsing error response", e)
+            }
+        }
+        Toast.makeText(context, "An unexpected error occurred", Toast.LENGTH_SHORT).show()
     }
 
     private fun setupTagInput() {
@@ -300,10 +354,62 @@ class CreateProjectIdeaFragment : Fragment() {
                 if (editingProjectId == null) {
                     saveProjectIdea()
                 } else {
-                    // TODO: Update project idea
+                    updateProjectIdea()
                 }
             } else {
                 Toast.makeText(context, "Collaboration Request not implemented yet", Toast.LENGTH_SHORT).show()
+            }
+        }
+    }
+
+    private fun updateProjectIdea() {
+        val title = projectTitleEditText.text.toString().trim()
+        val preview = previewDescriptionEditText.text.toString().trim()
+        val full = fullDescriptionEditText.text.toString().trim()
+        val githubLink = githubLinkEditText.text.toString().trim()
+
+        if (title.isEmpty() || preview.isEmpty() || full.isEmpty()) {
+            Toast.makeText(context, "Please fill in all required fields", Toast.LENGTH_SHORT).show()
+            return
+        }
+
+        if (selectedTags.isEmpty()) {
+            Toast.makeText(context, "Please add at least one tag", Toast.LENGTH_SHORT).show()
+            return
+        }
+
+        if (!isValidGitHubUrl(githubLink)) {
+            Toast.makeText(context, "Please enter a valid GitHub URL", Toast.LENGTH_SHORT).show()
+            return
+        }
+
+        val updateProjectRequest = UpdateProjectRequest(
+            title = title,
+            previewDescription = preview,
+            fullDescription = full,
+            githubLink = githubLink,
+            tags = selectedTags,
+            difficulty = selectedDifficulty
+        )
+
+        lifecycleScope.launch(Dispatchers.Main) {
+            loadingProgressBar.visibility = View.VISIBLE
+            try {
+                val response = apiService.updateProject(editingProjectId!!, updateProjectRequest)
+                if (response.isSuccessful) {
+                    Log.d("CreateProjectIdeaFragment", "Project updated successfully: ${response.body()?.id}")
+                    Toast.makeText(context, "Project updated!", Toast.LENGTH_SHORT).show()
+                    findNavController().popBackStack()
+                } else {
+                    val errorBody = response.errorBody()?.string()
+                    Log.e("CreateProjectIdeaFragment", "Error updating project: $errorBody")
+                    handleError(errorBody)
+                }
+            } catch (e: Exception) {
+                Log.e("CreateProjectIdeaFragment", "Error updating project", e)
+                Toast.makeText(context, "Error: ${e.message}", Toast.LENGTH_SHORT).show()
+            } finally {
+                loadingProgressBar.visibility = View.GONE
             }
         }
     }
@@ -388,6 +494,7 @@ class CreateProjectIdeaFragment : Fragment() {
         )
 
         lifecycleScope.launch(Dispatchers.Main) {
+            loadingProgressBar.visibility = View.VISIBLE
             try {
                 val response = apiService.createProject(projectCreateRequest)
                 if (response.isSuccessful) {
@@ -395,12 +502,15 @@ class CreateProjectIdeaFragment : Fragment() {
                     Toast.makeText(context, "Project saved!", Toast.LENGTH_SHORT).show()
                     findNavController().popBackStack()
                 } else {
-                    Log.e("CreateProjectIdeaFragment", "Error saving project: ${response.errorBody()?.string()}")
-                    Toast.makeText(context, "Error saving project", Toast.LENGTH_SHORT).show()
+                    val errorBody = response.errorBody()?.string()
+                    Log.e("CreateProjectIdeaFragment", "Error saving project: $errorBody")
+                    handleError(errorBody)
                 }
             } catch (e: Exception) {
                 Log.e("CreateProjectIdeaFragment", "Error saving project", e)
                 Toast.makeText(context, "Error: ${e.message}", Toast.LENGTH_SHORT).show()
+            } finally {
+                loadingProgressBar.visibility = View.GONE
             }
         }
     }
