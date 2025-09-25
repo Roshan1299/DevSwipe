@@ -55,4 +55,10 @@ interface ApiService {
 
     @POST("api/projects")
     suspend fun createProject(@Body request: ProjectCreateRequest): Response<ProjectResponse>
+
+    @PUT("api/projects/{projectId}")
+    suspend fun updateProject(@Path("projectId") projectId: String, @Body request: UpdateProjectRequest): Response<ProjectResponse>
+
+    @GET("api/projects/{projectId}")
+    suspend fun getProject(@Path("projectId") projectId: String): Response<ProjectResponse>
 }
