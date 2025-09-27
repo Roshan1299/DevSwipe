@@ -42,8 +42,8 @@ class MainActivity : AppCompatActivity() {
                 R.id.onboardingSkillsFragment,
                 R.id.onboardingInterestsFragment,
                 R.id.registerFragment,
-                R.id.createPostFragment,
-                R.id.ResetPasswordFragment,
+                R.id.createProjectIdeaFragment,
+//                R.id.ResetPasswordFragment,
                 R.id.editProfileFragment -> {
                     binding.customBottomNav.visibility = View.GONE
                     binding.addButtons.visibility = View.GONE
@@ -118,7 +118,7 @@ class MainActivity : AppCompatActivity() {
 
         // Navigate to create post fragment
         try {
-            navController.navigate(R.id.createPostFragment)
+            navController.navigate(R.id.createProjectIdeaFragment)
         } catch (e: IllegalArgumentException) {
             // Handle navigation error gracefully
             e.printStackTrace()
