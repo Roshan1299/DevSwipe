@@ -21,3 +21,12 @@ data class ProjectResponse(
     val difficulty: String,
     val createdBy: UserDto
 )
+
+data class UpdateProjectRequest(
+    val title: String? = null,
+    val fullDescription: String? = null,
+    val previewDescription: String? = null,
+    val tags: List<String>? = null,
+    val difficulty: String? = null,
+    val githubLink: String? = null
+)
