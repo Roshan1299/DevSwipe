@@ -26,4 +26,25 @@ class ProjectService(
         )
         return projectRepository.save(project)
     }
+
+    fun updateProject(projectId: UUID, request: com.first.devswipe.dto.UpdateProjectRequest): Project {
+        val project = projectRepository.findById(projectId).orElseThrow { Exception("Project not found") }
+
+        request.title?.let { project.title = it }
+        request.previewDescription?.let { project.previewDescription = it }
+        request.fullDescription?.let { project.fullDescription = it }
+        request.githubLink?.let { project.githubLink = it }
+        request.tags?.let { project.tags = it }
+        request.difficulty?.let { project.difficulty = it }
+
+        return projectRepository.save(project)
+    }
+
+    fun getProject(projectId: UUID): Project {
+        return projectRepository.findById(projectId).orElseThrow { Exception("Project not found") }
+    }
+
+    fun getProjectsByUserId(userId: UUID): List<Project> {
+        return projectRepository.findByUserId(userId)
+    }
 }
