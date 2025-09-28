@@ -11,7 +11,26 @@ on:
 jobs:
   build-and-test:
     runs-on: ubuntu-latest
+    services:
+      postgres:
+        image: postgres:15
+        env:
+          POSTGRES_DB: devswipe_db
+          POSTGRES_USER: devswipe
+          POSTGRES_PASSWORD: password
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd pg_isready
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
     
+    env:
+      DB_USERNAME: devswipe
+      DB_PASSWORD: password
+      SPRING_DATASOURCE_URL: jdbc:postgresql://localhost:5432/devswipe_db
+
     steps:
     # Step 1: Get your code
     - name: Checkout code
@@ -39,15 +58,27 @@ jobs:
     - name: Grant execute permission for gradlew
       run: chmod +x backend/gradlew
       
-    # Step 5: Build the application
+    # Step 5: Install PostgreSQL client
+    - name: Install PostgreSQL client
+      run: sudo apt-get update && sudo apt-get -y install postgresql-client
+
+    # Step 6: Wait for Postgres
+    - name: Wait for Postgres
+      run: |
+        until pg_isready -h localhost -p 5432 -q; do
+          echo "Waiting for postgres..."
+          sleep 2
+        done
+
+    # Step 7: Build the application
     - name: Build Application
       run: cd backend && ./gradlew build -x test
       
-    # Step 6: Run Unit Tests
+    # Step 8: Run Unit Tests
     - name: Run Unit Tests
       run: cd backend && ./gradlew test
       
-    # Step 7: Test Server Startup
+    # Step 9: Test Server Startup
     - name: Test Server Startup
       run: |
         cd backend
@@ -62,14 +93,14 @@ jobs:
           exit 1
         fi
         
-    # Step 8: Upload JAR artifact
+    # Step 10: Upload JAR artifact
     - name: Upload JAR artifact
       uses: actions/upload-artifact@v4
       with:
         name: ProjectSwipe-Backend-JAR
         path: backend/build/libs/*.jar
         
-    # Step 9: Upload Test Results (if tests fail)
+    # Step 11: Upload Test Results (if tests fail)
     - name: Upload Test Reports
       uses: actions/upload-artifact@v4
       if: failure()
