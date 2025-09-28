@@ -13,11 +13,11 @@ import com.first.projectswipe.R
 import com.first.projectswipe.data.models.ProjectIdea
 import com.google.android.material.chip.Chip
 import com.google.android.material.chip.ChipGroup
-//import com.google.firebase.firestore.FirebaseFirestore
 
 
 class ProfilePostAdapter(
-    private val projects: MutableList<ProjectIdea>
+    private val projects: MutableList<ProjectIdea>,
+    private val onProjectDeleted: (ProjectIdea, Int) -> Unit
 ) : RecyclerView.Adapter<ProfilePostAdapter.ViewHolder>() {
 
     class ViewHolder(view: View) : RecyclerView.ViewHolder(view) {
@@ -54,7 +54,7 @@ class ProfilePostAdapter(
             popup.setOnMenuItemClickListener { item ->
                 when (item.itemId) {
                     R.id.action_delete_project -> {
-//                        deleteProject(project, position)
+                        deleteProject(project, position, v)
                         true
                     }
                     R.id.action_edit_project -> {
@@ -70,21 +70,15 @@ class ProfilePostAdapter(
 
     override fun getItemCount(): Int = projects.size
 
-//    private fun deleteProject(project: ProjectIdea, position: Int) {
-//        val db = FirebaseFirestore.getInstance()
-//        db.collection("project_ideas").document(project.id)
-//            .delete()
-//            .addOnSuccessListener {
-//                projects.removeAt(position)
-//                notifyItemRemoved(position)
-//                notifyItemRangeChanged(position, projects.size)
-//            }
-//    }
+    private fun deleteProject(project: ProjectIdea, position: Int, view: View) {
+        // Call the callback to handle deletion in the fragment
+        onProjectDeleted(project, position)
+    }
 
     private fun editProject(view: View, project: ProjectIdea) {
         val bundle = Bundle().apply {
             putString("projectId", project.id)
         }
-        view.findNavController().navigate(R.id.createPostFragment, bundle)
+        view.findNavController().navigate(R.id.createProjectIdeaFragment, bundle)
     }
 }

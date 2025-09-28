@@ -46,9 +46,7 @@ class ProfileRepository @Inject constructor(
         return@withContext try {
             val response = apiService.getUserProfile(userId)
             if (response.isSuccessful && response.body() != null) {
-                // Convert UserDto to UserProfileResponse
-                val userProfileResponse = response.body()!!.toUserProfileResponse()
-                Result.success(userProfileResponse)
+                Result.success(response.body()!!)
             } else {
                 val errorMessage = when (response.code()) {
                     404 -> "User profile not found."
@@ -93,9 +91,7 @@ class ProfileRepository @Inject constructor(
         return@withContext try {
             val response = apiService.updateUser(userId, request)
             if (response.isSuccessful && response.body() != null) {
-                // Convert UserDto to UserProfileResponse
-                val userProfileResponse = response.body()!!.toUserProfileResponse()
-                Result.success(userProfileResponse)
+                Result.success(response.body()!!)
             } else {
                 val errorMessage = when (response.code()) {
                     400 -> "Invalid user data. Please check your input."
@@ -118,8 +114,7 @@ class ProfileRepository @Inject constructor(
             val request = UpdateSkillsRequest(skills)
             val response = apiService.updateUserSkills(userId, request)
             if (response.isSuccessful && response.body() != null) {
-                val userProfileResponse = response.body()!!.toUserProfileResponse()
-                Result.success(userProfileResponse)
+                Result.success(response.body()!!)
             } else {
                 Result.failure(Exception("Failed to update skills: ${response.message()}"))
             }
@@ -136,8 +131,7 @@ class ProfileRepository @Inject constructor(
             val request = UpdateInterestsRequest(interests)
             val response = apiService.updateUserInterests(userId, request)
             if (response.isSuccessful && response.body() != null) {
-                val userProfileResponse = response.body()!!.toUserProfileResponse()
-                Result.success(userProfileResponse)
+                Result.success(response.body()!!)
             } else {
                 Result.failure(Exception("Failed to update interests: ${response.message()}"))
             }
@@ -153,8 +147,7 @@ class ProfileRepository @Inject constructor(
         return@withContext try {
             val response = apiService.completeOnboarding(userId)
             if (response.isSuccessful && response.body() != null) {
-                val userProfileResponse = response.body()!!.toUserProfileResponse()
-                Result.success(userProfileResponse)
+                Result.success(response.body()!!)
             } else {
                 val errorMessage = when (response.code()) {
                     400 -> "Cannot complete onboarding. Profile may be incomplete."

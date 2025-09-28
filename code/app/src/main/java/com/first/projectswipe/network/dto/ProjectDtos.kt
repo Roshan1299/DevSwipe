@@ -1,4 +1,4 @@
-package com.first.devswipe.dto
+package com.first.projectswipe.network.dto
 
 import java.util.UUID
 

@@ -1,140 +1,175 @@
 package com.first.devswipe.controller
 
-import com.first.devswipe.entity.Project
-import com.first.devswipe.repository.ProjectRepository
-import com.first.devswipe.repository.UserRepository
-import jakarta.validation.Valid
-import org.springframework.data.domain.Page
-import org.springframework.data.domain.PageRequest
-import org.springframework.http.HttpStatus
+import com.first.devswipe.dto.ProjectCreateRequest
+import com.first.devswipe.dto.ProjectResponse
+import com.first.devswipe.dto.UserDto
+import com.first.devswipe.entity.User
+import com.first.devswipe.service.ProjectService
 import org.springframework.http.ResponseEntity
-import com.first.devswipe.dto.CreateProjectRequest
-import org.springframework.security.core.Authentication
-import com.first.devswipe.dto.UpdateProjectRequest
+import org.springframework.security.core.annotation.AuthenticationPrincipal
 import org.springframework.web.bind.annotation.*
-import java.time.LocalDateTime
-import java.util.*
+import com.first.devswipe.repository.UserProfileRepository
+import java.util.UUID
 
 @RestController
 @RequestMapping("/api/projects")
 class ProjectController(
-    private val projectRepository: ProjectRepository,
-    private val userRepository: UserRepository
+    private val projectService: ProjectService,
+    private val userProfileRepository: UserProfileRepository
 ) {
-
-    @GetMapping
-    fun getAllProjects(
-        @RequestParam(defaultValue = "0") page: Int,
-        @RequestParam(defaultValue = "10") size: Int
-    ): ResponseEntity<Page<Project>> {
-        val pageable = PageRequest.of(page, size)
-        val projects = projectRepository.findAll(pageable)
-        return ResponseEntity.ok(projects)
-    }
-
-    @GetMapping("/{id}")
-    fun getProjectById(@PathVariable id: UUID): ResponseEntity<Project> {
-        val project = projectRepository.findById(id)
-            .orElseThrow { RuntimeException("Project not found") }
-        return ResponseEntity.ok(project)
-    }
 
     @PostMapping
     fun createProject(
-        @Valid @RequestBody request: CreateProjectRequest,
-        authentication: Authentication
-    ): ResponseEntity<Project> {
-        val user = userRepository.findByEmail(authentication.name)
-            ?: throw RuntimeException("User not found")
-
-        val project = Project(
-            title = request.title,
-            fullDescription = request.fullDescription,
-            previewDescription = request.previewDescription,
-            tags = request.tags.toTypedArray(),
-            difficulty = request.difficulty,
-            githubLink = request.githubLink,
-            createdBy = user.id!!
+        @AuthenticationPrincipal user: User,
+        @RequestBody request: ProjectCreateRequest
+    ): ResponseEntity<ProjectResponse> {
+        val project = projectService.createProject(user.id!!, request)
+        val userProfile = userProfileRepository.findByUserId(user.id!!)
+        val userDto = UserDto(
+            id = user.id!!,
+            username = user.displayName,
+            email = user.email,
+            firstName = user.firstName,
+            lastName = user.lastName,
+            university = userProfile?.university
         )
-
-        val savedProject = projectRepository.save(project)
-        return ResponseEntity.status(HttpStatus.CREATED).body(savedProject)
+        val response = ProjectResponse(
+            id = project.id,
+            title = project.title,
+            previewDescription = project.previewDescription,
+            fullDescription = project.fullDescription,
+            githubLink = project.githubLink,
+            tags = project.tags,
+            difficulty = project.difficulty,
+            createdBy = userDto
+        )
+        return ResponseEntity.ok(response)
     }
 
-    @PutMapping("/{id}")
+    @PutMapping("/{projectId}")
     fun updateProject(
-        @PathVariable id: UUID,
-        @Valid @RequestBody request: UpdateProjectRequest,
-        authentication: Authentication
-    ): ResponseEntity<Project> {
-        val project = projectRepository.findById(id)
-            .orElseThrow { RuntimeException("Project not found") }
-
-        val user = userRepository.findByEmail(authentication.name)
-            ?: throw RuntimeException("User not found")
-
-        // Check if user owns this project
-        if (project.createdBy != user.id) {
-            throw RuntimeException("Unauthorized to update this project")
-        }
-
-        val updatedProject = project.copy(
-            title = request.title ?: project.title,
-            fullDescription = request.fullDescription ?: project.fullDescription,
-            previewDescription = request.previewDescription ?: project.previewDescription,
-            tags = request.tags?.toTypedArray() ?: project.tags,
-            difficulty = request.difficulty ?: project.difficulty,
-            githubLink = request.githubLink ?: project.githubLink,
-            updatedAt = LocalDateTime.now()
+        @PathVariable projectId: UUID,
+        @RequestBody request: com.first.devswipe.dto.UpdateProjectRequest
+    ): ResponseEntity<ProjectResponse> {
+        val project = projectService.updateProject(projectId, request)
+        val userProfile = userProfileRepository.findByUserId(project.user.id!!)
+        val userDto = UserDto(
+            id = project.user.id!!,
+            username = project.user.displayName,
+            email = project.user.email,
+            firstName = project.user.firstName,
+            lastName = project.user.lastName,
+            university = userProfile?.university
         )
-
-        val savedProject = projectRepository.save(updatedProject)
-        return ResponseEntity.ok(savedProject)
+        val response = ProjectResponse(
+            id = project.id,
+            title = project.title,
+            previewDescription = project.previewDescription,
+            fullDescription = project.fullDescription,
+            githubLink = project.githubLink,
+            tags = project.tags,
+            difficulty = project.difficulty,
+            createdBy = userDto
+        )
+        return ResponseEntity.ok(response)
     }
 
-    @DeleteMapping("/{id}")
-    fun deleteProject(
-        @PathVariable id: UUID,
-        authentication: Authentication
-    ): ResponseEntity<Unit> {
-        val project = projectRepository.findById(id)
-            .orElseThrow { RuntimeException("Project not found") }
+    @GetMapping("/{projectId}")
+    fun getProject(@PathVariable projectId: UUID): ResponseEntity<ProjectResponse> {
+        val project = projectService.getProject(projectId)
+        val userProfile = userProfileRepository.findByUserId(project.user.id!!)
+        val userDto = UserDto(
+            id = project.user.id!!,
+            username = project.user.displayName,
+            email = project.user.email,
+            firstName = project.user.firstName,
+            lastName = project.user.lastName,
+            university = userProfile?.university
+        )
+        val response = ProjectResponse(
+            id = project.id,
+            title = project.title,
+            previewDescription = project.previewDescription,
+            fullDescription = project.fullDescription,
+            githubLink = project.githubLink,
+            tags = project.tags,
+            difficulty = project.difficulty,
+            createdBy = userDto
+        )
+        return ResponseEntity.ok(response)
+    }
 
-        val user = userRepository.findByEmail(authentication.name)
-            ?: throw RuntimeException("User not found")
-
-        if (project.createdBy != user.id) {
-            throw RuntimeException("Unauthorized to delete this project")
+    @GetMapping("/user/{userId}")
+    fun getUserProjects(@PathVariable userId: UUID): ResponseEntity<List<ProjectResponse>> {
+        val projects = projectService.getProjectsByUserId(userId)
+        val responses = projects.map { project ->
+            val userProfile = userProfileRepository.findByUserId(project.user.id!!)
+            val userDto = UserDto(
+                id = project.user.id!!,
+                username = project.user.displayName,
+                email = project.user.email,
+                firstName = project.user.firstName,
+                lastName = project.user.lastName,
+                university = userProfile?.university
+            )
+            ProjectResponse(
+                id = project.id,
+                title = project.title,
+                previewDescription = project.previewDescription,
+                fullDescription = project.fullDescription,
+                githubLink = project.githubLink,
+                tags = project.tags,
+                difficulty = project.difficulty,
+                createdBy = userDto
+            )
         }
-
-        projectRepository.delete(project)
-        return ResponseEntity.noContent().build()
+        return ResponseEntity.ok(responses)
     }
 
-    @GetMapping("/my")
-    fun getMyProjects(authentication: Authentication): ResponseEntity<List<Project>> {
-        val user = userRepository.findByEmail(authentication.name)
-            ?: throw RuntimeException("User not found")
-
-        val projects = projectRepository.findByCreatedByOrderByCreatedAtDesc(user.id!!)
-        return ResponseEntity.ok(projects)
+    @GetMapping("/my-projects")
+    fun getCurrentUserProjects(@AuthenticationPrincipal user: User): ResponseEntity<List<ProjectResponse>> {
+        val projects = projectService.getProjectsByUserId(user.id!!)
+        val responses = projects.map { project ->
+            val userProfile = userProfileRepository.findByUserId(project.user.id!!)
+            val userDto = UserDto(
+                id = project.user.id!!,
+                username = project.user.displayName,
+                email = project.user.email,
+                firstName = project.user.firstName,
+                lastName = project.user.lastName,
+                university = userProfile?.university
+            )
+            ProjectResponse(
+                id = project.id,
+                title = project.title,
+                previewDescription = project.previewDescription,
+                fullDescription = project.fullDescription,
+                githubLink = project.githubLink,
+                tags = project.tags,
+                difficulty = project.difficulty,
+                createdBy = userDto
+            )
+        }
+        return ResponseEntity.ok(responses)
     }
 
-    @GetMapping("/search")
-    fun searchProjects(@RequestParam query: String): ResponseEntity<List<Project>> {
-        val projects = projectRepository.searchProjects(query)
-        return ResponseEntity.ok(projects)
-    }
-
-    @GetMapping("/by-tag/{tag}")
-    fun getProjectsByTag(@PathVariable tag: String): ResponseEntity<List<Project>> {
-        val projects = projectRepository.findByTagsContaining(tag)
-        return ResponseEntity.ok(projects)
-    }
-
-    @GetMapping("/by-difficulty/{difficulty}")
-    fun getProjectsByDifficulty(@PathVariable difficulty: String): ResponseEntity<List<Project>> {
-        val projects = projectRepository.findByDifficultyOrderByCreatedAtDesc(difficulty)
-        return ResponseEntity.ok(projects)
+    @DeleteMapping("/{projectId}")
+    fun deleteProject(
+        @PathVariable projectId: UUID,
+        @AuthenticationPrincipal user: User
+    ): ResponseEntity<Map<String, String>> {
+        try {
+            val project = projectService.getProject(projectId)
+            
+            // Check if the user owns this project
+            if (project.user.id != user.id) {
+                return ResponseEntity.status(403).body(mapOf("error" to "You can only delete your own projects"))
+            }
+            
+            projectService.deleteProject(projectId)
+            return ResponseEntity.ok(mapOf("message" to "Project deleted successfully"))
+        } catch (e: Exception) {
+            return ResponseEntity.status(404).body(mapOf("error" to "Project not found: ${e.message}"))
+        }
     }
 }

@@ -23,23 +23,23 @@
         <action
             android:id="@+id/action_loginFragment_to_ideasFragment"
             app:destination="@id/homeFragment" />
-        <action
-            android:id="@+id/action_loginFragment_to_resetPasswordFragment"
-            app:destination="@id/ResetPasswordFragment" />
+<!--        <action-->
+<!--            android:id="@+id/action_loginFragment_to_resetPasswordFragment"-->
+<!--            app:destination="@id/ResetPasswordFragment" />-->
         <action
             android:id="@+id/action_loginFragment_to_onboardingSkillsFragment"
             app:destination="@id/onboardingSkillsFragment" />
     </fragment>
 
     <!-- Reset Password -->
-    <fragment
-        android:id="@+id/ResetPasswordFragment"
-        android:name="com.first.projectswipe.presentation.ui.auth.ResetPasswordFragment"
-        tools:layout="@layout/fragment_reset_password">
-        <action
-            android:id="@+id/action_resetPasswordFragment_to_loginFragment"
-            app:destination="@id/loginFragment" />
-    </fragment>
+<!--    <fragment-->
+<!--        android:id="@+id/ResetPasswordFragment"-->
+<!--        android:name="com.first.projectswipe.presentation.ui.auth.ResetPasswordFragment"-->
+<!--        tools:layout="@layout/fragment_reset_password">-->
+<!--        <action-->
+<!--            android:id="@+id/action_resetPasswordFragment_to_loginFragment"-->
+<!--            app:destination="@id/loginFragment" />-->
+<!--    </fragment>-->
 
     <!-- Register Fragment -->
     <fragment
@@ -64,8 +64,8 @@
         android:label="Ideas"
         tools:layout="@layout/fragment_home">
         <action
-            android:id="@+id/action_ideasFragment_to_createPostFragment"
-            app:destination="@id/createPostFragment" />
+            android:id="@+id/action_ideasFragment_to_createProjectIdeaFragment"
+            app:destination="@id/createProjectIdeaFragment" />
     </fragment>
 
     <!-- Profile Fragment -->
@@ -78,8 +78,8 @@
             android:id="@+id/action_profileFragment_to_editProfileFragment"
             app:destination="@id/editProfileFragment" />
         <action
-            android:id="@+id/action_profileFragment_to_createPostFragment"
-            app:destination="@id/createPostFragment">
+            android:id="@+id/action_profileFragment_to_createProjectIdeaFragment"
+            app:destination="@id/createProjectIdeaFragment">
             <argument
                 android:name="projectId"
                 app:argType="string"
@@ -100,15 +100,15 @@
 
     <!-- Create Post -->
     <fragment
-        android:id="@+id/createPostFragment"
-        android:name="com.first.projectswipe.presentation.ui.projects.CreatePostFragment"
+        android:id="@+id/createProjectIdeaFragment"
+        android:name="com.first.projectswipe.presentation.ui.projects.CreateProjectIdeaFragment"
         android:label="Create Post"
         tools:layout="@layout/fragment_create_post">
         <action
-            android:id="@+id/action_createPostFragment_to_homeFragment"
+            android:id="@+id/action_createProjectIdeaFragment_to_homeFragment"
             app:destination="@id/homeFragment" />
         <action
-            android:id="@+id/action_createPostFragment_to_profileFragment"
+            android:id="@+id/action_createProjectIdeaFragment_to_profileFragment"
             app:destination="@id/profileFragment" />
         <argument
             android:name="projectId"
@@ -150,8 +150,8 @@
         android:label="Collaborate"
         tools:layout="@layout/fragment_collaborate">
         <action
-            android:id="@+id/action_collaborateFragment_to_createPostFragment"
-            app:destination="@id/createPostFragment" />
+            android:id="@+id/action_collaborateFragment_to_createProjectIdeaFragment"
+            app:destination="@id/createProjectIdeaFragment" />
     </fragment>
     -->
 
@@ -163,8 +163,8 @@
         android:label="Chat"
         tools:layout="@layout/fragment_chat">
         <action
-            android:id="@+id/action_chatFragment_to_createPostFragment"
-            app:destination="@id/createPostFragment" />
+            android:id="@+id/action_chatFragment_to_createProjectIdeaFragment"
+            app:destination="@id/createProjectIdeaFragment" />
     </fragment>
     -->
 

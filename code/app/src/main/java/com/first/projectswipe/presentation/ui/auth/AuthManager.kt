@@ -54,6 +54,9 @@ class AuthManager @Inject constructor(
         private const val KEY_USER_INTERESTS = "user_interests"
         private const val KEY_ONBOARDING_COMPLETE = "onboarding_complete"
         private const val KEY_USER_UNIVERSITY = "user_university"
+        private const val KEY_USER_BIO = "user_bio"
+        private const val KEY_USER_PROFILE_IMAGE_URL = "user_profile_image_url"
+        private const val KEY_USER_CREATED_AT = "user_created_at"
     }
 
     sealed class AuthState {
@@ -312,6 +315,9 @@ class AuthManager @Inject constructor(
 
             // Save university
             putString(KEY_USER_UNIVERSITY, user.university ?: "")
+            putString(KEY_USER_BIO, user.bio ?: "")
+            putString(KEY_USER_PROFILE_IMAGE_URL, user.profileImageUrl ?: "")
+            putLong(KEY_USER_CREATED_AT, user.createdAt ?: 0L)
 
             apply()
         }
@@ -346,6 +352,9 @@ class AuthManager @Inject constructor(
         val interestsString = prefs.getString(KEY_USER_INTERESTS, null)
         val onboardingComplete = prefs.getBoolean(KEY_ONBOARDING_COMPLETE, false)
         val university = prefs.getString(KEY_USER_UNIVERSITY, "") ?: ""
+        val bio = prefs.getString(KEY_USER_BIO, "") ?: ""
+        val profileImageUrl = prefs.getString(KEY_USER_PROFILE_IMAGE_URL, "") ?: ""
+        val createdAt = prefs.getLong(KEY_USER_CREATED_AT, 0L)
 
         if (userId != null && email != null && username != null) {
             val skills = skillsString?.split(",")?.filter { it.isNotBlank() } ?: emptyList()
@@ -358,12 +367,12 @@ class AuthManager @Inject constructor(
                 username = username,
                 firstName = firstName.takeIf { it.isNotEmpty() },
                 lastName = lastName.takeIf { it.isNotEmpty() },
-                bio = "",
+                bio = bio,
                 skills = skills,
                 interests = interests,
                 onboardingCompleted = onboardingComplete,
-                profileImageUrl = "",
-                createdAt = System.currentTimeMillis(),
+                profileImageUrl = profileImageUrl,
+                createdAt = createdAt,
                 university = university
             )
 

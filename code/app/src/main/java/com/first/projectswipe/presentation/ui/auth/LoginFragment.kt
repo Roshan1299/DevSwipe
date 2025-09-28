@@ -67,9 +67,9 @@ class LoginFragment : Fragment() {
             }
         }
 
-        binding.forgotPasswordText.setOnClickListener {
-            findNavController().navigate(R.id.action_loginFragment_to_resetPasswordFragment)
-        }
+        // binding.forgotPasswordText.setOnClickListener {
+        //     findNavController().navigate(R.id.action_loginFragment_to_resetPasswordFragment)
+        // }
 
         binding.registerPrompt.setOnClickListener {
             findNavController().navigate(R.id.action_loginFragment_to_registerFragment)
