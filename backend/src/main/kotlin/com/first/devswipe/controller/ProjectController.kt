@@ -98,4 +98,78 @@ class ProjectController(
         )
         return ResponseEntity.ok(response)
     }
+
+    @GetMapping("/user/{userId}")
+    fun getUserProjects(@PathVariable userId: UUID): ResponseEntity<List<ProjectResponse>> {
+        val projects = projectService.getProjectsByUserId(userId)
+        val responses = projects.map { project ->
+            val userProfile = userProfileRepository.findByUserId(project.user.id!!)
+            val userDto = UserDto(
+                id = project.user.id!!,
+                username = project.user.displayName,
+                email = project.user.email,
+                firstName = project.user.firstName,
+                lastName = project.user.lastName,
+                university = userProfile?.university
+            )
+            ProjectResponse(
+                id = project.id,
+                title = project.title,
+                previewDescription = project.previewDescription,
+                fullDescription = project.fullDescription,
+                githubLink = project.githubLink,
+                tags = project.tags,
+                difficulty = project.difficulty,
+                createdBy = userDto
+            )
+        }
+        return ResponseEntity.ok(responses)
+    }
+
+    @GetMapping("/my-projects")
+    fun getCurrentUserProjects(@AuthenticationPrincipal user: User): ResponseEntity<List<ProjectResponse>> {
+        val projects = projectService.getProjectsByUserId(user.id!!)
+        val responses = projects.map { project ->
+            val userProfile = userProfileRepository.findByUserId(project.user.id!!)
+            val userDto = UserDto(
+                id = project.user.id!!,
+                username = project.user.displayName,
+                email = project.user.email,
+                firstName = project.user.firstName,
+                lastName = project.user.lastName,
+                university = userProfile?.university
+            )
+            ProjectResponse(
+                id = project.id,
+                title = project.title,
+                previewDescription = project.previewDescription,
+                fullDescription = project.fullDescription,
+                githubLink = project.githubLink,
+                tags = project.tags,
+                difficulty = project.difficulty,
+                createdBy = userDto
+            )
+        }
+        return ResponseEntity.ok(responses)
+    }
+
+    @DeleteMapping("/{projectId}")
+    fun deleteProject(
+        @PathVariable projectId: UUID,
+        @AuthenticationPrincipal user: User
+    ): ResponseEntity<Map<String, String>> {
+        try {
+            val project = projectService.getProject(projectId)
+            
+            // Check if the user owns this project
+            if (project.user.id != user.id) {
+                return ResponseEntity.status(403).body(mapOf("error" to "You can only delete your own projects"))
+            }
+            
+            projectService.deleteProject(projectId)
+            return ResponseEntity.ok(mapOf("message" to "Project deleted successfully"))
+        } catch (e: Exception) {
+            return ResponseEntity.status(404).body(mapOf("error" to "Project not found: ${e.message}"))
+        }
+    }
 }
