@@ -18,6 +18,7 @@ import com.first.projectswipe.R
 import com.first.projectswipe.presentation.adapters.ProfilePostAdapter
 import com.first.projectswipe.data.models.ProjectIdea
 import com.first.projectswipe.data.repository.ProfileRepository
+import com.first.projectswipe.data.repository.ProjectRepository
 import com.first.projectswipe.network.dto.UserProfileResponse
 import com.google.android.material.chip.Chip
 import com.google.android.material.chip.ChipGroup
@@ -40,6 +41,9 @@ class ProfileFragment : Fragment() {
     // Replace Firebase with your backend
     @Inject
     lateinit var profileRepository: ProfileRepository
+    
+    @Inject
+    lateinit var projectRepository: ProjectRepository
 
     private val postList = mutableListOf<ProjectIdea>()
     private lateinit var adapter: ProfilePostAdapter
@@ -72,7 +76,10 @@ class ProfileFragment : Fragment() {
 
         // Setup RecyclerView
         postsRecyclerView.layoutManager = LinearLayoutManager(requireContext())
-        adapter = ProfilePostAdapter(postList)
+        adapter = ProfilePostAdapter(postList) { project, position ->
+            // Handle project deletion
+            deleteProject(project, position)
+        }
         postsRecyclerView.adapter = adapter
 
         loadUserProfile()
@@ -124,16 +131,17 @@ class ProfileFragment : Fragment() {
     }
 
     private fun loadUserPosts() {
-        // TODO: Implement when you have project API endpoints
-        // For now, you can keep this empty or load from your project API
-
         lifecycleScope.launch {
             try {
-                // When you implement project endpoints:
-                // val projects = projectRepository.getCurrentUserProjects()
-                // postList.clear()
-                // postList.addAll(projects)
-                // adapter.notifyDataSetChanged()
+                projectRepository.getCurrentUserProjects()
+                    .onSuccess { projects ->
+                        postList.clear()
+                        postList.addAll(projects)
+                        adapter.notifyDataSetChanged()
+                    }
+                    .onFailure { error ->
+                        showError("Failed to load posts: ${error.message}")
+                    }
             } catch (e: Exception) {
                 showError("Failed to load posts: ${e.message}")
             }
@@ -167,5 +175,27 @@ class ProfileFragment : Fragment() {
 
     private fun showSuccess(message: String) {
         Toast.makeText(requireContext(), message, Toast.LENGTH_SHORT).show()
+    }
+
+    private fun deleteProject(project: ProjectIdea, position: Int) {
+        showError("Attempting to delete project: ${project.id}") // Debug message
+        lifecycleScope.launch {
+            try {
+                projectRepository.deleteProject(project.id)
+                    .onSuccess {
+                        // Remove from local list and notify adapter
+                        postList.removeAt(position)
+                        adapter.notifyItemRemoved(position)
+                        adapter.notifyItemRangeChanged(position, postList.size)
+                        
+                        showSuccess("Project deleted successfully")
+                    }
+                    .onFailure { error ->
+                        showError("Failed to delete project: ${error.message}")
+                    }
+            } catch (e: Exception) {
+                showError("Error deleting project: ${e.message}")
+            }
+        }
     }
 }
