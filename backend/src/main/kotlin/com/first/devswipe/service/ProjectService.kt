@@ -47,4 +47,11 @@ class ProjectService(
     fun getProjectsByUserId(userId: UUID): List<Project> {
         return projectRepository.findByUserId(userId)
     }
+
+    fun deleteProject(projectId: UUID) {
+        if (!projectRepository.existsById(projectId)) {
+            throw Exception("Project not found")
+        }
+        projectRepository.deleteById(projectId)
+    }
 }
