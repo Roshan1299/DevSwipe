@@ -4,6 +4,7 @@
 [![Platform](https://img.shields.io/badge/Android-13%2B-brightgreen?logo=android)](https://developer.android.com)
 [![License](https://img.shields.io/badge/License-MIT-blue?logo=opensourceinitiative)](https://opensource.org/licenses/MIT)
 [![CI](https://github.com/Roshan1299/DevSwipe/workflows/Android%20CI/badge.svg)](https://github.com/Roshan1299/DevSwipe/actions)
+[![Backend-CI](https://github.com/Roshan1299/DevSwipe/workflows/Backend%20CI/badge.svg)](https://github.com/Roshan1299/DevSwipe/actions)
 [![Release](https://img.shields.io/github/v/release/Roshan1299/DevSwipe?include_prereleases&label=beta&logo=github)](https://github.com/Roshan1299/DevSwipe/releases)
 
 <img width="1536" height="1024" alt="DevSwipe Marketing banner" src="https://github.com/user-attachments/assets/dfe2efb0-ab55-4020-a645-bef61207580e" />
