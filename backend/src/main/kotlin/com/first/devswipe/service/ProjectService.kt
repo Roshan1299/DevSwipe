@@ -48,6 +48,26 @@ class ProjectService(
         return projectRepository.findByUserId(userId)
     }
 
+    fun getAllProjects(): List<Project> {
+        return projectRepository.findAll()
+    }
+
+    fun filterProjects(difficulty: String?, tags: List<String>?): List<Project> {
+        return if (difficulty != null && !tags.isNullOrEmpty()) {
+            // Both difficulty and tags are specified
+            projectRepository.findByDifficultyAndTagsContaining(difficulty, tags)
+        } else if (difficulty != null) {
+            // Only difficulty is specified
+            projectRepository.findByDifficulty(difficulty)
+        } else if (!tags.isNullOrEmpty()) {
+            // Only tags are specified
+            projectRepository.findByTagsContaining(tags)
+        } else {
+            // No filters, return all projects
+            projectRepository.findAll()
+        }
+    }
+
     fun deleteProject(projectId: UUID) {
         if (!projectRepository.existsById(projectId)) {
             throw Exception("Project not found")
