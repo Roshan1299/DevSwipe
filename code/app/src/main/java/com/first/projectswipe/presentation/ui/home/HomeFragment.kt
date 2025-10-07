@@ -224,8 +224,10 @@ import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.findNavController
 import com.first.projectswipe.R
 import com.first.projectswipe.presentation.ui.auth.AuthManager
+import com.first.projectswipe.network.toProjectIdea
 import com.first.projectswipe.data.models.ProjectIdea
 import com.first.projectswipe.network.ApiService
+import com.first.projectswipe.utils.CardStackManager
 import com.google.android.material.navigation.NavigationView
 import kotlinx.coroutines.launch
 import dagger.hilt.android.AndroidEntryPoint
@@ -244,8 +246,9 @@ class HomeFragment : Fragment() {
     private lateinit var drawerLayout: DrawerLayout
     private lateinit var navigationView: NavigationView
     private lateinit var cardContainer: FrameLayout
+    private var cardStackManager: CardStackManager? = null
 
-    // Master list of all fetched ideas (unfiltered)
+
     private var allIdeas: List<ProjectIdea> = emptyList()
 
     // Currently displayed ideas after filtering (or allIdeas)
@@ -271,8 +274,13 @@ class HomeFragment : Fragment() {
         setupToolbar(view)
         setupNavigationDrawer()
         setupFilterButton(view)
-
-        loadIdeas()
+        authManager.isLoggedIn.observe(viewLifecycleOwner) {
+            if (it) {
+                loadIdeas()
+            } else {
+                // Handle not logged in case if needed
+            }
+        }
 
         return view
     }
@@ -305,9 +313,17 @@ class HomeFragment : Fragment() {
     private fun setupFilterButton(view: View) {
         val filterButton = view.findViewById<ImageButton>(R.id.filterButton)
         filterButton.setOnClickListener {
-            // TODO: Implement filter bottom sheet when ready
-            // For now, just show a placeholder message
-            Toast.makeText(context, "Filter feature coming soon!", Toast.LENGTH_SHORT).show()
+            val sheet = FilterBottomSheet.newInstance(lastSelectedDifficulty, lastSelectedTags)
+            sheet.setFilterListener(object : FilterBottomSheet.FilterListener {
+                override fun onFiltersSelected(filterMap: Map<String, Any?>) {
+                    lastSelectedDifficulty = filterMap["difficulty"] as? String
+                    lastSelectedTags =
+                        (filterMap["tags"] as? List<*>)?.filterIsInstance<String>()?.toSet() ?: emptySet()
+
+                    applyFilters(filterMap)
+                }
+            })
+            sheet.show(parentFragmentManager, FilterBottomSheet.TAG)
         }
     }
 
@@ -315,18 +331,24 @@ class HomeFragment : Fragment() {
     private fun loadIdeas() {
         lifecycleScope.launch {
             try {
-                // TODO: Replace with your actual API endpoint for project ideas
-                // For now, we'll create some sample data to prevent crashes
+                val response = apiService.getProjects()
+                if (response.isSuccessful) {
+                    allIdeas = response.body()?.map { it.toProjectIdea() } ?: emptyList()
+                    Log.d("HomeFragment", "Loaded ${allIdeas.size} projects")
 
-                allIdeas = getSampleProjectIdeas()
-                Log.d("HomeFragment", "Loaded ${allIdeas.size} projects")
-
-                if (allIdeas.isNotEmpty()) {
-                    // On first load, reset filters selections so all are shown
-                    lastSelectedDifficulty = null
-                    lastSelectedTags = emptySet()
-                    showCards(allIdeas)
+                    if (allIdeas.isNotEmpty()) {
+                        val startingIndex = requireContext().getSharedPreferences("SwipePrefs", Context.MODE_PRIVATE)
+                            .getInt("swipe_index", 0)
+                        // On first load, reset filters selections so all are shown
+                        lastSelectedDifficulty = null
+                        lastSelectedTags = emptySet()
+                        showCards(allIdeas, startingIndex)
+                    } else {
+                        showEmptyState()
+                    }
                 } else {
+                    Toast.makeText(context, "Error loading projects: ${response.message()}", Toast.LENGTH_SHORT).show()
+                    Log.e("HomeFragment", "Error loading projects: ${response.code()} ${response.message()}")
                     showEmptyState()
                 }
             } catch (e: Exception) {
@@ -337,117 +359,57 @@ class HomeFragment : Fragment() {
         }
     }
 
-    /** Creates sample project ideas - replace this with API call later */
-    private fun getSampleProjectIdeas(): List<ProjectIdea> {
-        return listOf(
-            ProjectIdea(
-                id = "1",
-                title = "Task Management App",
-                previewDescription = "Create a simple task management app with auth and real-time updates.",
-                fullDescription = "Build a comprehensive task management application that includes user authentication, real-time task updates, project organization, team collaboration features, and deadline tracking. This project will help you learn modern Android development patterns and backend integration.",
-                createdBy = "user123",
-                createdByName = "John Developer",
-                difficulty = "Beginner",
-                tags = listOf("Android", "Kotlin", "REST API"),
-                githubLink = "https://github.com/example/task-manager",
-                timeline = "2-3 weeks"
-            ),
-            ProjectIdea(
-                id = "2",
-                title = "Weather Dashboard",
-                previewDescription = "Build a weather dashboard with forecasts using external APIs.",
-                fullDescription = "Develop a comprehensive weather dashboard that displays current weather conditions, 7-day forecasts, weather maps, and alerts. Integrate with multiple weather APIs for accurate data and create beautiful data visualizations with charts and graphs.",
-                createdBy = "user456",
-                createdByName = "Sarah WebDev",
-                difficulty = "Intermediate",
-                tags = listOf("Web", "JavaScript", "API"),
-                githubLink = "https://github.com/example/weather-dashboard",
-                timeline = "1-2 weeks"
-            ),
-            ProjectIdea(
-                id = "3",
-                title = "E-commerce Platform",
-                previewDescription = "Develop a full e-commerce platform with payments and admin panel.",
-                fullDescription = "Create a complete e-commerce solution with product catalog, shopping cart, payment processing, order management, user accounts, admin dashboard, inventory tracking, and analytics. This full-stack project covers everything from frontend to backend to database design.",
-                createdBy = "user789",
-                createdByName = "Mike FullStack",
-                difficulty = "Advanced",
-                tags = listOf("Full-Stack", "Database", "Payments"),
-                githubLink = "https://github.com/example/ecommerce-platform",
-                timeline = "2-3 months"
-            ),
-            ProjectIdea(
-                id = "4",
-                title = "Social Media Clone",
-                previewDescription = "Build a social media app with posts, likes, and comments.",
-                fullDescription = "Create a social media platform similar to Instagram or Twitter with user profiles, photo/text posts, likes, comments, following system, real-time notifications, and discover feed. Learn about social app architecture and real-time features.",
-                createdBy = "user101",
-                createdByName = "Alex SocialDev",
-                difficulty = "Intermediate",
-                tags = listOf("Mobile", "Social", "Real-time"),
-                githubLink = "https://github.com/example/social-clone",
-                timeline = "4-6 weeks"
-            ),
-            ProjectIdea(
-                id = "5",
-                title = "AI Chatbot Assistant",
-                previewDescription = "Create an AI-powered chatbot with natural language processing.",
-                fullDescription = "Build an intelligent chatbot assistant that can understand natural language, provide helpful responses, integrate with various APIs for information retrieval, and learn from user interactions. Implement machine learning models and NLP techniques.",
-                createdBy = "user202",
-                createdByName = "Emma AIExpert",
-                difficulty = "Advanced",
-                tags = listOf("AI", "NLP", "Machine Learning"),
-                githubLink = "https://github.com/example/ai-chatbot",
-                timeline = "6-8 weeks"
-            )
-        )
-    }
+
 
     /** Rebuilds the card stack UI with [ideas]. */
-    private fun showCards(ideas: List<ProjectIdea>) {
+    private fun showCards(ideas: List<ProjectIdea>, startingIndex: Int = 0) {
         displayedIdeas = ideas
         cardContainer.removeAllViews()
-
-        // TODO: Implement CardStackManager when ready
-        // For now, show a simple message
-        val textView = android.widget.TextView(context).apply {
-            text = "Found ${ideas.size} project ideas!\n\nCard stack feature will be implemented next."
-            textAlignment = View.TEXT_ALIGNMENT_CENTER
-            setPadding(32, 32, 32, 32)
-            textSize = 16f
-        }
-        cardContainer.addView(textView)
-
-        saveSwipePosition(0)
+        cardStackManager = CardStackManager(
+            context = requireContext(),
+            container = cardContainer,
+            allIdeas = displayedIdeas,
+            apiService = apiService,
+            startingIndex = startingIndex,
+            onCardSwiped = { _, _ ->
+                saveSwipePosition(cardStackManager?.currentTopIndex ?: 0)
+            }
+        ).also { it.showInitialCards() }
+        saveSwipePosition(startingIndex)
     }
 
     /** Applies difficulty/tags filters and shows filtered projects */
     fun applyFilters(filters: Map<String, Any?>) {
-        // If no filters, show all projects
-        if (filters.isEmpty()) {
-            showCards(allIdeas)
-            return
-        }
+        lifecycleScope.launch {
+            try {
+                val difficulty = filters["difficulty"] as? String
+                val tags = filters["tags"] as? List<String>
 
-        val filtered = allIdeas.filter { idea ->
-            val difficultyMatch = filters["difficulty"]?.let { diff ->
-                idea.difficulty.equals(diff.toString(), ignoreCase = true)
-            } ?: true
+                val response = if (difficulty == null && (tags == null || tags.isEmpty())) {
+                    // No filters applied - get all projects
+                    apiService.getProjects()
+                } else {
+                    // Apply filters - Retrofit will handle the List<String> conversion to query parameters
+                    apiService.filterProjects(difficulty, tags)
+                }
 
-            val tagsMatch = filters["tags"]?.let { tagList ->
-                if (tagList is List<*> && tagList.isNotEmpty()) {
-                    val selectedTags = tagList.filterIsInstance<String>()
-                    selectedTags.isEmpty() || idea.tags.any { tag -> selectedTags.contains(tag) }
-                } else true
-            } ?: true
-
-            difficultyMatch && tagsMatch
-        }
-
-        if (filtered.isNotEmpty()) {
-            showCards(filtered)
-        } else {
-            showEmptyState()
+                if (response.isSuccessful) {
+                    val filteredIdeas = response.body()?.map { it.toProjectIdea() } ?: emptyList()
+                    if (filteredIdeas.isNotEmpty()) {
+                        showCards(filteredIdeas)
+                    } else {
+                        showEmptyState()
+                    }
+                } else {
+                    Toast.makeText(context, "Error filtering projects: ${response.message()}", Toast.LENGTH_SHORT).show()
+                    Log.e("HomeFragment", "Error filtering projects: ${response.code()} ${response.message()}")
+                    showEmptyState()
+                }
+            } catch (e: Exception) {
+                Toast.makeText(context, "Error filtering projects: ${e.message}", Toast.LENGTH_SHORT).show()
+                Log.e("HomeFragment", "Error filtering projects", e)
+                showEmptyState()
+            }
         }
     }
 
