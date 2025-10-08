@@ -181,7 +181,7 @@ class ProfileFragment : Fragment() {
         showError("Attempting to delete project: ${project.id}") // Debug message
         lifecycleScope.launch {
             try {
-                projectRepository.deleteProject(project.id)
+                projectRepository.deleteProject(project.id.toString())
                     .onSuccess {
                         // Remove from local list and notify adapter
                         postList.removeAt(position)
