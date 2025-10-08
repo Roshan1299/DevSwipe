@@ -67,4 +67,13 @@ interface ApiService {
 
     @DELETE("api/projects/{projectId}")
     suspend fun deleteProject(@Path("projectId") projectId: String): Response<Map<String, String>>
+
+    @GET("api/projects")
+    suspend fun getProjects(): Response<List<ProjectResponse>>
+
+    @GET("api/projects/filter")
+    suspend fun filterProjects(
+        @Query("difficulty") difficulty: String?,
+        @Query("tags") tags: List<String>?
+    ): Response<List<ProjectResponse>>
 }
