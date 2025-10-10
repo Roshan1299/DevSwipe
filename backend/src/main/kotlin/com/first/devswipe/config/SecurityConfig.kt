@@ -35,6 +35,9 @@ class SecurityConfig(
             .authorizeHttpRequests { auth ->
                 auth.requestMatchers("/api/auth/**").permitAll()
                     .requestMatchers("/api/public/**").permitAll()
+                    .requestMatchers("/api/projects").permitAll()  // Allow viewing all projects
+                    .requestMatchers("/api/projects/filter").permitAll()  // Allow filtering projects
+                    .requestMatchers("/api/projects/{projectId}").permitAll()  // Allow viewing specific project
                     .requestMatchers("/h2-console/**").permitAll() // for testing if you use H2
                     .anyRequest().authenticated()
             }

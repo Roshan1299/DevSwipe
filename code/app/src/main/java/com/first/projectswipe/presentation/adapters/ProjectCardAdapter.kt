@@ -27,7 +27,7 @@ class ProjectCardAdapter(private val projectList: List<ProjectIdea>) :
         val project = projectList[position]
         holder.titleView.text = project.title
         holder.descView.text = project.previewDescription
-        holder.creatorView.text = project.createdByName // or use a lookup for UID → name
+        holder.creatorView.text = project.createdBy.fullName
     }
 
     override fun getItemCount(): Int = projectList.size

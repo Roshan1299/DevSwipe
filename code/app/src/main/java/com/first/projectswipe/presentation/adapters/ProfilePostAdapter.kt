@@ -77,7 +77,7 @@ class ProfilePostAdapter(
 
     private fun editProject(view: View, project: ProjectIdea) {
         val bundle = Bundle().apply {
-            putString("projectId", project.id)
+            putString("projectId", project.id.toString())
         }
         view.findNavController().navigate(R.id.createProjectIdeaFragment, bundle)
     }

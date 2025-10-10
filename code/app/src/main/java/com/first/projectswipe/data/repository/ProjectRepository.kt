@@ -26,16 +26,14 @@ class ProjectRepository @Inject constructor(
                 val projectResponses = response.body() ?: emptyList()
                 val projectIdeas = projectResponses.map { projectResponse ->
                     ProjectIdea(
-                        id = projectResponse.id.toString(),
+                        id = projectResponse.id,
                         title = projectResponse.title,
                         previewDescription = projectResponse.previewDescription,
                         fullDescription = projectResponse.fullDescription,
-                        createdBy = projectResponse.createdBy.id.toString(),
+                        createdBy = projectResponse.createdBy,
                         tags = projectResponse.tags,
-                        createdByName = "${projectResponse.createdBy.firstName} ${projectResponse.createdBy.lastName}".trim(),
                         difficulty = projectResponse.difficulty,
-                        githubLink = projectResponse.githubLink ?: "",
-                        timeline = "" // Timeline not available in current model
+                        githubLink = projectResponse.githubLink
                     )
                 }
                 Result.success(projectIdeas)

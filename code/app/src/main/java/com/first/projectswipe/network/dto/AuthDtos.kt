@@ -62,4 +62,7 @@ data class UserDto(
     val profileImageUrl: String? = null,
     val createdAt: Long? = null,
     val updatedAt: String? = null
-)
+) {
+    val fullName: String
+        get() = if (!firstName.isNullOrEmpty() || !lastName.isNullOrEmpty()) "${firstName ?: ""} ${lastName ?: ""}".trim() else username
+}

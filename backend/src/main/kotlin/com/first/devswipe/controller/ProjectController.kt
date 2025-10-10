@@ -153,6 +153,63 @@ class ProjectController(
         return ResponseEntity.ok(responses)
     }
 
+    @GetMapping
+    fun getAllProjects(): ResponseEntity<List<ProjectResponse>> {
+        val projects = projectService.getAllProjects()
+        val responses = projects.map { project ->
+            val userProfile = userProfileRepository.findByUserId(project.user.id!!)
+            val userDto = UserDto(
+                id = project.user.id!!,
+                username = project.user.displayName,
+                email = project.user.email,
+                firstName = project.user.firstName,
+                lastName = project.user.lastName,
+                university = userProfile?.university
+            )
+            ProjectResponse(
+                id = project.id,
+                title = project.title,
+                previewDescription = project.previewDescription,
+                fullDescription = project.fullDescription,
+                githubLink = project.githubLink,
+                tags = project.tags,
+                difficulty = project.difficulty,
+                createdBy = userDto
+            )
+        }
+        return ResponseEntity.ok(responses)
+    }
+
+    @GetMapping("/filter")
+    fun filterProjects(
+        @RequestParam(required = false) difficulty: String?,
+        @RequestParam(required = false) tags: List<String>?
+    ): ResponseEntity<List<ProjectResponse>> {
+        val projects = projectService.filterProjects(difficulty, tags)
+        val responses = projects.map { project ->
+            val userProfile = userProfileRepository.findByUserId(project.user.id!!)
+            val userDto = UserDto(
+                id = project.user.id!!,
+                username = project.user.displayName,
+                email = project.user.email,
+                firstName = project.user.firstName,
+                lastName = project.user.lastName,
+                university = userProfile?.university
+            )
+            ProjectResponse(
+                id = project.id,
+                title = project.title,
+                previewDescription = project.previewDescription,
+                fullDescription = project.fullDescription,
+                githubLink = project.githubLink,
+                tags = project.tags,
+                difficulty = project.difficulty,
+                createdBy = userDto
+            )
+        }
+        return ResponseEntity.ok(responses)
+    }
+
     @DeleteMapping("/{projectId}")
     fun deleteProject(
         @PathVariable projectId: UUID,
