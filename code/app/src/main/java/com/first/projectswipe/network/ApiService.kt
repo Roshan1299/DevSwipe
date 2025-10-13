@@ -76,4 +76,23 @@ interface ApiService {
         @Query("difficulty") difficulty: String?,
         @Query("tags") tags: List<String>?
     ): Response<List<ProjectResponse>>
+
+    // Collaboration Post endpoints
+    @POST("api/collaborations")
+    suspend fun createCollaboration(@Body request: CollaborationCreateRequest): Response<CollaborationResponse>
+
+    @PUT("api/collaborations/{postId}")
+    suspend fun updateCollaboration(@Path("postId") postId: String, @Body request: UpdateCollaborationRequest): Response<CollaborationResponse>
+
+    @GET("api/collaborations/{postId}")
+    suspend fun getCollaboration(@Path("postId") postId: String): Response<CollaborationResponse>
+
+    @GET("api/collaborations/my-collaborations")
+    suspend fun getCurrentUserCollaborations(): Response<List<CollaborationResponse>>
+
+    @DELETE("api/collaborations/{postId}")
+    suspend fun deleteCollaboration(@Path("postId") postId: String): Response<Map<String, String>>
+
+    @GET("api/collaborations")
+    suspend fun getCollaborations(): Response<List<CollaborationResponse>>
 }
