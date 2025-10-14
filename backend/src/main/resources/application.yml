@@ -19,8 +19,7 @@ spring:
         format_sql: true
 
   flyway:
-    locations: classpath:db/migration
-    baseline-on-migrate: true
+    enabled: false
 
 server:
   port: 8080
