@@ -16,6 +16,7 @@ import com.first.projectswipe.R
 import com.first.projectswipe.network.ApiService
 import com.first.projectswipe.network.dto.ProjectCreateRequest
 import com.first.projectswipe.network.dto.UpdateProjectRequest
+import com.first.projectswipe.network.dto.CollaborationCreateRequest
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
@@ -48,6 +49,15 @@ class CreateProjectIdeaFragment : Fragment() {
     private lateinit var saveButton: Button
     private lateinit var closeButton: ImageView
     private lateinit var loadingProgressBar: ProgressBar
+    
+    // Collaboration Request fields
+    private lateinit var projectIdeaFields: LinearLayout
+    private lateinit var collabRequestFields: LinearLayout
+    private lateinit var collabTitleEditText: EditText
+    private lateinit var collabDescriptionEditText: EditText
+    private lateinit var skillsNeededEditText: EditText
+    private lateinit var timeCommitmentEditText: EditText
+    private lateinit var teamSizeEditText: EditText
 
 
 
@@ -159,6 +169,15 @@ class CreateProjectIdeaFragment : Fragment() {
         saveButton = view.findViewById(R.id.saveProjectButton)
         closeButton = view.findViewById(R.id.closeButton)
         loadingProgressBar = view.findViewById(R.id.loadingProgressBar)
+        
+        // Collaboration Request views
+        projectIdeaFields = view.findViewById(R.id.projectIdeaFields)
+        collabRequestFields = view.findViewById(R.id.collabRequestFields)
+        collabTitleEditText = view.findViewById(R.id.collabTitleEditText)
+        collabDescriptionEditText = view.findViewById(R.id.collabDescriptionEditText)
+        skillsNeededEditText = view.findViewById(R.id.skillsNeededEditText)
+        timeCommitmentEditText = view.findViewById(R.id.timeCommitmentEditText)
+        teamSizeEditText = view.findViewById(R.id.teamSizeEditText)
 
         updateDifficultyDisplay()
     }
@@ -194,10 +213,13 @@ class CreateProjectIdeaFragment : Fragment() {
     }
 
     private fun addTagFromInput() {
-        val tagText = tagsEditText.text.toString().trim()
-        if (tagText.isNotEmpty()) {
-            addTag(tagText)
-            tagsEditText.text.clear()
+        // Only allow adding tags when on the Project Idea tab
+        if (selectedTab == "Project Idea") {
+            val tagText = tagsEditText.text.toString().trim()
+            if (tagText.isNotEmpty()) {
+                addTag(tagText)
+                tagsEditText.text.clear()
+            }
         }
     }
 
@@ -357,7 +379,11 @@ class CreateProjectIdeaFragment : Fragment() {
                     updateProjectIdea()
                 }
             } else {
-                Toast.makeText(context, "Collaboration Request not implemented yet", Toast.LENGTH_SHORT).show()
+                if (editingProjectId == null) {
+                    saveCollaborationRequest()
+                } else {
+                    updateCollaborationRequest()
+                }
             }
         }
     }
@@ -457,6 +483,15 @@ class CreateProjectIdeaFragment : Fragment() {
                 if (tab == "Collaboration Request") R.drawable.tab_selected_bg else R.drawable.tab_unselected_bg)
             setTextColor(ContextCompat.getColor(requireContext(), R.color.black))
         }
+        
+        // Show/hide the appropriate fields based on the selected tab
+        if (tab == "Project Idea") {
+            projectIdeaFields.visibility = View.VISIBLE
+            collabRequestFields.visibility = View.GONE
+        } else {
+            projectIdeaFields.visibility = View.GONE
+            collabRequestFields.visibility = View.VISIBLE
+        }
     }
 
     private fun isValidGitHubUrl(url: String): Boolean {
@@ -513,5 +548,73 @@ class CreateProjectIdeaFragment : Fragment() {
                 loadingProgressBar.visibility = View.GONE
             }
         }
+    }
+
+    private fun saveCollaborationRequest() {
+        val title = collabTitleEditText.text.toString().trim()
+        val description = collabDescriptionEditText.text.toString().trim()
+        val skillsNeededText = skillsNeededEditText.text.toString().trim()
+        val timeCommitment = timeCommitmentEditText.text.toString().trim()
+        val teamSizeText = teamSizeEditText.text.toString().trim()
+
+        if (title.isEmpty() || description.isEmpty() || skillsNeededText.isEmpty() || timeCommitment.isEmpty() || teamSizeText.isEmpty()) {
+            Toast.makeText(context, "Please fill in all required fields", Toast.LENGTH_SHORT).show()
+            return
+        }
+
+        val teamSize = try {
+            teamSizeText.toInt()
+        } catch (e: NumberFormatException) {
+            Toast.makeText(context, "Please enter a valid team size", Toast.LENGTH_SHORT).show()
+            return
+        }
+
+        if (teamSize <= 0) {
+            Toast.makeText(context, "Team size must be greater than 0", Toast.LENGTH_SHORT).show()
+            return
+        }
+
+        // Parse skills from comma-separated input
+        val skillsNeeded = skillsNeededText.split(",").map { it.trim() }.filter { it.isNotEmpty() }
+
+        if (skillsNeeded.isEmpty()) {
+            Toast.makeText(context, "Please enter at least one skill needed", Toast.LENGTH_SHORT).show()
+            return
+        }
+
+        val collaborationCreateRequest = CollaborationCreateRequest(
+            projectTitle = title,
+            description = description,
+            skillsNeeded = skillsNeeded,
+            timeCommitment = timeCommitment,
+            teamSize = teamSize
+        )
+
+        lifecycleScope.launch(Dispatchers.Main) {
+            loadingProgressBar.visibility = View.VISIBLE
+            try {
+                val response = apiService.createCollaboration(collaborationCreateRequest)
+                if (response.isSuccessful) {
+                    Log.d("CreateProjectIdeaFragment", "Collaboration request saved successfully: ${response.body()?.id}")
+                    Toast.makeText(context, "Collaboration request saved!", Toast.LENGTH_SHORT).show()
+                    findNavController().popBackStack()
+                } else {
+                    val errorBody = response.errorBody()?.string()
+                    Log.e("CreateProjectIdeaFragment", "Error saving collaboration request: $errorBody")
+                    handleError(errorBody)
+                }
+            } catch (e: Exception) {
+                Log.e("CreateProjectIdeaFragment", "Error saving collaboration request", e)
+                Toast.makeText(context, "Error: ${e.message}", Toast.LENGTH_SHORT).show()
+            } finally {
+                loadingProgressBar.visibility = View.GONE
+            }
+        }
+    }
+
+    private fun updateCollaborationRequest() {
+        // For now, we'll just show a toast that editing is not implemented for collab requests
+        // You can implement this later if needed
+        Toast.makeText(context, "Editing collaboration requests is not yet implemented", Toast.LENGTH_SHORT).show()
     }
 }

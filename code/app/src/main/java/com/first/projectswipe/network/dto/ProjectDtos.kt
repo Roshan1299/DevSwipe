@@ -30,3 +30,33 @@ data class UpdateProjectRequest(
     val difficulty: String? = null,
     val githubLink: String? = null
 )
+
+data class CollaborationCreateRequest(
+    val projectTitle: String,
+    val description: String,
+    val skillsNeeded: List<String>,
+    val timeCommitment: String,
+    val teamSize: Int
+)
+
+data class CollaborationResponse(
+    val id: UUID,
+    val projectTitle: String,
+    val description: String,
+    val skillsNeeded: List<String>,
+    val timeCommitment: String,
+    val teamSize: Int,
+    val currentTeamSize: Int,
+    val status: String,
+    val createdBy: UserDto,
+    val createdAt: Long,
+    val updatedAt: Long
+)
+
+data class UpdateCollaborationRequest(
+    val projectTitle: String? = null,
+    val description: String? = null,
+    val skillsNeeded: List<String>? = null,
+    val timeCommitment: String? = null,
+    val teamSize: Int? = null
+)
