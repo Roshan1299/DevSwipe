@@ -1,0 +1,12 @@
+spring:
+  jpa:
+    hibernate:
+      ddl-auto: create-drop  # Create schema for tests, drop after
+    show-sql: false
+  flyway:
+    enabled: false
+  datasource:
+    url: jdbc:postgresql://localhost:5432/devswipe_db
+    username: devswipe
+    password: password
+    driver-class-name: org.postgresql.Driver
