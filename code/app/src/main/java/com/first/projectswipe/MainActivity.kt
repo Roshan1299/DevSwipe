@@ -85,6 +85,11 @@ class MainActivity : AppCompatActivity() {
             navigateToFragment(R.id.homeFragment)
         }
 
+        // Collaborate button
+        binding.collaborateButton.setOnClickListener {
+            navigateToFragment(R.id.collaborateFragment)
+        }
+
         // Add button (floating action button)
         binding.addButtons.setOnClickListener {
             handleAddButtonClick()
@@ -163,6 +168,11 @@ class MainActivity : AppCompatActivity() {
                 binding.ideasButton.isSelected = true
                 binding.ideasText.isSelected = true
                 binding.ideasIcon.isSelected = true
+            }
+            R.id.collaborateFragment -> {
+                binding.collaborateButton.isSelected = true
+                binding.collaborateText.isSelected = true
+                binding.collaborateIcon.isSelected = true
             }
             R.id.profileFragment -> {
                 binding.profileButton.isSelected = true
