@@ -2,7 +2,7 @@
 
 ## 🏗️ Overview
 
-DevSwipe is a Tinder-style Android application that connects developers through project collaboration. Built with Kotlin, the app uses a **card-based UI pattern** with swipe gestures for project discovery, Firebase for backend services, and follows Android's **View-based architecture** with custom utility classes for complex interactions.
+DevSwipe is a Tinder-style Android application that connects developers through project collaboration. Built with Kotlin and Jetpack Compose, the app uses a **card-based UI pattern** with swipe gestures for project discovery, Spring Boot with PostgreSQL for backend services, and follows Android's **MVVM (Model-View-ViewModel) architecture** with clean architecture principles and Repository Pattern for complex interactions.
 
 ## 🎯 Application Purpose
 
@@ -14,27 +14,32 @@ DevSwipe solves the developer collaboration problem by providing:
 
 ## 📐 Architectural Pattern
 
-### View-Based Architecture with Utils Pattern
+### MVVM with Clean Architecture and Repository Pattern
 
 ```
 ┌─────────────────────────────────────────┐
-│               Presentation              │
-│        (Activities, Fragments)          │
+│           Presentation Layer            │
+│        (Activities, Fragments,          │
+│         Composables, ViewModels)        │
 ├─────────────────────────────────────────┤
-│            Business Logic               │
-│         (Utils, Custom Classes)         │
+│          Domain Layer                   │
+│         (Use Cases, Business Logic,     │
+│          Entities, Repository Interfaces)│
 ├─────────────────────────────────────────┤
-│               Data Layer                │
-│         (Firebase, Data Models)         │
+│            Data Layer                   │
+│      (Repository Implementations,       │
+│       Remote Data Sources, Local Data,  │
+│       Network Services, Database)       │
 └─────────────────────────────────────────┘
 ```
 
 **Key Characteristics:**
 - **Single Activity Architecture**: MainActivity hosts all fragments via Navigation Component
-- **Fragment-based Features**: Each major feature is a separate fragment
-- **Utility-driven Business Logic**: Complex logic encapsulated in utility classes
-- **Firebase Direct Integration**: Direct Firebase calls from fragments/utils
-- **Custom View Components**: Complex UI interactions handled by custom utility classes
+- **Feature-based Modularization**: Each major feature organized in separate modules
+- **Repository Pattern**: Abstracts data sources and provides clean API to domain layer
+- **Retrofit Integration**: REST API calls to Spring Boot backend
+- **Dependency Injection**: Hilt for dependency injection management
+- **Clean Architecture**: Separation of concerns for maintainability and testability
 
 ## 📱 Presentation Layer
 
@@ -42,13 +47,16 @@ DevSwipe solves the developer collaboration problem by providing:
 
 ```kotlin
 // MainActivity.kt - Single entry point with bottom navigation
+@AndroidEntryPoint
 class MainActivity : AppCompatActivity() {
     private lateinit var binding: ActivityMainBinding
     private lateinit var navController: NavController
-    private lateinit var auth: FirebaseAuth
+    @Inject
+    lateinit var authManager: AuthManager
     
     // Handles navigation, bottom nav visibility, authentication state
     // Controls fragment transitions and user session management
+    // Uses Hilt for dependency injection
 }
 ```
 
@@ -71,7 +79,7 @@ class MainActivity : AppCompatActivity() {
 ├── 📁 profile/                 # User Profile
 │   ├── ProfileFragment.kt
 │   └── EditProfileFragment.kt
-├── 📁 collaboration/           # Future collaboration features
+├── 📁 collaboration/           # Collaboration features
 │   └── SeekingCollaboratorsFragment.kt
 └── 📁 splash/
     └── SplashActivity.kt
@@ -86,7 +94,7 @@ private fun setupBottomNavigation() {
         navigateToFragment(R.id.homeFragment)  // Main discovery
     }
     binding.addButtons.setOnClickListener {
-        navigateToFragment(R.id.createPostFragment)  // Project creation
+        navigateToFragment(R.id.createProjectIdeaFragment)  // Project creation
     }
     binding.profileButton.setOnClickListener {
         navigateToFragment(R.id.profileFragment)  // User profile
@@ -96,17 +104,24 @@ private fun setupBottomNavigation() {
 // Dynamic bottom nav visibility based on current fragment
 navController.addOnDestinationChangedListener { _, destination, _ ->
     when (destination.id) {
-        R.id.loginFragment, R.id.createPostFragment -> {
+        R.id.loginFragment,
+        R.id.onboardingSkillsFragment,
+        R.id.onboardingInterestsFragment,
+        R.id.registerFragment,
+        R.id.createProjectIdeaFragment,
+        R.id.editProfileFragment -> {
             binding.customBottomNav.visibility = View.GONE
+            binding.addButtons.visibility = View.GONE
         }
         else -> {
             binding.customBottomNav.visibility = View.VISIBLE
+            binding.addButtons.visibility = View.VISIBLE
         }
     }
 }
 ```
 
-## 🧠 Business Logic Layer (Utils)
+## 🧠 Business Logic Layer (Domain & Data)
 
 ### Card Stack Management
 
@@ -116,6 +131,8 @@ class CardStackManager(
     private val context: Context,
     private val container: FrameLayout,
     var allIdeas: List<ProjectIdea>,
+    private val apiService: ApiService,
+    private val startingIndex: Int = 0,
     private val onCardSwiped: (ProjectIdea, Int) -> Unit
 ) {
     private val maxVisible = 3  // Number of visible cards
@@ -124,60 +141,47 @@ class CardStackManager(
     // Manages card positioning, scaling, and animation
     // Handles infinite scroll by cycling through projects
     // Coordinates with SwipeHandler for gesture recognition
+    // Uses Retrofit API service for data operations
 }
 ```
 
-### Swipe Gesture Handling
+### Data Repository
 
 ```kotlin
-// SwipeHandler.kt - Custom touch handling for card swiping
-class SwipeHandler(
-    private val card: View,
-    private val swipeThreshold: Float = 250f,
-    private val flingThreshold: Float = 1000f,
-    private val onSwipeComplete: (direction: Int) -> Unit
-) {
-    // Implements custom touch detection
-    // Handles card animation during drag
-    // Provides visual feedback (labels, haptic feedback)
-    // Determines swipe completion based on distance/velocity
+// ProjectRepository.kt - Repository interface for project operations
+interface ProjectRepository {
+    suspend fun getCurrentUserProjects(): Result<List<ProjectIdea>>
+    suspend fun getAllProjects(): Result<List<ProjectIdea>>
+    suspend fun createProject(createRequest: ProjectCreateRequest): Result<ProjectIdea>
+    suspend fun updateProject(id: UUID, updateRequest: UpdateProjectRequest): Result<ProjectIdea>
+    suspend fun deleteProject(id: UUID): Result<Unit>
+    suspend fun getProject(id: UUID): Result<ProjectIdea>
+    suspend fun filterProjects(difficulty: String?, tags: List<String>?): Result<List<ProjectIdea>>
 }
 ```
 
-### Card Content Binding
+### Repository Implementation
 
 ```kotlin
-// ProjectCardBinder.kt - Handles card content and flip animations
-object ProjectCardBinder {
-    fun bind(card: View, context: Context, idea: ProjectIdea) {
-        // Binds project data to front/back card layouts
-        // Implements card flip animation using 3D rotation
-        // Manages user profile loading with UserUtils
-        // Sets up button interactions (like/dislike/info)
+// ProjectRepositoryImpl.kt - Repository implementation using API service
+class ProjectRepositoryImpl @Inject constructor(
+    private val apiService: ApiService
+) : ProjectRepository {
+    override suspend fun getCurrentUserProjects(): Result<List<ProjectIdea>> {
+        return try {
+            val response = apiService.getCurrentUserProjects()
+            if (response.isSuccessful) {
+                val projectResponses = response.body() ?: emptyList()
+                val projectIdeas = projectResponses.map { it.toProjectIdea() }
+                Result.success(projectIdeas)
+            } else {
+                Result.failure(Exception("Error: ${response.code()}"))
+            }
+        } catch (e: Exception) {
+            Result.failure(e)
+        }
     }
-    
-    // Implements sophisticated card flip with 3D rotation
-    private fun flipCard(root: View, front: View, back: View, showBack: Boolean) {
-        val scale = root.context.resources.displayMetrics.density
-        root.cameraDistance = 8000 * scale  // 3D perspective
-        
-        // Two-phase animation: rotate out, switch content, rotate in
-        val outAnim = ObjectAnimator.ofFloat(root, "rotationY", 0f, 90f)
-        val inAnim = ObjectAnimator.ofFloat(root, "rotationY", -90f, 0f)
-    }
-}
-```
-
-### User Data Management
-
-```kotlin
-// UserUtils.kt - Handles user data operations
-object UserUtils {
-    fun getUserInfo(userId: String, callback: (UserInfo) -> Unit) {
-        // Direct Firebase queries for user information
-        // Caches user data for performance
-        // Handles profile image loading coordination
-    }
+    // ... other implementations
 }
 ```
 
@@ -188,71 +192,69 @@ object UserUtils {
 ```kotlin
 // ProjectIdea.kt - Main data model
 data class ProjectIdea(
-    val id: String = "",
-    val title: String = "",
-    val previewDescription: String = "",      // For swipe cards
-    val fullDescription: String = "",         // For detailed view
-    val createdBy: String = "",               // User ID
-    val tags: List<String> = emptyList(),     // Skills/technologies
-    val createdByName: String = "",
-    val difficulty: String = "",              // Beginner/Intermediate/Advanced
-    val githubLink: String = "",
-    val timeline: String = ""
+    val id: UUID,
+    val title: String,
+    val previewDescription: String,
+    val fullDescription: String,
+    val githubLink: String?,
+    val tags: List<String>,
+    val difficulty: String,
+    val createdBy: UserDto
 ) {
     // Used throughout the app for project representation
     // Supports both preview (swipe) and detailed (flip) views
+    // Aligned with Spring Boot backend entity
 }
 ```
 
-### Firebase Integration
+### Network Layer with Retrofit
 
 ```kotlin
-// Direct Firebase integration pattern used throughout fragments
-class CreateProjectIdeaFragment {
-    private fun saveProjectIdea() {
-        val projectIdea = ProjectIdea(
-            title = binding.projectTitleEditText.text.toString(),
-            previewDescription = binding.previewDescriptionEditText.text.toString(),
-            // ... other fields
-        )
-        
-        FirebaseFirestore.getInstance()
-            .collection("project_ideas")
-            .add(projectIdea)
-            .addOnSuccessListener { /* Handle success */ }
-            .addOnFailureListener { /* Handle error */ }
-    }
+// ApiService.kt - Interface for API endpoints
+interface ApiService {
+    // Authentication endpoints
+    @POST("api/auth/register")
+    suspend fun register(@Body request: RegisterRequest): Response<AuthResponse>
+    
+    @POST("api/auth/login")
+    suspend fun login(@Body request: LoginRequest): Response<AuthResponse>
+    
+    // Project endpoints
+    @POST("api/projects")
+    suspend fun createProject(@Body request: ProjectCreateRequest): Response<ProjectResponse>
+    
+    @GET("api/projects")
+    suspend fun getProjects(): Response<List<ProjectResponse>>
+    
+    // ... other endpoints
 }
 ```
 
-### Firestore Schema
+### Backend Entity Mapping
 
-```javascript
-// Collections Structure
-project_ideas: {
-  [documentId]: {
-    title: "React Native Food App",
-    previewDescription: "Short description for swipe cards...",
-    fullDescription: "Detailed project description...",
-    createdBy: "userId123",
-    tags: ["React Native", "Node.js", "Design"],
-    difficulty: "Intermediate",
-    githubLink: "https://github.com/user/project",
-    timeline: "3 months",
-    createdByName: "John Doe"
-  }
-}
-
-users: {
-  [userId]: {
-    email: "user@example.com",
-    displayName: "John Doe",
-    skills: ["JavaScript", "React", "Node.js"],
-    interests: ["Mobile", "Web", "AI"],
-    profileImageUrl: "https://...",
-    // ... other profile fields
-  }
-}
+```kotlin
+// Project.kt - Backend entity in Spring Boot
+@Entity
+@Table(name = "projects")
+data class Project(
+    @Id
+    @GeneratedValue(strategy = GenerationType.UUID)
+    val id: UUID = UUID.randomUUID(),
+    
+    var title: String,
+    var previewDescription: String,
+    var fullDescription: String,
+    var githubLink: String?,
+    
+    @ElementCollection
+    var tags: List<String>,
+    
+    var difficulty: String,
+    
+    @ManyToOne
+    @JoinColumn(name = "user_id")
+    val user: User
+)
 ```
 
 ## 🏗️ Project Structure
@@ -267,18 +269,31 @@ com.first.projectswipe/
 │   │   ├── 📁 home/                  # Main discovery interface
 │   │   ├── 📁 projects/              # Project creation/management
 │   │   ├── 📁 profile/               # User profile management
-│   │   └── 📁 collaboration/         # Future collaboration features
+│   │   └── 📁 collaboration/         # Collaboration features
 │   └── 📁 adapters/                  # RecyclerView adapters
 │       ├── ProfilePostAdapter.kt     # User's projects in profile
-│       └── ProjectCardAdapter.kt     # Future: if switching from utils
+│       └── ProjectCardAdapter.kt     # For list displays
 ├── 📁 data/
-│   └── 📁 models/
-│       └── ProjectIdea.kt            # Main data model
-└── 📁 utils/                         # Business logic utilities
+│   ├── 📁 models/                    # Data models
+│   │   └── ProjectIdea.kt            # Main data model
+│   ├── 📁 repository/                # Repository implementations
+│   │   └── ProjectRepositoryImpl.kt  # Project repository implementation
+│   └── 📁 remote/                    # Remote data sources
+│       └── NetworkService.kt         # Network API service
+├── 📁 domain/
+│   ├── 📁 repository/                # Repository interfaces
+│   │   └── ProjectRepository.kt      # Project repository interface
+│   └── 📁 usecase/                   # Use cases
+│       └── GetProjectsUseCase.kt     # Use case for getting projects
+├── 📁 network/                       # Network layer
+│   ├── ApiService.kt                 # API service interface
+│   ├── NetworkModule.kt              # Hilt network module
+│   ├── ProjectMapper.kt              # Data mapping between DTOs and models
+│   └── RetrofitClient.kt             # Retrofit client configuration
+└── 📁 utils/                         # Utility classes
     ├── CardStackManager.kt           # Card stack management
     ├── ProjectCardBinder.kt          # Card content binding
-    ├── SwipeHandler.kt               # Gesture handling
-    └── UserUtils.kt                  # User data operations
+    └── SwipeHandler.kt               # Gesture handling
 ```
 
 ## 🔄 Data Flow Examples
@@ -287,12 +302,15 @@ com.first.projectswipe/
 
 ```
 1. User opens HomeFragment
-2. HomeFragment loads projects from Firestore
-3. CardStackManager creates card stack with ProjectIdea data
-4. SwipeHandler attaches to each card for gesture detection
-5. ProjectCardBinder populates card content and handles flips
-6. User swipes → SwipeHandler detects → CardStackManager updates stack
-7. Process repeats with new cards
+2. HomeFragment requests projects from ProjectRepository
+3. ProjectRepository calls ApiService to fetch projects from Spring Boot backend
+4. Backend retrieves projects from PostgreSQL database
+5. Backend returns response to Android app
+6. CardStackManager creates card stack with ProjectIdea data
+7. SwipeHandler attaches to each card for gesture detection
+8. ProjectCardBinder populates card content and handles flips
+9. User swipes → SwipeHandler detects → CardStackManager updates stack
+10. Process repeats with new cards
 ```
 
 ### Project Creation Flow
@@ -300,10 +318,12 @@ com.first.projectswipe/
 ```
 1. User taps Add button → MainActivity navigates to CreateProjectIdeaFragment
 2. User fills form and taps Save
-3. Fragment creates ProjectIdea object
-4. Direct Firestore call to save project
-5. On success, navigate back to HomeFragment
-6. HomeFragment reloads to show new project
+3. Fragment creates ProjectCreateRequest object
+4. ProjectRepository calls ApiService to save project to backend
+5. Backend saves project to PostgreSQL database
+6. On success, backend returns created project
+7. Fragment receives success response and navigates back to HomeFragment
+8. HomeFragment reloads to show new project
 ```
 
 ### Card Interaction Flow
@@ -315,6 +335,7 @@ com.first.projectswipe/
 4. User can like/dislike from either side
 5. SwipeHandler processes gesture and notifies CardStackManager
 6. CardStackManager removes current card and advances to next
+7. Swipe action may trigger backend API calls (like, save, etc.)
 ```
 
 ## 🎨 UI Architecture
@@ -328,6 +349,7 @@ private fun setupCardStack() {
         context = requireContext(),
         container = binding.cardStackContainer,
         allIdeas = projectIdeas,
+        apiService = apiService,  // Retrofit API service
         onCardSwiped = { idea, direction ->
             handleCardSwipe(idea, direction)
         }
@@ -366,62 +388,98 @@ dependencies {
     implementation("androidx.navigation:navigation-fragment-ktx")
     implementation("androidx.navigation:navigation-ui-ktx")
     
-    // Firebase
-    implementation(platform("com.google.firebase:firebase-bom:33.1.0"))
-    implementation("com.google.firebase:firebase-auth-ktx")
-    implementation("com.google.firebase:firebase-firestore-ktx")
-    implementation("com.google.firebase:firebase-storage-ktx")
+    // Dependency Injection
+    implementation("com.google.dagger:hilt-android:2.48")
+    kapt("com.google.dagger:hilt-compiler:2.48")
+    
+    // Networking
+    implementation("com.squareup.retrofit2:retrofit:2.9.0")
+    implementation("com.squareup.retrofit2:converter-gson:2.9.0")
+    implementation("com.squareup.okhttp3:logging-interceptor:4.11.0")
     
     // Image Loading
     implementation("com.github.bumptech.glide:glide:4.16.0")
     implementation("com.squareup.picasso:picasso:2.71828")
     
     // UI Components
+    implementation("com.google.android.material:material:1.10.0")
     implementation("com.google.android.flexbox:flexbox:3.0.0")
     
     // Coroutines
-    implementation("org.jetbrains.kotlinx:kotlinx-coroutines-play-services:1.8.1")
-}
-```
-
-## 🔥 Firebase Integration Pattern
-
-### Direct Fragment Integration
-
-```kotlin
-// Pattern used throughout the app - direct Firebase calls from fragments
-class HomeFragment : Fragment() {
-    private fun loadProjects() {
-        FirebaseFirestore.getInstance()
-            .collection("project_ideas")
-            .orderBy("timestamp", Query.Direction.DESCENDING)
-            .get()
-            .addOnSuccessListener { documents ->
-                val ideas = documents.mapNotNull { doc ->
-                    doc.toObject<ProjectIdea>().copy(id = doc.id)
-                }
-                cardStackManager.updateIdeas(ideas)
-            }
-            .addOnFailureListener { exception ->
-                // Handle error
-            }
-    }
-}
-```
-
-### Authentication State Management
-
-```kotlin
-// MainActivity handles auth state globally
-override fun onCreate(savedInstanceState: Bundle?) {
-    auth = FirebaseAuth.getInstance()
-    val currentUser = auth.currentUser
+    implementation("org.jetbrains.kotlinx:kotlinx-coroutines-android:1.7.3")
     
-    // Auto-navigate to home if logged in
-    if (currentUser != null && savedInstanceState == null) {
-        navController.navigate(R.id.homeFragment)
+    // JSON
+    implementation("com.google.code.gson:gson:2.10.1")
+}
+```
+
+## 🌐 Spring Boot Backend Integration Pattern
+
+### Retrofit Client with JWT Authentication
+
+```kotlin
+// NetworkModule.kt - Hilt module for network configuration
+@Module
+@InstallIn(SingletonComponent::class)
+object NetworkModule {
+    private const val BASE_URL = "http://10.0.2.2:8080/" // Emulator
+
+    @Provides
+    @Singleton
+    fun provideAuthInterceptor(tokenProvider: TokenProvider): Interceptor {
+        return Interceptor { chain ->
+            val requestBuilder = chain.request().newBuilder()
+
+            val token = tokenProvider.getToken()
+            token?.let {
+                requestBuilder.addHeader("Authorization", "Bearer $it")
+            }
+
+            requestBuilder.addHeader("Content-Type", "application/json")
+
+            chain.proceed(requestBuilder.build())
+        }
     }
-    // Otherwise, navigation graph handles login flow
+
+    @Provides
+    @Singleton
+    fun provideRetrofit(okHttpClient: OkHttpClient): Retrofit {
+        return Retrofit.Builder()
+            .baseUrl(BASE_URL)
+            .client(okHttpClient)
+            .addConverterFactory(GsonConverterFactory.create())
+            .build()
+    }
+
+    @Provides
+    @Singleton
+    fun provideApiService(retrofit: Retrofit): ApiService {
+        return retrofit.create(ApiService::class.java)
+    }
+}
+```
+
+### Authentication State Management with JWT
+
+```kotlin
+// AuthManager.kt - Authentication manager using JWT tokens
+@Singleton
+class AuthManager @Inject constructor(
+    @ApplicationContext private val context: Context
+) {
+    private val prefs = context.getSharedPreferences("auth_prefs", Context.MODE_PRIVATE)
+
+    fun saveToken(token: String) {
+        prefs.edit().putString("jwt_token", token).apply()
+    }
+
+    fun getToken(): String? = prefs.getString("jwt_token", null)
+
+    fun isUserLoggedIn(): Boolean = !getToken().isNullOrBlank()
+
+    fun logout() {
+        prefs.edit().remove("jwt_token").apply()
+    }
 }
 ```
 
@@ -455,95 +513,80 @@ class CardStackManager {
 
 ```kotlin
 // Efficient image loading with Glide in ProjectCardBinder
-UserUtils.getUserInfo(idea.createdBy) { userInfo ->
-    userInfo.profileImageUrl?.let { url ->
-        Glide.with(context)
-            .load(url)
-            .placeholder(R.drawable.ic_profile_placeholder)
-            .error(R.drawable.ic_profile_placeholder)
-            .circleCrop()                    // Process once, cache result
-            .into(frontPfp)
-    }
-}
+// Uses Retrofit API service to fetch user information
+// Implements proper caching strategies
+Glide.with(context)
+    .load(userDto.profileImageUrl)
+    .placeholder(R.drawable.ic_profile_placeholder)
+    .error(R.drawable.ic_profile_placeholder)
+    .circleCrop()                    // Process once, cache result
+    .into(frontPfp)
 ```
 
 ## 🚀 Future Architecture Considerations
 
-### Potential Refactoring to MVVM
+### Potential Compose Migration
 
 ```kotlin
-// Future ViewModel structure for better separation
-class HomeViewModel : ViewModel() {
-    private val _projects = MutableLiveData<List<ProjectIdea>>()
-    val projects: LiveData<List<ProjectIdea>> = _projects
+// Future Composable structure with clean architecture
+@Composable
+fun ProjectSwipeApp() {
+    val navController = rememberNavController()
     
-    fun loadProjects() {
-        viewModelScope.launch {
-            // Move Firebase logic from fragment to ViewModel
-            // Add proper error handling and loading states
-        }
+    NavHost(navController = navController, startDestination = "home") {
+        composable("home") { HomeScreen() }
+        composable("profile") { ProfileScreen() }
+        // ... other screens
     }
 }
 ```
 
-### Repository Pattern Introduction
+### Repository Pattern Enhancement
 
 ```kotlin
-// Future repository layer
+// Advanced repository with caching and offline support
 interface ProjectRepository {
-    suspend fun getProjects(): Flow<List<ProjectIdea>>
-    suspend fun createProject(project: ProjectIdea): Result<String>
-    suspend fun deleteProject(projectId: String): Result<Unit>
-}
-
-class ProjectRepositoryImpl : ProjectRepository {
-    // Encapsulate Firebase operations
-    // Add caching, offline support
-    // Better error handling
+    suspend fun getProjects(): Flow<PagingData<ProjectIdea>>
+    suspend fun createProject(createRequest: ProjectCreateRequest): Result<ProjectIdea>
+    suspend fun updateProject(id: UUID, updateRequest: UpdateProjectRequest): Result<ProjectIdea>
+    suspend fun deleteProject(id: UUID): Result<Unit>
+    suspend fun syncProjects(): Result<Unit>
 }
 ```
 
 ### Modularization Path
 
 ```
-projectswipe/
-├── app/                    # Main application module
+devswipe/
+├── app/                            # Main application module
 ├── core/
-│   ├── ui/                # Shared UI components (CardStackManager, etc.)
-│   ├── data/              # Data models and Firebase utilities
-│   └── utils/             # Shared utilities
+│   ├── network/                   # Network layer with Retrofit
+│   ├── data/                      # Data models and repositories
+│   ├── domain/                    # Business logic and use cases
+│   └── ui/                        # Shared UI components
 ├── feature/
-│   ├── home/              # Home/discovery feature
-│   ├── projects/          # Project creation/management
-│   ├── profile/           # User profile
-│   └── auth/              # Authentication
+│   ├── auth/                      # Authentication feature
+│   ├── home/                      # Home/discovery feature
+│   ├── projects/                  # Project creation/management
+│   ├── profile/                   # User profile
+│   └── collaboration/             # Collaboration features
 └── shared/
-    └── resources/         # Shared resources
+    └── resources/                 # Shared resources
 ```
 
 ## 🎯 Key Design Decisions
 
-### Why Utils-Based Architecture?
+### Why MVVM with Repository Pattern?
 
-1. **Rapid Development**: Direct Firebase integration speeds up development
-2. **Custom UI Needs**: Complex card interactions require custom solutions
-3. **Small Team**: Simple architecture easier to maintain with limited resources
-4. **Proof of Concept**: Focus on core functionality over architectural purity
+1. **Separation of Concerns**: Clear boundaries between UI, business logic, and data
+2. **Testability**: Easy to unit test ViewModels and Use Cases separately
+3. **Maintainability**: Changes in one layer don't affect others
+4. **Scalability**: Architecture supports growth with new features
 
-### Card Stack vs RecyclerView
+### Spring Boot Backend vs Firebase
 
-```kotlin
-// Chosen CardStackManager over RecyclerView because:
-// 1. Custom swipe gestures with physics
-// 2. 3D card flip animations
-// 3. Stacked card visual effect
-// 4. Complex touch handling requirements
-```
+- **Current**: Spring Boot with PostgreSQL for full control and customization
+- **Advantages**: Custom business logic, complex queries, data relationships
+- **Trade-off**: More infrastructure management vs. Firebase's simplicity
 
-### Direct Firebase vs Repository Pattern
-
-- **Current**: Direct Firebase calls for simplicity and speed
-- **Future**: Repository pattern for testability and maintainability
-- **Trade-off**: Development speed vs. architectural flexibility
-
-This architecture reflects ProjectSwipe's current implementation focused on rapid prototyping and core functionality, with clear paths for future architectural improvements as the team and requirements grow.
+This architecture reflects DevSwipe's current implementation focused on scalability and maintainability with clear separation of concerns, supporting both the Android frontend and Spring Boot backend with PostgreSQL database.
