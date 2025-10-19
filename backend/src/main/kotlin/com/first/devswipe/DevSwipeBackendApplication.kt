@@ -4,8 +4,8 @@ import org.springframework.boot.autoconfigure.SpringBootApplication
 import org.springframework.boot.runApplication
 
 @SpringBootApplication
-class ProjectSwipeBackendApplication
+class DevSwipeBackendApplication
 
 fun main(args: Array<String>) {
-    runApplication<ProjectSwipeBackendApplication>(*args)
+    runApplication<DevSwipeBackendApplication>(*args)
 }

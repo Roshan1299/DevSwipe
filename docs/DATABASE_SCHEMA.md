@@ -1,295 +1,421 @@
 # Database Schema
 
-This document outlines the Firebase Firestore database structure for **ProjectSwipe** (also referred to as DevSwipe), a Tinder-like Android application for discovering side project ideas and connecting with collaborators among university students.
+This document outlines the PostgreSQL database structure for **DevSwipe** (formerly ProjectSwipe), a Tinder-like Android application for discovering side project ideas and connecting with collaborators among university students. The application uses a Spring Boot backend with PostgreSQL database for data persistence.
 
 ## Database Structure Overview
 
-### Current MVP Structure
+### Current Structure
 ```
-projectswipe-db/
+devswipe_db/
 ├── users/                 # User authentication and profile data
-└── project_ideas/         # Project ideas and details
+├── user_profiles/         # Extended user profile information
+├── projects/              # Project ideas and details
+└── collab_posts/          # Posts seeking collaborators
 ```
 
 ### Future Full App Structure
 ```
-projectswipe-db/
+devswipe_db/
 ├── users/                 # User authentication and profile data
-├── project_ideas/         # Project ideas and details
-├── collaboration_posts/   # Posts seeking collaborators
-├── matches/              # User-project and user-user matches
-├── messages/             # In-app messaging system
-├── swipes/               # User swipe history and preferences
-├── notifications/        # Push notification management
-└── universities/         # University domain verification
+├── user_profiles/         # Extended user profile information
+├── projects/              # Project ideas and details
+├── collab_posts/          # Posts seeking collaborators
+├── matches/               # User-project and user-user matches
+├── messages/              # In-app messaging system
+├── swipes/                # User swipe history and preferences
+├── notifications/         # Push notification management
+└── universities/          # University domain verification
 ```
 
-## Current MVP Collections
+## Current Tables
 
-### 1. Users Collection (`users/`)
+### 1. Users Table (`users`)
 
-Stores user authentication data and profile information for the MVP version.
+Stores user authentication data and basic profile information for the current version.
 
-**Collection Path:** `/users/{userId}`
+**Table:** `users`
 
-#### Current MVP Fields
+#### Current Fields
 
 | Field | Type | Required | Description |
 |-------|------|----------|-------------|
-| `bio` | `string` | No | User's biography/description |
-| `createdAt` | `number` | Yes | Unix timestamp of account creation |
-| `email` | `string` | Yes | User's email address |
-| `interests` | `array` | Yes | Array of user interests (selected during post-registration setup) |
-| `name` | `string` | Yes | User's display name |
-| `profileImageUrl` | `string` | No | URL to user's profile image (empty string if none) |
-| `skills` | `array` | Yes | Array of user's technical skills (selected during post-registration setup) |
-| `university` | `string` | No | User's university affiliation |
+| `id` | `UUID` | Yes | Unique user identifier (Primary Key) |
+| `username` | `VARCHAR(255)` | Yes | User's display name (Unique) |
+| `email` | `VARCHAR(255)` | Yes | User's email address (Unique) |
+| `password_hash` | `VARCHAR(255)` | Yes | Hashed password for authentication |
+| `first_name` | `VARCHAR(255)` | No | User's first name |
+| `last_name` | `VARCHAR(255)` | No | User's last name |
+| `created_at` | `TIMESTAMP` | Yes | Timestamp of account creation |
+| `updated_at` | `TIMESTAMP` | Yes | Timestamp of last update |
+| `profile_picture_url` | `TEXT` | No | URL to user's profile image |
+| `bio` | `TEXT` | No | User's biography/description |
+| `university` | `VARCHAR(255)` | No | User's university affiliation |
 
-#### Example MVP Document
+#### Example Row
 
-```json
-{
-  "bio": "Computer Science student passionate about AI and web development",
-  "createdAt": 1753057154711,
-  "email": "student@ualberta.ca",
-  "interests": ["AI", "Design", "Startups"],
-  "name": "John Doe",
-  "profileImageUrl": "",
-  "skills": ["Flutter", "Python", "React"],
-  "university": "University of Alberta"
-}
+```sql
+INSERT INTO users (id, username, email, password_hash, first_name, last_name, created_at, updated_at) 
+VALUES ('550e8400-e29b-41d4-a716-446655440000', 'johndoe', 'john.doe@ualberta.ca', '$2a$10$...', 'John', 'Doe', '2025-01-15 10:30:00', '2025-01-15 10:30:00');
 ```
 
-### 2. Project Ideas Collection (`project_ideas/`)
+### 2. User Profiles Table (`user_profiles`)
 
-Stores project ideas for the swipe interface in the MVP version.
+Stores extended user profile information including skills and interests.
 
-**Collection Path:** `/project_ideas/{projectId}`
+**Table:** `user_profiles`
 
-#### Current MVP Fields
+#### Current Fields
 
 | Field | Type | Required | Description |
 |-------|------|----------|-------------|
-| `createdBy` | `string` | Yes | User ID of the project creator |
-| `difficulty` | `string` | Yes | Project difficulty level ("Beginner", "Intermediate", "Advanced") |
-| `fullDescription` | `string` | Yes | Complete project description |
-| `id` | `string` | Yes | Unique project identifier |
-| `previewDescription` | `string` | Yes | Short description for card preview |
-| `tags` | `array` | Yes | Array of technology/skill tags |
-| `title` | `string` | Yes | Project title |
+| `id` | `UUID` | Yes | Unique profile identifier (Primary Key) |
+| `user_id` | `UUID` | Yes | Reference to the user (Foreign Key -> users.id) |
+| `bio` | `TEXT` | No | User's biography/description |
+| `interests` | `TEXT[]` | No | Array of user interests |
+| `name` | `VARCHAR(255)` | Yes | User's display name |
+| `onboarding_completed` | `BOOLEAN` | Yes | Whether user completed onboarding (default: false) |
+| `profile_image_url` | `TEXT` | No | URL to user's profile image |
+| `skills` | `TEXT[]` | No | Array of user's technical skills |
+| `university` | `VARCHAR(255)` | No | User's university affiliation |
+| `created_at` | `TIMESTAMP` | Yes | Timestamp of profile creation |
+| `updated_at` | `TIMESTAMP` | Yes | Timestamp of last update |
 
-#### Example MVP Document
+#### Example Row
 
-```json
-{
-  "createdBy": "2FwXbGT4DZeJR2s2h4PitYoACz32",
-  "difficulty": "Beginner",
-  "fullDescription": "Build a modern todo app with React and Firebase. Perfect for learning frontend development and database integration.",
-  "id": "KJPSbmPYSj8QvHlb0Ose",
-  "previewDescription": "React Todo App with Firebase backend",
-  "tags": ["React", "Firebase", "JavaScript", "CSS"],
-  "title": "Modern Todo Application"
-}
+```sql
+INSERT INTO user_profiles (id, user_id, bio, interests, name, onboarding_completed, skills, university, created_at, updated_at) 
+VALUES ('660e8400-e29b-41d4-a716-446655440000', '550e8400-e29b-41d4-a716-446655440000', 'Computer Science student passionate about AI and web development', '{"AI", "Design", "Startups"}', 'John Doe', true, '{"Flutter", "Python", "React"}', 'University of Alberta', '2025-01-15 10:30:00', '2025-01-15 10:30:00');
+```
+
+### 3. Projects Table (`projects`)
+
+Stores project ideas for the swipe interface in the current version.
+
+**Table:** `projects`
+
+#### Current Fields
+
+| Field | Type | Required | Description |
+|-------|------|----------|-------------|
+| `id` | `UUID` | Yes | Unique project identifier (Primary Key) |
+| `title` | `VARCHAR(255)` | Yes | Project title |
+| `preview_description` | `TEXT` | Yes | Short description for card preview |
+| `full_description` | `TEXT` | Yes | Complete project description |
+| `github_link` | `TEXT` | No | URL to the project's GitHub repository |
+| `tags` | `TEXT[]` | Yes | Array of technology/skill tags |
+| `difficulty` | `VARCHAR(50)` | Yes | Project difficulty level ("Beginner", "Intermediate", "Advanced") |
+| `user_id` | `UUID` | Yes | Reference to the user who created the project (Foreign Key -> users.id) |
+
+#### Example Row
+
+```sql
+INSERT INTO projects (id, title, preview_description, full_description, github_link, tags, difficulty, user_id) 
+VALUES ('770e8400-e29b-41d4-a716-446655440000', 'Modern Todo Application', 'React Todo App with Spring Boot backend', 'Build a modern todo app with React and Spring Boot. Perfect for learning frontend development and backend integration.', 'https://github.com/user/react-todo-app', '{"React", "Spring Boot", "JavaScript", "CSS"}', 'Beginner', '550e8400-e29b-41d4-a716-446655440000');
+```
+
+### 4. Collaborator Posts Table (`collab_posts`)
+
+For users seeking collaborators on existing projects.
+
+**Table:** `collab_posts`
+
+#### Current Fields
+
+| Field | Type | Required | Description |
+|-------|------|----------|-------------|
+| `id` | `UUID` | Yes | Unique post identifier (Primary Key) |
+| `project_title` | `VARCHAR(255)` | Yes | Title of the collaboration project |
+| `description` | `TEXT` | Yes | Detailed project description |
+| `skills_needed` | `TEXT[]` | Yes | Required skills for collaborators |
+| `time_commitment` | `VARCHAR(255)` | Yes | Expected time commitment |
+| `team_size` | `INTEGER` | Yes | Desired number of collaborators |
+| `current_team_size` | `INTEGER` | Yes | Current number of team members (default: 0) |
+| `status` | `VARCHAR(50)` | Yes | "active", "filled", "completed", "cancelled" (default: "active") |
+| `created_at` | `TIMESTAMP` | Yes | Post creation timestamp |
+| `updated_at` | `TIMESTAMP` | Yes | Last update timestamp |
+| `user_id` | `UUID` | Yes | Reference to the user who created the post (Foreign Key -> users.id) |
+
+#### Example Row
+
+```sql
+INSERT INTO collab_posts (id, project_title, description, skills_needed, time_commitment, team_size, current_team_size, status, created_at, updated_at, user_id) 
+VALUES ('880e8400-e29b-41d4-a716-446655440000', 'Mobile Game Development', 'Create a cross-platform mobile game using React Native', '{"React Native", "Game Design", "Unity"}', '5-10 hours/week', 4, 1, 'active', '2025-01-15 10:30:00', '2025-01-15 10:30:00', '550e8400-e29b-41d4-a716-446655440000');
 ```
 
 ## Future Full App Schema
 
-### Enhanced Users Collection
+### Enhanced User Tables
 
 #### Additional Future Fields
 
 | Field | Type | Required | Description |
 |-------|------|----------|-------------|
-| `lastActive` | `timestamp` | No | Last app activity timestamp |
-| `preferences` | `object` | No | User matching and notification preferences |
-| `swipeHistory` | `array` | No | Array of swiped project IDs with actions |
-| `collaborationCount` | `number` | No | Number of active collaborations |
-| `projectsCreated` | `number` | No | Total projects created by user |
-| `verified` | `boolean` | No | University email verification status |
-| `pushTokens` | `array` | No | FCM push notification tokens |
+| `last_active` | `TIMESTAMP` | No | Last app activity timestamp |
+| `collaboration_count` | `INTEGER` | No | Number of active collaborations |
+| `projects_created` | `INTEGER` | No | Total projects created by user |
+| `verified` | `BOOLEAN` | No | University email verification status |
 
-#### Preferences Object Structure
-```json
-{
-  "preferences": {
-    "maxDifficulty": "Advanced",
-    "preferredTags": ["React", "Python", "AI"],
-    "collaborationOpen": true,
-    "notificationsEnabled": true,
-    "emailNotifications": false
-  }
-}
-```
+### New Future Tables
 
-### New Future Collections
-
-#### 3. Collaboration Posts Collection (`collaboration_posts/`)
-
-For users seeking collaborators on existing projects.
-
-**Collection Path:** `/collaboration_posts/{postId}`
-
-| Field | Type | Required | Description |
-|-------|------|----------|-------------|
-| `id` | `string` | Yes | Unique post identifier |
-| `createdBy` | `string` | Yes | User ID of post creator |
-| `projectTitle` | `string` | Yes | Title of the collaboration project |
-| `description` | `string` | Yes | Detailed project description |
-| `skillsNeeded` | `array` | Yes | Required skills for collaborators |
-| `timeCommitment` | `string` | Yes | Expected time commitment |
-| `teamSize` | `number` | Yes | Desired number of collaborators |
-| `currentTeamSize` | `number` | Yes | Current number of team members |
-| `deadline` | `timestamp` | No | Project deadline |
-| `status` | `string` | Yes | "active", "filled", "completed", "cancelled" |
-| `createdAt` | `timestamp` | Yes | Post creation timestamp |
-| `updatedAt` | `timestamp` | Yes | Last update timestamp |
-
-#### 4. Matches Collection (`matches/`)
+#### 5. Matches Table (`matches`)
 
 Stores successful matches between users and projects/collaborators.
 
-**Collection Path:** `/matches/{matchId}`
+**Table:** `matches`
 
 | Field | Type | Required | Description |
 |-------|------|----------|-------------|
-| `id` | `string` | Yes | Unique match identifier |
-| `userId` | `string` | Yes | ID of the user who swiped |
-| `targetId` | `string` | Yes | ID of project or collaboration post |
-| `targetType` | `string` | Yes | "project_idea" or "collaboration_post" |
-| `status` | `string` | Yes | "pending", "accepted", "declined", "expired" |
-| `createdAt` | `timestamp` | Yes | Match creation timestamp |
-| `expiresAt` | `timestamp` | Yes | Match expiration timestamp |
+| `id` | `UUID` | Yes | Unique match identifier (Primary Key) |
+| `user_id` | `UUID` | Yes | ID of the user who swiped (Foreign Key -> users.id) |
+| `target_id` | `UUID` | Yes | ID of project or collaboration post |
+| `target_type` | `VARCHAR(50)` | Yes | "project" or "collab_post" |
+| `status` | `VARCHAR(50)` | Yes | "pending", "accepted", "declined", "expired" |
+| `created_at` | `TIMESTAMP` | Yes | Match creation timestamp |
+| `expires_at` | `TIMESTAMP` | Yes | Match expiration timestamp |
 
-#### 5. Messages Collection (`messages/`)
+#### 6. Messages Table (`messages`)
 
 In-app messaging system for collaboration discussions.
 
-**Collection Path:** `/messages/{conversationId}/messages/{messageId}`
+**Table:** `messages`
 
 | Field | Type | Required | Description |
 |-------|------|----------|-------------|
-| `id` | `string` | Yes | Unique message identifier |
-| `senderId` | `string` | Yes | ID of message sender |
-| `receiverId` | `string` | Yes | ID of message receiver |
-| `content` | `string` | Yes | Message content |
-| `timestamp` | `timestamp` | Yes | Message sent timestamp |
-| `read` | `boolean` | Yes | Message read status |
-| `type` | `string` | Yes | "text", "image", "file" |
+| `id` | `UUID` | Yes | Unique message identifier (Primary Key) |
+| `sender_id` | `UUID` | Yes | ID of message sender (Foreign Key -> users.id) |
+| `receiver_id` | `UUID` | Yes | ID of message receiver (Foreign Key -> users.id) |
+| `content` | `TEXT` | Yes | Message content |
+| `timestamp` | `TIMESTAMP` | Yes | Message sent timestamp |
+| `read` | `BOOLEAN` | Yes | Message read status (default: false) |
+| `type` | `VARCHAR(50)` | Yes | "text", "image", "file" (default: "text") |
 
-#### 6. Swipes Collection (`swipes/`)
+#### 7. Swipes Table (`swipes`)
 
 Track user swipe actions for recommendation algorithm.
 
-**Collection Path:** `/swipes/{swipeId}`
+**Table:** `swipes`
 
 | Field | Type | Required | Description |
 |-------|------|----------|-------------|
-| `userId` | `string` | Yes | ID of user who swiped |
-| `targetId` | `string` | Yes | ID of swiped item |
-| `targetType` | `string` | Yes | "project_idea" or "collaboration_post" |
-| `action` | `string` | Yes | "like" (right swipe) or "pass" (left swipe) |
-| `timestamp` | `timestamp` | Yes | Swipe timestamp |
+| `id` | `UUID` | Yes | Unique swipe identifier (Primary Key) |
+| `user_id` | `UUID` | Yes | ID of user who swiped (Foreign Key -> users.id) |
+| `target_id` | `UUID` | Yes | ID of swiped item |
+| `target_type` | `VARCHAR(50)` | Yes | "project" or "collab_post" |
+| `action` | `VARCHAR(50)` | Yes | "like" (right swipe) or "pass" (left swipe) |
+| `timestamp` | `TIMESTAMP` | Yes | Swipe timestamp |
 
-#### 7. Notifications Collection (`notifications/`)
+#### 8. Notifications Table (`notifications`)
 
 Push notification management and history.
 
-**Collection Path:** `/notifications/{notificationId}`
+**Table:** `notifications`
 
 | Field | Type | Required | Description |
 |-------|------|----------|-------------|
-| `id` | `string` | Yes | Unique notification identifier |
-| `userId` | `string` | Yes | Target user ID |
-| `title` | `string` | Yes | Notification title |
-| `body` | `string` | Yes | Notification content |
-| `type` | `string` | Yes | "match", "message", "system", "update" |
-| `data` | `object` | No | Additional notification data |
-| `sent` | `boolean` | Yes | Delivery status |
-| `read` | `boolean` | Yes | Read status |
-| `createdAt` | `timestamp` | Yes | Notification creation timestamp |
+| `id` | `UUID` | Yes | Unique notification identifier (Primary Key) |
+| `user_id` | `UUID` | Yes | Target user ID (Foreign Key -> users.id) |
+| `title` | `VARCHAR(255)` | Yes | Notification title |
+| `body` | `TEXT` | Yes | Notification content |
+| `type` | `VARCHAR(50)` | Yes | "match", "message", "system", "update" |
+| `data` | `JSONB` | No | Additional notification data as JSON |
+| `sent` | `BOOLEAN` | Yes | Delivery status (default: false) |
+| `read` | `BOOLEAN` | Yes | Read status (default: false) |
+| `created_at` | `TIMESTAMP` | Yes | Notification creation timestamp |
 
-#### 8. Universities Collection (`universities/`)
+#### 9. Universities Table (`universities`)
 
 University domain verification for enhanced features.
 
-**Collection Path:** `/universities/{universityId}`
+**Table:** `universities`
 
 | Field | Type | Required | Description |
 |-------|------|----------|-------------|
-| `id` | `string` | Yes | Unique university identifier |
-| `name` | `string` | Yes | University full name |
-| `domain` | `string` | Yes | Email domain (e.g., "ualberta.ca") |
-| `verified` | `boolean` | Yes | Verification status |
-| `location` | `string` | No | University location |
-| `studentCount` | `number` | No | Number of registered students |
+| `id` | `UUID` | Yes | Unique university identifier (Primary Key) |
+| `name` | `VARCHAR(255)` | Yes | University full name |
+| `domain` | `VARCHAR(255)` | Yes | Email domain (e.g., "ualberta.ca") |
+| `verified` | `BOOLEAN` | Yes | Verification status (default: false) |
+| `location` | `VARCHAR(255)` | No | University location |
+| `student_count` | `INTEGER` | No | Number of registered students |
 
 ## Data Relationships
 
-### Current MVP Relationships
-- **User → Project Ideas**: One-to-Many (`project_ideas.createdBy` → `users.{userId}`)
+### Current Relationships
+- **Users → Projects**: One-to-Many (`projects.user_id` → `users.id`)
+- **Users → UserProfiles**: One-to-One (`user_profiles.user_id` → `users.id`)
+- **Users → CollabPosts**: One-to-Many (`collab_posts.user_id` → `users.id`)
 
 ### Future Full App Relationships
-- **User → Collaboration Posts**: One-to-Many
-- **User → Matches**: One-to-Many (as both matcher and target)
-- **User → Messages**: One-to-Many (as both sender and receiver)
-- **User → Swipes**: One-to-Many
-- **User → Notifications**: One-to-Many
-- **Project Ideas → Matches**: One-to-Many
-- **Collaboration Posts → Matches**: One-to-Many
+- **Users → Matches**: One-to-Many (as both matcher and target)
+- **Users → Messages**: One-to-Many (as both sender and receiver)
+- **Users → Swipes**: One-to-Many
+- **Users → Notifications**: One-to-Many
+- **Projects → Matches**: One-to-Many
+- **CollabPosts → Matches**: One-to-Many
 
-## Security Rules
+## SQL Schema Definition
 
-### MVP Security Implementation
-```javascript
-// Users collection - MVP rules
-match /users/{userId} {
-  allow read, write: if request.auth != null && request.auth.uid == userId;
-  allow read: if request.auth != null; // For profile discovery
-}
+```sql
+-- Enable UUID extension
+CREATE EXTENSION IF NOT EXISTS "uuid-ossp";
 
-// Project ideas collection - MVP rules
-match /project_ideas/{projectId} {
-  allow read: if request.auth != null;
-  allow create: if request.auth != null;
-  allow update, delete: if request.auth != null && resource.data.createdBy == request.auth.uid;
-}
+-- Users table
+CREATE TABLE users (
+    id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+    username VARCHAR(255) UNIQUE NOT NULL,
+    email VARCHAR(255) UNIQUE NOT NULL,
+    password_hash VARCHAR(255) NOT NULL,
+    first_name VARCHAR(255),
+    last_name VARCHAR(255),
+    created_at TIMESTAMP DEFAULT NOW(),
+    updated_at TIMESTAMP DEFAULT NOW(),
+    profile_picture_url TEXT,
+    bio TEXT,
+    university VARCHAR(255)
+);
+
+-- User profiles table
+CREATE TABLE user_profiles (
+    id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+    user_id UUID NOT NULL UNIQUE REFERENCES users(id) ON DELETE CASCADE,
+    bio TEXT,
+    interests TEXT[],
+    name VARCHAR(255) NOT NULL,
+    onboarding_completed BOOLEAN NOT NULL DEFAULT FALSE,
+    profile_image_url TEXT,
+    skills TEXT[],
+    university VARCHAR(255),
+    created_at TIMESTAMP DEFAULT NOW(),
+    updated_at TIMESTAMP DEFAULT NOW()
+);
+
+-- Projects table
+CREATE TABLE projects (
+    id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+    title VARCHAR(255) NOT NULL,
+    preview_description TEXT NOT NULL,
+    full_description TEXT NOT NULL,
+    github_link TEXT,
+    tags TEXT[] NOT NULL,
+    difficulty VARCHAR(50) NOT NULL CHECK (difficulty IN ('Beginner', 'Intermediate', 'Advanced')),
+    user_id UUID NOT NULL REFERENCES users(id) ON DELETE CASCADE
+);
+
+-- Collaborator posts table
+CREATE TABLE collab_posts (
+    id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+    project_title VARCHAR(255) NOT NULL,
+    description TEXT NOT NULL,
+    skills_needed TEXT[] NOT NULL,
+    time_commitment VARCHAR(255) NOT NULL,
+    team_size INTEGER NOT NULL,
+    current_team_size INTEGER NOT NULL DEFAULT 0,
+    status VARCHAR(50) NOT NULL DEFAULT 'active' CHECK (status IN ('active', 'filled', 'completed', 'cancelled')),
+    created_at TIMESTAMP DEFAULT NOW(),
+    updated_at TIMESTAMP DEFAULT NOW(),
+    user_id UUID NOT NULL REFERENCES users(id) ON DELETE CASCADE
+);
+
+-- Indexes for performance
+CREATE INDEX idx_projects_user_id ON projects(user_id);
+CREATE INDEX idx_projects_difficulty ON projects(difficulty);
+CREATE INDEX idx_projects_tags ON projects USING GIN(tags);
+CREATE INDEX idx_collab_posts_user_id ON collab_posts(user_id);
+CREATE INDEX idx_collab_posts_status ON collab_posts(status);
+CREATE INDEX idx_user_profiles_user_id ON user_profiles(user_id);
+
+-- Future tables (commented out until implemented)
+
+/*
+-- Matches table
+CREATE TABLE matches (
+    id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+    user_id UUID NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+    target_id UUID NOT NULL,
+    target_type VARCHAR(50) NOT NULL CHECK (target_type IN ('project', 'collab_post')),
+    status VARCHAR(50) NOT NULL DEFAULT 'pending' CHECK (status IN ('pending', 'accepted', 'declined', 'expired')),
+    created_at TIMESTAMP DEFAULT NOW(),
+    expires_at TIMESTAMP NOT NULL
+);
+
+-- Messages table
+CREATE TABLE messages (
+    id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+    sender_id UUID NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+    receiver_id UUID NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+    content TEXT NOT NULL,
+    timestamp TIMESTAMP DEFAULT NOW(),
+    read BOOLEAN NOT NULL DEFAULT FALSE,
+    type VARCHAR(50) NOT NULL DEFAULT 'text' CHECK (type IN ('text', 'image', 'file'))
+);
+
+-- Swipes table
+CREATE TABLE swipes (
+    id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+    user_id UUID NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+    target_id UUID NOT NULL,
+    target_type VARCHAR(50) NOT NULL CHECK (target_type IN ('project', 'collab_post')),
+    action VARCHAR(50) NOT NULL CHECK (action IN ('like', 'pass')),
+    timestamp TIMESTAMP DEFAULT NOW()
+);
+
+-- Notifications table
+CREATE TABLE notifications (
+    id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+    user_id UUID NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+    title VARCHAR(255) NOT NULL,
+    body TEXT NOT NULL,
+    type VARCHAR(50) NOT NULL CHECK (type IN ('match', 'message', 'system', 'update')),
+    data JSONB,
+    sent BOOLEAN NOT NULL DEFAULT FALSE,
+    read BOOLEAN NOT NULL DEFAULT FALSE,
+    created_at TIMESTAMP DEFAULT NOW()
+);
+
+-- Universities table
+CREATE TABLE universities (
+    id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+    name VARCHAR(255) NOT NULL,
+    domain VARCHAR(255) NOT NULL UNIQUE,
+    verified BOOLEAN NOT NULL DEFAULT FALSE,
+    location VARCHAR(255),
+    student_count INTEGER
+);
+*/
 ```
 
-### Future Enhanced Security Rules
-```javascript
-// Enhanced security with role-based access and advanced validation
-match /matches/{matchId} {
-  allow read, write: if request.auth != null && 
-    (resource.data.userId == request.auth.uid || 
-     resource.data.targetUserId == request.auth.uid);
-}
+## Authentication and Security
 
-match /messages/{conversationId}/messages/{messageId} {
-  allow read, write: if request.auth != null && 
-    (resource.data.senderId == request.auth.uid || 
-     resource.data.receiverId == request.auth.uid);
-}
-```
+### User Authentication
+- Passwords are stored using BCrypt hashing
+- JWT tokens are used for session management
+- Spring Security provides authentication and authorization
+
+### Access Controls
+- Users can only view and modify their own data
+- Projects can only be modified by their creators
+- Profile information is restricted based on privacy settings
 
 ## Indexing Strategy
 
-### MVP Indexes
-1. **Project Ideas by Difficulty**: `difficulty ASC`
-2. **Project Ideas by Creator**: `createdBy ASC`
-3. **Project Ideas by Tags**: `tags ARRAY_CONTAINS_ANY`
+### Current Indexes
+1. **Projects by User ID**: `idx_projects_user_id` - for user-specific project queries
+2. **Projects by Difficulty**: `idx_projects_difficulty` - for filtering projects by difficulty
+3. **Projects by Tags**: `idx_projects_tags` - for searching projects by tags using GIN index
+4. **Collab Posts by User ID**: `idx_collab_posts_user_id` - for user-specific collab posts
+5. **Collab Posts by Status**: `idx_collab_posts_status` - for filtering active posts
+6. **User Profiles by User ID**: `idx_user_profiles_user_id` - for profile lookups
 
-### Future Full App Indexes
-1. **Matches by User and Status**: `userId ASC, status ASC`
-2. **Messages by Conversation**: `conversationId ASC, timestamp ASC`
-3. **Swipes by User**: `userId ASC, timestamp DESC`
-4. **Notifications by User and Read Status**: `userId ASC, read ASC, createdAt DESC`
-5. **Collaboration Posts by Status and Skills**: `status ASC, skillsNeeded ARRAY_CONTAINS_ANY`
+### Future Performance Indexes
+1. **Matches by User and Status**: `idx_matches_user_status`
+2. **Messages by Conversation**: `idx_messages_conversation`
+3. **Swipes by User**: `idx_swipes_user_timestamp`
+4. **Notifications by User and Read Status**: `idx_notifications_user_read`
 
 ## Migration Strategy
 
-### Phase 1: MVP (Current)
-- Firebase Firestore with basic collections
-- Simple authentication and project management
+### Phase 1: Current Implementation (Completed)
+- PostgreSQL database with basic tables
+- Spring Boot REST API for user authentication and project management
 - Basic swipe functionality
 
 ### Phase 2: Enhanced Features
@@ -297,64 +423,40 @@ match /messages/{conversationId}/messages/{messageId} {
 - Implement in-app messaging
 - Enhanced user profiles and preferences
 
-### Phase 3: PostgreSQL Migration
-```sql
--- Example PostgreSQL schema structure
-CREATE TABLE users (
-  id UUID PRIMARY KEY,
-  email VARCHAR(255) UNIQUE NOT NULL,
-  name VARCHAR(255) NOT NULL,
-  bio TEXT,
-  university VARCHAR(255),
-  created_at TIMESTAMP DEFAULT NOW(),
-  updated_at TIMESTAMP DEFAULT NOW()
-);
-
-CREATE TABLE project_ideas (
-  id UUID PRIMARY KEY,
-  created_by UUID REFERENCES users(id),
-  title VARCHAR(255) NOT NULL,
-  preview_description TEXT NOT NULL,
-  full_description TEXT NOT NULL,
-  difficulty VARCHAR(50) NOT NULL,
-  created_at TIMESTAMP DEFAULT NOW(),
-  updated_at TIMESTAMP DEFAULT NOW()
-);
-```
-
-### Phase 4: Advanced Features
+### Phase 3: Advanced Features
 - Machine learning recommendation engine
 - Advanced analytics and insights
 - University integration and verification
 
 ## Performance Considerations
 
-### MVP Optimization
-- Implement pagination for project cards (20 cards per batch)
-- Cache user profiles for offline viewing
-- Optimize image loading and caching
+### Current Optimization
+- Proper indexing on frequently queried columns
+- Connection pooling for database connections
+- Pagination for project cards (20 cards per batch)
+- Efficient query design to minimize data transfer
 
 ### Future Optimization
-- Implement Redis caching layer
-- Database query optimization
+- Redis caching layer for frequently accessed data
+- Database query optimization with EXPLAIN ANALYZE
 - CDN for static assets
-- Real-time data synchronization optimization
+- Optimized data retrieval patterns
 
 ## Backup and Recovery
 
-### MVP Strategy
-- Firebase automatic backups
-- Weekly manual exports
-- Version control for schema changes
+### Current Strategy
+- Automated PostgreSQL backups using pg_dump
+- Point-in-time recovery enabled
+- Regular backup verification
+- Version control for schema changes using Flyway
 
-### Future Strategy
-- Automated PostgreSQL backups
-- Point-in-time recovery
-- Cross-region data replication
-- Disaster recovery procedures
+### Recovery Procedures
+- Automated backup restoration scripts
+- Database cluster setup for high availability
+- Regular disaster recovery testing
 
 ---
 
-*Last Updated: July 23, 2025*  
-*Version: 2.0 (MVP + Future Schema)*  
-*Target Migration: Post-MVP Phase*
+*Last Updated: October 17, 2025*  
+*Version: 3.0 (Current PostgreSQL Schema)*  
+*Platform: Spring Boot with PostgreSQL*

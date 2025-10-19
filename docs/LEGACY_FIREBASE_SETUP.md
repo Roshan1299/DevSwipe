@@ -1,8 +1,12 @@
-# Firebase Setup Guide
+# Legacy Firebase Setup Guide
 
-## 🔥 Overview
+## ⚠️ Warning: Legacy Documentation
 
-ProjectSwipe uses Firebase as the backend service for the MVP version. This guide will walk you through setting up Firebase Authentication, Firestore Database, and Cloud Messaging for the project.
+This document describes the original Firebase-based backend setup for DevSwipe. This approach has been **deprecated** in favor of a Spring Boot backend with PostgreSQL database. This document is maintained for **historical reference only**.
+
+## 🔥 Original Overview
+
+ProjectSwipe originally used Firebase as the backend service for the MVP version. This guide walked you through setting up Firebase Authentication, Firestore Database, and Cloud Messaging for the project.
 
 ## 📋 Prerequisites
 
