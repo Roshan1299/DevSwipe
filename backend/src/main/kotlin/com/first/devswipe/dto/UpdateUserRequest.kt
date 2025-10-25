@@ -6,5 +6,6 @@ data class UpdateUserRequest(
     val bio: String?,
     val profilePictureUrl: String?,
     val skills: List<String>?,
-    val interests: List<String>?
+    val interests: List<String>?,
+    val onboardingCompleted: Boolean?
 )
