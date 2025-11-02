@@ -27,12 +27,15 @@ class ChatService(
     fun sendMessage(sender: User, receiverId: UUID, content: String, messageType: MessageType): SendMessageResponse {
         try {
             // Check if receiver exists
-            val receiver = userRepository.findByIdOrNull(receiverId)
-                ?: return SendMessageResponse(
+            val receiverOpt = userRepository.findById(receiverId)
+            if (receiverOpt.isEmpty) {
+                return SendMessageResponse(
                     success = false,
                     message = null,
                     error = "Receiver not found"
                 )
+            }
+            val receiver = receiverOpt.get()
 
             // Ensure sender and receiver are different users
             if (sender.id == receiverId) {
@@ -161,13 +164,19 @@ class ChatService(
     }
 
     fun markMessagesAsRead(currentUserId: UUID, otherUserId: UUID) {
-        val unreadMessages = messageRepository.findByReceiverIdAndIsReadFalse(currentUserId)
+        val allUnreadMessages = messageRepository.findUnreadMessagesByUserId(currentUserId)
         
-        unreadMessages.filter { it.sender.id == otherUserId }.forEach { message ->
+        // Filter messages that are from the other user
+        val messagesToMarkAsRead = allUnreadMessages.filter { it.sender.id == otherUserId }
+        
+        messagesToMarkAsRead.forEach { message ->
             message.isRead = true
         }
         
-        messageRepository.saveAll(unreadMessages)
+        // Only save the messages that were actually updated
+        if (messagesToMarkAsRead.isNotEmpty()) {
+            messageRepository.saveAll(messagesToMarkAsRead)
+        }
     }
 
     fun getUnreadCount(userId: UUID): Long {
