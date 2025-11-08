@@ -154,16 +154,31 @@
     </fragment>
 
     <!-- Chat -->
-    <!--
     <fragment
         android:id="@+id/chatFragment"
-        android:name="com.first.projectswipe.chat.ChatFragment"
+        android:name="com.first.projectswipe.presentation.ui.chat.ChatFragment"
         android:label="Chat"
         tools:layout="@layout/fragment_chat">
         <action
             android:id="@+id/action_chatFragment_to_createProjectIdeaFragment"
             app:destination="@id/createProjectIdeaFragment" />
+        <action
+            android:id="@+id/action_chatFragment_to_individualChatFragment"
+            app:destination="@id/individualChatFragment" />
     </fragment>
-    -->
+
+    <!-- Individual Chat -->
+    <fragment
+        android:id="@+id/individualChatFragment"
+        android:name="com.first.projectswipe.presentation.ui.chat.IndividualChatFragment"
+        android:label="Chat"
+        tools:layout="@layout/fragment_individual_chat">
+        <argument
+            android:name="conversationId"
+            app:argType="string" />
+        <action
+            android:id="@+id/action_individualChatFragment_to_chatFragment"
+            app:destination="@id/chatFragment" />
+    </fragment>
 
 </navigation>
