@@ -95,4 +95,24 @@ interface ApiService {
 
     @GET("api/collaborations")
     suspend fun getCollaborations(): Response<List<CollaborationResponse>>
+
+    // Chat endpoints
+    @POST("api/chat/messages")
+    suspend fun sendMessage(@Body request: MessageRequest): Response<SendMessageResponse>
+
+    @GET("api/chat/conversations")
+    suspend fun getConversations(): Response<List<ConversationResponse>>
+
+    @GET("api/chat/messages/{otherUserId}")
+    suspend fun getConversationMessages(
+        @Path("otherUserId") otherUserId: String,
+        @Query("page") page: Int = 0,
+        @Query("size") size: Int = 20
+    ): Response<List<MessageResponse>>
+
+    @POST("api/chat/messages/{otherUserId}/mark-as-read")
+    suspend fun markMessagesAsRead(@Path("otherUserId") otherUserId: String): Response<Map<String, String>>
+
+    @GET("api/chat/unread-count")
+    suspend fun getUnreadCount(): Response<Map<String, Long>>
 }
