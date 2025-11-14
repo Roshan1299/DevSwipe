@@ -44,7 +44,8 @@ class MainActivity : AppCompatActivity() {
                 R.id.registerFragment,
                 R.id.createProjectIdeaFragment,
 //                R.id.ResetPasswordFragment,
-                R.id.editProfileFragment -> {
+                R.id.editProfileFragment,
+                R.id.individualChatFragment -> {
                     binding.customBottomNav.visibility = View.GONE
                     binding.addButtons.visibility = View.GONE
                 }
@@ -88,6 +89,11 @@ class MainActivity : AppCompatActivity() {
         // Collaborate button
         binding.collaborateButton.setOnClickListener {
             navigateToFragment(R.id.collaborateFragment)
+        }
+
+        // Chat button
+        binding.chatButton.setOnClickListener {
+            navigateToFragment(R.id.chatFragment)
         }
 
         // Add button (floating action button)
@@ -173,6 +179,11 @@ class MainActivity : AppCompatActivity() {
                 binding.collaborateButton.isSelected = true
                 binding.collaborateText.isSelected = true
                 binding.collaborateIcon.isSelected = true
+            }
+            R.id.chatFragment -> {
+                binding.chatButton.isSelected = true
+                binding.chatText.isSelected = true
+                binding.chatIcon.isSelected = true
             }
             R.id.profileFragment -> {
                 binding.profileButton.isSelected = true
