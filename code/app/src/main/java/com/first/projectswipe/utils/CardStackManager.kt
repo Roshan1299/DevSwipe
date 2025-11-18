@@ -15,6 +15,7 @@ class CardStackManager(
     private val container: FrameLayout,
     var allIdeas: List<ProjectIdea>,
     private val apiService: ApiService,
+    private val fragment: androidx.fragment.app.Fragment,
     private val startingIndex: Int = 0,
     private val onCardSwiped: (ProjectIdea, Int) -> Unit
 ) {
@@ -61,7 +62,7 @@ class CardStackManager(
         if (position == 0) {
             currentSwipeHandler = handler
         }
-        ProjectCardBinder.bind(card, context, idea, apiService)
+        ProjectCardBinder.bind(card, context, idea, apiService, fragment)
     }
 
     private fun handleCardSwipe(card: View, idea: ProjectIdea, direction: Int) {
@@ -108,6 +109,7 @@ class CardStackManager(
                 if (i == 0) {
                     currentSwipeHandler = handler
                 }
+                ProjectCardBinder.bind(card, context, allIdeas[ideaIndex], apiService, fragment)
             }
         }
     }
