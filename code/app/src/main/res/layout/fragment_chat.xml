@@ -24,7 +24,7 @@
         android:layout_height="0dp"
         android:padding="8dp"
         app:layout_constraintTop_toBottomOf="@id/toolbar"
-        app:layout_constraintBottom_toTopOf="@id/messageInputLayout"
+        app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         tools:listitem="@layout/item_conversation" />
@@ -40,38 +40,5 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         tools:visibility="visible" />
-
-    <!-- Message Input Layout -->
-    <LinearLayout
-        android:id="@+id/messageInputLayout"
-        android:layout_width="0dp"
-        android:layout_height="wrap_content"
-        android:orientation="horizontal"
-        android:padding="8dp"
-        android:background="@color/white"
-        android:layout_margin="8dp"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintEnd_toEndOf="parent">
-
-        <com.google.android.material.textfield.TextInputEditText
-            android:id="@+id/messageEditText"
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_weight="1"
-            android:hint="Type a message..."
-            android:background="@drawable/edit_text_background"
-            android:padding="12dp"
-            android:layout_marginEnd="8dp" />
-
-        <com.google.android.material.floatingactionbutton.FloatingActionButton
-            android:id="@+id/sendButton"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:src="@drawable/ic_send"
-            app:tint="@color/white"
-            android:contentDescription="Send message" />
-
-    </LinearLayout>
 
 </androidx.constraintlayout.widget.ConstraintLayout>
