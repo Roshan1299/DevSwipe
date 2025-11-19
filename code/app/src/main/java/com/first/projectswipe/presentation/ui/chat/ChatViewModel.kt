@@ -88,11 +88,12 @@ class ChatViewModel @Inject constructor(
         viewModelScope.launch {
             chatRepository.markMessagesAsRead(otherUserId)
                 .onSuccess {
-                    // Update unread count in conversations list
-                    // This would require updating the specific conversation
+                    // Update unread count in conversations list - reload conversations
+                    getConversations()
                 }
-                .onFailure { 
-                    // Handle error silently or show notification
+                .onFailure { exception ->
+                    // Could emit error state if needed
+                    _uiState.value = UiState.Error(exception.message ?: "Failed to mark messages as read")
                 }
         }
     }
