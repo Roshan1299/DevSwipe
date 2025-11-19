@@ -7,7 +7,8 @@ import android.view.ViewGroup
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.lifecycleScope
-import androidx.navigation.fragment.findNavController
+import kotlinx.coroutines.launch
+import androidx.navigation.fragment.navArgs
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.first.projectswipe.databinding.FragmentIndividualChatBinding
 import com.first.projectswipe.presentation.adapters.MessageAdapter
@@ -32,6 +33,8 @@ class IndividualChatFragment : Fragment() {
     // Store the other user's ID (passed from conversations list)
     private var otherUserId: String = ""
 
+    private val args: IndividualChatFragmentArgs by navArgs()
+
     override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,
@@ -45,10 +48,7 @@ class IndividualChatFragment : Fragment() {
         super.onViewCreated(view, savedInstanceState)
 
         // Extract other user ID from arguments
-        otherUserId = arguments?.getString("conversationId") ?: ""
-
-        // Set up the toolbar with user info
-        setupToolbar()
+        otherUserId = args.otherUserId ?: ""
 
         // Setup recycler view for messages
         setupRecyclerView()
@@ -56,7 +56,7 @@ class IndividualChatFragment : Fragment() {
         // Observe view model
         observeViewModel()
 
-        // Load messages for this conversation
+        // Load messages for this conversation first to get other user info
         loadMessages()
 
         // Set up send button
@@ -71,12 +71,6 @@ class IndividualChatFragment : Fragment() {
         }
     }
 
-    private fun setupToolbar() {
-        // For now, we'll set placeholder values
-        // In a real implementation, we'd get this from the user details
-        // and potentially make an API call to get user info based on otherUserId
-    }
-
     private fun setupRecyclerView() {
         val currentUserId = authManager.getCurrentUserId()
         messageAdapter = MessageAdapter(currentUserId)
@@ -87,21 +81,57 @@ class IndividualChatFragment : Fragment() {
     }
 
     private fun observeViewModel() {
-        viewModel.messages.observe(viewLifecycleOwner) { messages ->
-            messageAdapter.submitList(messages)
-            // Scroll to bottom when new messages arrive
-            binding.messagesRecyclerView.scrollToPosition(messageAdapter.itemCount - 1)
+        viewLifecycleOwner.lifecycleScope.launch {
+            viewModel.messages.collect { messages ->
+                messageAdapter.submitList(messages)
+                // Scroll to bottom when new messages arrive
+                binding.messagesRecyclerView.scrollToPosition(messageAdapter.itemCount - 1)
+
+                // Update toolbar with the other user's info if we have messages
+                if (messages.isNotEmpty()) {
+                    // Get the other user's info from the first message
+                    val firstMessage = messages.first()
+                    val otherUser = if (firstMessage.sender.id == authManager.getCurrentUserId()) {
+                        firstMessage.receiver
+                    } else {
+                        firstMessage.sender
+                    }
+                    updateToolbarWithUser(otherUser)
+                }
+            }
         }
 
-        viewModel.uiState.observe(viewLifecycleOwner) { uiState ->
-            // Handle UI state changes if needed
+        viewLifecycleOwner.lifecycleScope.launch {
+            viewModel.uiState.collect { uiState ->
+                // Handle UI state changes if needed
+            }
+        }
+    }
+
+    private fun updateToolbarWithUser(user: com.first.projectswipe.network.dto.UserDto) {
+        binding.userNameTextView.text = user.fullName
+        binding.userStatusTextView.text = "Online"  // Could be dynamic in the future
+
+        // Load profile image
+        val profileImageUrl = user.profileImageUrl
+        if (!profileImageUrl.isNullOrEmpty()) {
+            com.bumptech.glide.Glide.with(binding.profileImageView.context)
+                .load(profileImageUrl)
+                .circleCrop()
+                .placeholder(com.first.projectswipe.R.drawable.ic_profile_placeholder)
+                .into(binding.profileImageView)
+        } else {
+            com.bumptech.glide.Glide.with(binding.profileImageView.context)
+                .load(com.first.projectswipe.R.drawable.ic_profile_placeholder)
+                .circleCrop()
+                .into(binding.profileImageView)
         }
     }
 
     private fun loadMessages() {
         // Load messages for the specific conversation
-        // The conversation ID is passed as an argument
-        viewModel.getConversationMessages(args.conversationId)
+        // The other user ID is passed as an argument
+        viewModel.getConversationMessages(otherUserId)
     }
 
     private fun sendMessage() {
@@ -118,6 +148,10 @@ class IndividualChatFragment : Fragment() {
     }
 
     override fun onDestroyView() {
+        // Mark messages as read when leaving the chat
+        if (otherUserId.isNotEmpty()) {
+            viewModel.markMessagesAsRead(otherUserId)
+        }
         super.onDestroyView()
         _binding = null
     }
