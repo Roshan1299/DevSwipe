@@ -20,6 +20,7 @@ import com.first.projectswipe.data.models.ProjectIdea
 import com.first.projectswipe.data.repository.ProfileRepository
 import com.first.projectswipe.data.repository.ProjectRepository
 import com.first.projectswipe.network.dto.UserProfileResponse
+import com.google.android.material.floatingactionbutton.FloatingActionButton
 import com.google.android.material.chip.Chip
 import com.google.android.material.chip.ChipGroup
 import com.squareup.picasso.Picasso
@@ -37,17 +38,19 @@ class ProfileFragment : Fragment() {
     private lateinit var skillsChipGroup: ChipGroup
     private lateinit var interestsChipGroup: ChipGroup
     private lateinit var postsRecyclerView: RecyclerView
+    private lateinit var messageButton: FloatingActionButton
 
     // Replace Firebase with your backend
     @Inject
     lateinit var profileRepository: ProfileRepository
-    
+
     @Inject
     lateinit var projectRepository: ProjectRepository
 
     private val postList = mutableListOf<ProjectIdea>()
     private lateinit var adapter: ProfilePostAdapter
     private var currentProfile: UserProfileResponse? = null
+    private var viewedUserId: String? = null
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -64,10 +67,24 @@ class ProfileFragment : Fragment() {
         skillsChipGroup = view.findViewById(R.id.skillsChipGroup)
         interestsChipGroup = view.findViewById(R.id.interestsChipGroup)
         postsRecyclerView = view.findViewById(R.id.userPostsRecyclerView)
+        messageButton = view.findViewById(R.id.messageButton)
 
         val editBtn = view.findViewById<ImageButton>(R.id.editProfileButton)
         editBtn.setOnClickListener {
             findNavController().navigate(R.id.action_profileFragment_to_editProfileFragment)
+        }
+
+        messageButton.setOnClickListener {
+            // Navigate directly to individual chat with the viewed user
+            viewedUserId?.let { userId ->
+                val bundle = Bundle().apply {
+                    putString("otherUserId", userId)
+                }
+                findNavController().navigate(
+                    R.id.action_profileFragment_to_individualChatFragment,
+                    bundle
+                )
+            }
         }
 
         backButton.setOnClickListener {
@@ -82,6 +99,11 @@ class ProfileFragment : Fragment() {
         }
         postsRecyclerView.adapter = adapter
 
+        // Check if viewing another user's profile
+        arguments?.let { bundle ->
+            viewedUserId = bundle.getString("viewedUserId")
+        }
+
         loadUserProfile()
         loadUserPosts()
 
@@ -91,16 +113,36 @@ class ProfileFragment : Fragment() {
     private fun loadUserProfile() {
         lifecycleScope.launch {
             try {
-                profileRepository.getCurrentProfile()
+                val result = if (viewedUserId != null) {
+                    // Loading another user's profile
+                    profileRepository.getUserProfile(viewedUserId!!)
+                } else {
+                    // Loading current user's profile
+                    profileRepository.getCurrentProfile()
+                }
+
+                result
                     .onSuccess { profile ->
                         currentProfile = profile
                         displayProfile(profile)
+
+                        // Show/hide message button based on if it's another user's profile
+                        if (viewedUserId != null) {
+                            // This is another user's profile, show message button
+                            messageButton.show()
+                        } else {
+                            // This is current user's profile, hide message button
+                            messageButton.hide()
+                        }
                     }
                     .onFailure { error ->
                         showError("Failed to load profile: ${error.message}")
-                        // If profile doesn't exist, navigate to create profile
-                        if (error.message?.contains("Profile not found") == true) {
-                            navigateToCreateProfile()
+                        // If viewing current user's profile and it fails
+                        if (viewedUserId == null) {
+                            // If profile doesn't exist, navigate to create profile
+                            if (error.message?.contains("Profile not found") == true) {
+                                navigateToCreateProfile()
+                            }
                         }
                     }
             } catch (e: Exception) {
@@ -133,7 +175,17 @@ class ProfileFragment : Fragment() {
     private fun loadUserPosts() {
         lifecycleScope.launch {
             try {
-                projectRepository.getCurrentUserProjects()
+                val result = if (viewedUserId != null) {
+                    // Loading another user's posts - this might need a different API call
+                    // Currently, we may only have an API for getting current user's projects
+                    // We might need to implement a method to get user's projects by user ID
+                    projectRepository.getCurrentUserProjects() // For now, keep existing pattern
+                    // TODO: Implement method to get projects by user ID in the future
+                } else {
+                    projectRepository.getCurrentUserProjects()
+                }
+
+                result
                     .onSuccess { projects ->
                         postList.clear()
                         postList.addAll(projects)

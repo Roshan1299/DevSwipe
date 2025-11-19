@@ -145,4 +145,16 @@
             android:layout_weight="1"
             android:overScrollMode="never" />
     </LinearLayout>
+
+    <!-- Floating Message Button - only shown when viewing another user's profile -->
+    <com.google.android.material.floatingactionbutton.FloatingActionButton
+        android:id="@+id/messageButton"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="bottom|end"
+        android:layout_margin="24dp"
+        android:src="@drawable/ic_chat"
+        android:contentDescription="Message user"
+        app:tint="@android:color/white" />
+
 </FrameLayout>

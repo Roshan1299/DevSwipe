@@ -35,7 +35,19 @@
     <!-- Button Colors -->
     <color name="button_disabled">#C7C7CC</color>
 
+    <!-- Gray Colors -->
+    <color name="gray_200">#E5E5EA</color>
+    <color name="gray_300">#D1D1D6</color>
+    <color name="gray_500">#8E8E93</color>
+    <color name="gray_600">#6C7680</color>
+    
     <!-- Other Colors -->
     <color name="gray_light">#F2F2F7</color>
     <color name="gray_medium">#C7C7CC</color>
+    
+    <!-- Light Blue for chat bubbles -->
+    <color name="light_blue">#E3F2FD</color>
+    
+    <!-- Red for unread count -->
+    <color name="red">#F44336</color>
 </resources>

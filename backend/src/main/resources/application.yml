@@ -11,8 +11,8 @@ spring:
 
   jpa:
     hibernate:
-      ddl-auto: validate
-    show-sql: false
+      ddl-auto: update  # Changed from validate to update to create missing tables
+    show-sql: true  # Enable to see the SQL being executed
     properties:
       hibernate:
         dialect: org.hibernate.dialect.PostgreSQLDialect

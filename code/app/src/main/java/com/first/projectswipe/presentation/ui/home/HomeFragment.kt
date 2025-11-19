@@ -370,6 +370,7 @@ class HomeFragment : Fragment() {
             container = cardContainer,
             allIdeas = displayedIdeas,
             apiService = apiService,
+            fragment = this,
             startingIndex = startingIndex,
             onCardSwiped = { _, _ ->
                 saveSwipePosition(cardStackManager?.currentTopIndex ?: 0)

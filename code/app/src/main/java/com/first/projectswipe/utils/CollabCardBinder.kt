@@ -4,9 +4,11 @@ import android.animation.Animator
 import android.animation.AnimatorListenerAdapter
 import android.animation.ObjectAnimator
 import android.content.Context
+import android.os.Bundle
 import android.view.View
 import android.widget.ImageView
 import android.widget.TextView
+import androidx.navigation.fragment.findNavController
 import com.bumptech.glide.Glide
 import com.first.projectswipe.R
 import com.first.projectswipe.data.models.CollabPost
@@ -16,7 +18,7 @@ import com.first.projectswipe.network.ApiService
 
 object CollabCardBinder {
 
-    fun bind(card: View, context: Context, collabPost: CollabPost, apiService: ApiService) {
+    fun bind(card: View, context: Context, collabPost: CollabPost, apiService: ApiService, fragment: androidx.fragment.app.Fragment? = null) {
         val swipeHandler = card.getTag(R.id.swipe_handler_tag) as? SwipeHandler
 
         // --- FRONT SIDE ---
@@ -51,6 +53,33 @@ object CollabCardBinder {
                     .circleCrop()
                     .into(frontPfp)
             } ?: frontPfp.setImageResource(R.drawable.ic_profile_placeholder)
+
+            // Set click listener to navigate to user's profile
+            frontCreator.setOnClickListener {
+                // Navigate to profile with the user ID
+                fragment?.let { frag ->
+                    val bundle = Bundle().apply {
+                        putString("viewedUserId", collabPost.createdBy.id)
+                    }
+                    frag.findNavController().navigate(
+                        R.id.action_ideasFragment_to_profileFragment,
+                        bundle
+                    )
+                }
+            }
+
+            frontPfp.setOnClickListener {
+                // Navigate to profile with the user ID
+                fragment?.let { frag ->
+                    val bundle = Bundle().apply {
+                        putString("viewedUserId", collabPost.createdBy.id)
+                    }
+                    frag.findNavController().navigate(
+                        R.id.action_ideasFragment_to_profileFragment,
+                        bundle
+                    )
+                }
+            }
         }
 
         // --- BACK SIDE ---

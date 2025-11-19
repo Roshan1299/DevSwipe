@@ -145,6 +145,7 @@ class SeekingCollaboratorsFragment : Fragment() {
             container = cardContainer,
             allCollabPosts = collabPosts,
             apiService = apiService,
+            fragment = this,
             startingIndex = startingIndex,
             onCardSwiped = { _, _ ->
                 saveSwipePosition(cardStackManager?.currentTopIndex ?: 0)

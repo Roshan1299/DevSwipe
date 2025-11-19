@@ -15,6 +15,7 @@ class CollabCardStackManager(
     private val container: FrameLayout,
     var allCollabPosts: List<CollabPost>,
     private val apiService: ApiService,
+    private val fragment: androidx.fragment.app.Fragment,
     private val startingIndex: Int = 0,
     private val onCardSwiped: (CollabPost, Int) -> Unit
 ) {
@@ -61,7 +62,7 @@ class CollabCardStackManager(
         if (position == 0) {
             currentSwipeHandler = handler
         }
-        CollabCardBinder.bind(card, context, collabPost, apiService)
+        CollabCardBinder.bind(card, context, collabPost, apiService, fragment)
     }
 
     private fun handleCardSwipe(card: View, collabPost: CollabPost, direction: Int) {
@@ -108,6 +109,7 @@ class CollabCardStackManager(
                 if (i == 0) {
                     currentSwipeHandler = handler
                 }
+                CollabCardBinder.bind(card, context, allCollabPosts[collabPostIndex], apiService, fragment)
             }
         }
     }

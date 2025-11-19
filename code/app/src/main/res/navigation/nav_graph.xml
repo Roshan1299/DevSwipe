@@ -66,6 +66,9 @@
         <action
             android:id="@+id/action_ideasFragment_to_createProjectIdeaFragment"
             app:destination="@id/createProjectIdeaFragment" />
+        <action
+            android:id="@+id/action_ideasFragment_to_profileFragment"
+            app:destination="@id/profileFragment" />
     </fragment>
 
     <!-- Profile Fragment -->
@@ -74,6 +77,11 @@
         android:name="com.first.projectswipe.presentation.ui.profile.ProfileFragment"
         android:label="Profile"
         tools:layout="@layout/fragment_profile">
+        <argument
+            android:name="viewedUserId"
+            app:argType="string"
+            app:nullable="true"
+            android:defaultValue="@null" />
         <action
             android:id="@+id/action_profileFragment_to_editProfileFragment"
             app:destination="@id/editProfileFragment" />
@@ -85,6 +93,12 @@
                 app:argType="string"
                 android:defaultValue="" />
         </action>
+        <action
+            android:id="@+id/action_profileFragment_to_chatFragment"
+            app:destination="@id/chatFragment" />
+        <action
+            android:id="@+id/action_profileFragment_to_individualChatFragment"
+            app:destination="@id/individualChatFragment" />
     </fragment>
 
     <!-- Edit Profile -->
@@ -154,16 +168,31 @@
     </fragment>
 
     <!-- Chat -->
-    <!--
     <fragment
         android:id="@+id/chatFragment"
-        android:name="com.first.projectswipe.chat.ChatFragment"
+        android:name="com.first.projectswipe.presentation.ui.chat.ChatFragment"
         android:label="Chat"
         tools:layout="@layout/fragment_chat">
         <action
             android:id="@+id/action_chatFragment_to_createProjectIdeaFragment"
             app:destination="@id/createProjectIdeaFragment" />
+        <action
+            android:id="@+id/action_chatFragment_to_individualChatFragment"
+            app:destination="@id/individualChatFragment" />
     </fragment>
-    -->
+
+    <!-- Individual Chat -->
+    <fragment
+        android:id="@+id/individualChatFragment"
+        android:name="com.first.projectswipe.presentation.ui.chat.IndividualChatFragment"
+        android:label="Chat"
+        tools:layout="@layout/fragment_individual_chat">
+        <argument
+            android:name="otherUserId"
+            app:argType="string" />
+        <action
+            android:id="@+id/action_individualChatFragment_to_chatFragment"
+            app:destination="@id/chatFragment" />
+    </fragment>
 
 </navigation>
