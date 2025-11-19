@@ -7,14 +7,15 @@ import android.view.ViewGroup
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.lifecycleScope
+import kotlinx.coroutines.launch
 import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.first.projectswipe.databinding.FragmentChatBinding
 import com.first.projectswipe.presentation.adapters.ConversationAdapter
 import com.first.projectswipe.presentation.ui.auth.AuthManager
 import dagger.hilt.android.AndroidEntryPoint
+import com.first.projectswipe.presentation.ui.chat.ChatFragmentDirections
 import javax.inject.Inject
-
 @AndroidEntryPoint
 class ChatFragment : Fragment() {
 
@@ -43,31 +44,17 @@ class ChatFragment : Fragment() {
         setupRecyclerView()
         observeViewModel()
         loadConversations()
-
-        // Set up send button click listener
-        binding.sendButton.setOnClickListener {
-            sendMessage()
-        }
-
-        // Send message when pressing Enter in the EditText
-        binding.messageEditText.setOnEditorActionListener { _, _, _ ->
-            sendMessage()
-            true
-        }
     }
 
     private fun setupRecyclerView() {
         conversationAdapter = ConversationAdapter { conversation ->
             // Navigate to individual chat screen
-            // For now, passing the conversation ID - but normally you'd pass the other user ID
+            // Pass the other user's ID to the individual chat fragment
             findNavController().navigate(
-                R.id.action_chatFragment_to_individualChatFragment,
-                Bundle().apply {
-                    putString("conversationId", conversation.id)
-                }
+                ChatFragmentDirections.actionChatFragmentToIndividualChatFragment(conversation.otherUser.id)
             )
         }
-        
+
         binding.recyclerView.apply {
             adapter = conversationAdapter
             layoutManager = LinearLayoutManager(requireContext())
@@ -75,23 +62,27 @@ class ChatFragment : Fragment() {
     }
 
     private fun observeViewModel() {
-        viewModel.conversations.observe(viewLifecycleOwner) { conversations ->
-            conversationAdapter.submitList(conversations)
+        viewLifecycleOwner.lifecycleScope.launch {
+            viewModel.conversations.collect { conversations ->
+                conversationAdapter.submitList(conversations)
+            }
         }
 
-        viewModel.uiState.observe(viewLifecycleOwner) { uiState ->
-            when (uiState) {
-                is UiState.Loading -> {
-                    binding.progressBar.visibility = View.VISIBLE
+        viewLifecycleOwner.lifecycleScope.launch {
+            viewModel.uiState.collect { uiState ->
+                when (uiState) {
+                    is UiState.Loading -> {
+                        binding.progressBar.visibility = View.VISIBLE
+                    }
+                    is UiState.Success -> {
+                        binding.progressBar.visibility = View.GONE
+                    }
+                    is UiState.Error -> {
+                        binding.progressBar.visibility = View.GONE
+                        // Handle error (show snackbar, etc.)
+                    }
+                    is UiState.Idle -> {} // Do nothing for Idle state
                 }
-                is UiState.Success -> {
-                    binding.progressBar.visibility = View.GONE
-                }
-                is UiState.Error -> {
-                    binding.progressBar.visibility = View.GONE
-                    // Handle error (show snackbar, etc.)
-                }
-                else -> {} // Do nothing for Idle state
             }
         }
     }
@@ -100,14 +91,6 @@ class ChatFragment : Fragment() {
         viewModel.getConversations()
     }
 
-    private fun sendMessage() {
-        val messageText = binding.messageEditText.text.toString().trim()
-        if (messageText.isNotEmpty()) {
-            // For now, this would send a test message - in real implementation,
-            // this would be handled in the individual chat screen
-            binding.messageEditText.setText("")
-        }
-    }
 
     override fun onDestroyView() {
         super.onDestroyView()
