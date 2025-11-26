@@ -34,6 +34,9 @@ dependencies {
     implementation("com.fasterxml.jackson.module:jackson-module-kotlin")
     implementation("org.jetbrains.kotlin:kotlin-reflect")
 
+    // FCM for Push Notifications
+    implementation("com.google.firebase:firebase-admin:9.2.0")
+
     // Development
     developmentOnly("org.springframework.boot:spring-boot-devtools")
 
