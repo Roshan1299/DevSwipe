@@ -1,8 +1,7 @@
 plugins {
     alias(libs.plugins.android.application)
     alias(libs.plugins.kotlin.android)
-    // Remove Firebase plugin
-    // alias(libs.plugins.google.services)
+    id("com.google.gms.google-services")  // Add Google Services plugin for FCM
     id("kotlin-kapt")
     id("dagger.hilt.android.plugin")
     id("androidx.navigation.safeargs.kotlin")
@@ -85,14 +84,10 @@ dependencies {
     implementation(libs.androidx.navigation.fragment.ktx)
     implementation(libs.androidx.navigation.ui.ktx)
 
-    // ===== REMOVE ALL FIREBASE DEPENDENCIES =====
-    // Remove Firebase BOM and all Firebase dependencies:
-    // implementation(platform("com.google.firebase:firebase-bom:33.1.0"))
-    // implementation("com.google.android.gms:play-services-auth:21.0.0")
-    // implementation("com.google.firebase:firebase-auth-ktx")
-    // implementation("com.google.firebase:firebase-firestore-ktx")
-    // implementation("com.google.firebase:firebase-storage-ktx")
-    // implementation("com.google.android.gms:play-services-auth")
+    // ===== FCM DEPENDENCIES =====
+    implementation(platform("com.google.firebase:firebase-bom:32.7.0"))
+    implementation("com.google.firebase:firebase-messaging-ktx")
+    implementation("com.google.firebase:firebase-analytics-ktx")
 
     // ===== ADD NETWORKING DEPENDENCIES =====
     // Retrofit for REST API calls
