@@ -21,7 +21,8 @@ import java.util.*
 class ChatService(
     private val messageRepository: MessageRepository,
     private val conversationRepository: ConversationRepository,
-    private val userRepository: UserRepository
+    private val userRepository: UserRepository,
+    private val notificationService: NotificationService
 ) {
 
     fun sendMessage(sender: User, receiverId: UUID, content: String, messageType: MessageType): SendMessageResponse {
@@ -58,6 +59,15 @@ class ChatService(
 
             // Update or create conversation
             updateOrCreateConversation(sender, receiver, savedMessage)
+
+            // Send notification to receiver if they have an FCM token
+            if (receiver.fcmToken != null) {
+                notificationService.sendNewMessageNotification(
+                    senderName = sender.displayName,
+                    recipientToken = receiver.fcmToken!!,
+                    messageContent = content
+                )
+            }
 
             // Create response DTO
             val messageResponse = MessageResponse(
