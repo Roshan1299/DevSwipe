@@ -115,4 +115,11 @@ interface ApiService {
 
     @GET("api/chat/unread-count")
     suspend fun getUnreadCount(): Response<Map<String, Long>>
+
+    // Notification endpoints
+    @POST("api/notifications/register-token")
+    suspend fun registerFcmToken(@Body request: Map<String, String>): Response<Map<String, String>>
+
+    @POST("api/notifications/unregister-token")
+    suspend fun unregisterFcmToken(): Response<Map<String, String>>
 }
