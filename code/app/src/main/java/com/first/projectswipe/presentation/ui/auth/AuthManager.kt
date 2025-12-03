@@ -412,6 +412,47 @@ class AuthManager @Inject constructor(
             _currentUser.postValue(updatedUser)
         }
     }
+
+    // Method to register FCM token with backend
+    suspend fun registerFcmToken(token: String): Boolean {
+        return withContext(Dispatchers.IO) {
+            try {
+                val request = mapOf("token" to token)
+                val response = apiService.registerFcmToken(request)
+
+                if (response.isSuccessful) {
+                    Log.d(TAG, "FCM token registered successfully with backend")
+                    true
+                } else {
+                    Log.e(TAG, "Failed to register FCM token: ${response.code()} - ${response.message()}")
+                    false
+                }
+            } catch (e: Exception) {
+                Log.e(TAG, "Error registering FCM token: ${e.message}", e)
+                false
+            }
+        }
+    }
+
+    // Method to unregister FCM token with backend
+    suspend fun unregisterFcmToken(): Boolean {
+        return withContext(Dispatchers.IO) {
+            try {
+                val response = apiService.unregisterFcmToken()
+
+                if (response.isSuccessful) {
+                    Log.d(TAG, "FCM token unregistered successfully with backend")
+                    true
+                } else {
+                    Log.e(TAG, "Failed to unregister FCM token: ${response.code()} - ${response.message()}")
+                    false
+                }
+            } catch (e: Exception) {
+                Log.e(TAG, "Error unregistering FCM token: ${e.message}", e)
+                false
+            }
+        }
+    }
 }
 
 // Result classes
