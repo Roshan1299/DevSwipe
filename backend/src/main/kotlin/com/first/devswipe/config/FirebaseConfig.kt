@@ -13,7 +13,7 @@ class FirebaseConfig {
 
     @Bean
     fun firebaseMessaging(): FirebaseMessaging {
-        val serviceAccount = ClassPathResource("firebase-service-account.json")
+        val serviceAccount = ClassPathResource("devswipe-f00d4-firebase-adminsdk-fbsvc-e22a8cb3e9.json")
 
         val options = FirebaseOptions.builder()
             .setCredentials(GoogleCredentials.fromStream(serviceAccount.inputStream))
