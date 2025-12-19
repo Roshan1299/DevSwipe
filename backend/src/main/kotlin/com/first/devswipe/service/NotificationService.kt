@@ -14,7 +14,7 @@ class NotificationService(
 ) {
     private val logger = Logger.getLogger(NotificationService::class.java.name)
 
-    suspend fun sendNotification(notificationRequest: NotificationRequest): NotificationResponse {
+    fun sendNotification(notificationRequest: NotificationRequest): NotificationResponse {
         try {
             val user = userRepository.findById(notificationRequest.userId)
                 .orElseThrow { Exception("User not found") }
@@ -60,7 +60,7 @@ class NotificationService(
         }
     }
 
-    suspend fun sendNotificationToToken(fcmToken: String, title: String, body: String, data: Map<String, String>? = null): NotificationResponse {
+    fun sendNotificationToToken(fcmToken: String, title: String, body: String, data: Map<String, String>? = null): NotificationResponse {
         try {
             val message = Message.builder()
                 .setToken(fcmToken)
@@ -94,7 +94,7 @@ class NotificationService(
     }
 
     // Specialized method for sending message notifications
-    suspend fun sendNewMessageNotification(senderName: String, recipientToken: String, messageContent: String): NotificationResponse {
+    fun sendNewMessageNotification(senderName: String, recipientToken: String, messageContent: String): NotificationResponse {
         return sendNotificationToToken(
             fcmToken = recipientToken,
             title = "New Message from $senderName",
