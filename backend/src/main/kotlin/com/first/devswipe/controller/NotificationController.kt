@@ -31,12 +31,11 @@ class NotificationController(
                 )
             )
         } catch (e: Exception) {
-            return ResponseEntity.status(500).body(
-                NotificationResponse(
-                    success = false,
-                    message = "Error registering FCM token: ${e.message}"
-                )
+            val errorResponse = NotificationResponse(
+                success = false,
+                message = "Error registering FCM token: ${e.message ?: "Unknown error"}"
             )
+            return ResponseEntity.status(500).body(errorResponse)
         }
     }
 
@@ -55,13 +54,12 @@ class NotificationController(
                     message = "FCM token unregistered successfully"
                 )
             )
-        } catch (e) {
-            return ResponseEntity.status(500).body(
-                NotificationResponse(
-                    success = false,
-                    message = "Error unregistering FCM token: ${e.message}"
-                )
+        } catch (e: Exception) {
+            val errorResponse = NotificationResponse(
+                success = false,
+                message = "Error unregistering FCM token: ${e.message ?: "Unknown error"}"
             )
+            return ResponseEntity.status(500).body(errorResponse)
         }
     }
 }
