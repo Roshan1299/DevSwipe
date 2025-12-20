@@ -62,7 +62,7 @@ object CollabCardBinder {
                         putString("viewedUserId", collabPost.createdBy.id)
                     }
                     frag.findNavController().navigate(
-                        R.id.action_ideasFragment_to_profileFragment,
+                        R.id.action_collaborateFragment_to_profileFragment,
                         bundle
                     )
                 }
@@ -75,7 +75,7 @@ object CollabCardBinder {
                         putString("viewedUserId", collabPost.createdBy.id)
                     }
                     frag.findNavController().navigate(
-                        R.id.action_ideasFragment_to_profileFragment,
+                        R.id.action_collaborateFragment_to_profileFragment,
                         bundle
                     )
                 }
