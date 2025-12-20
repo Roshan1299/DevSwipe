@@ -20,3 +20,4 @@
 .externalNativeBuild
 .cxx
 local.properties
+backend/src/main/resources/*-firebase-adminsdk-*.json
