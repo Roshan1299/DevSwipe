@@ -4,7 +4,9 @@
     <option name="autoReloadType" value="NONE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="788ed65b-853a-41da-814d-84812ee7d0af" name="Changes" comment="feat: add Firebase configuration for FCM service" />
+    <list default="true" id="788ed65b-853a-41da-814d-84812ee7d0af" name="Changes" comment="feat: add Firebase configuration for FCM service">
+      <change beforePath="$PROJECT_DIR$/../.github/workflows/backend_ci.yml" beforeDir="false" afterPath="$PROJECT_DIR$/../.github/workflows/backend_ci.yml" afterDir="false" />
+    </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
