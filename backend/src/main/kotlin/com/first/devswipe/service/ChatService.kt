@@ -24,6 +24,7 @@ class ChatService(
     private val userRepository: UserRepository,
     private val notificationService: NotificationService
 ) {
+    private val logger = java.util.logging.Logger.getLogger(ChatService::class.java.name)
 
     fun sendMessage(sender: User, receiverId: UUID, content: String, messageType: MessageType): SendMessageResponse {
         try {
@@ -62,11 +63,18 @@ class ChatService(
 
             // Send notification to receiver if they have an FCM token
             if (receiver.fcmToken != null) {
-                notificationService.sendNewMessageNotification(
-                    senderName = sender.displayName,
-                    recipientToken = receiver.fcmToken!!,
-                    messageContent = content
-                )
+                // Run notification in a separate thread to not block the message sending
+                Thread {
+                    try {
+                        notificationService.sendNewMessageNotification(
+                            senderName = sender.displayName,
+                            recipientToken = receiver.fcmToken!!,
+                            messageContent = content
+                        )
+                    } catch (e: Exception) {
+                        logger.severe("Error sending notification: ${e.message}")
+                    }
+                }.start()
             }
 
             // Create response DTO
