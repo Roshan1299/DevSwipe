@@ -158,13 +158,16 @@
 
     <!-- Collaborate -->
     <fragment
-        android:id="@+id/collaborateFragment"
         android:name="com.first.projectswipe.presentation.ui.collaboration.SeekingCollaboratorsFragment"
+        android:id="@+id/collaborateFragment"
         android:label="Collaborate"
         tools:layout="@layout/fragment_collaborate">
         <action
             android:id="@+id/action_collaborateFragment_to_createProjectIdeaFragment"
             app:destination="@id/createProjectIdeaFragment" />
+        <action
+            android:id="@+id/action_collaborateFragment_to_profileFragment"
+            app:destination="@id/profileFragment" />
     </fragment>
 
     <!-- Chat -->
