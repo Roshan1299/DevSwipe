@@ -5,7 +5,7 @@ spring:
   # Database config (we'll set up PostgreSQL next)
   datasource:
     url: jdbc:postgresql://localhost:5432/devswipe_db
-    username: ${DB_USERNAME:devswipe}
+    username: ${DB_USERNAME:postgres}
     password: ${DB_PASSWORD:password}
     driver-class-name: org.postgresql.Driver
 
