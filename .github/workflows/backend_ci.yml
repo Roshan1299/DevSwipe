@@ -91,7 +91,7 @@ jobs:
         SPRING_DATASOURCE_URL: jdbc:postgresql://localhost:5432/devswipe_db
         SPRING_DATASOURCE_USERNAME: devswipe
         SPRING_DATASOURCE_PASSWORD: password
-      
+
     # Step 8: Run Unit Tests
     - name: Run Unit Tests
       run: cd backend && ./gradlew test
@@ -107,7 +107,7 @@ jobs:
     - name: Test Server Startup
       run: |
         cd backend
-        SPRING_PROFILES_ACTIVE=test timeout 30s ./gradlew bootRun &
+        SPRING_PROFILES_ACTIVE=test DB_USERNAME=devswipe DB_PASSWORD=password SPRING_DATASOURCE_URL=jdbc:postgresql://localhost:5432/devswipe_db SPRING_DATASOURCE_USERNAME=devswipe SPRING_DATASOURCE_PASSWORD=password timeout 30s ./gradlew bootRun &
         SERVER_PID=$!
         sleep 15
         if ps -p $SERVER_PID > /dev/null; then
