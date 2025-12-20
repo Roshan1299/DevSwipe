@@ -10,21 +10,14 @@ import android.util.Log
 import androidx.core.app.NotificationCompat
 import com.first.projectswipe.MainActivity
 import com.first.projectswipe.R
-import com.first.projectswipe.network.ApiService
-import com.first.projectswipe.utils.TokenProvider
-import dagger.hilt.android.AndroidEntryPoint
+import com.google.firebase.messaging.FirebaseMessagingService
+import com.google.firebase.messaging.RemoteMessage
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
-import javax.inject.Inject
-import com.google.firebase.messaging.FirebaseMessagingService
-import com.google.firebase.messaging.RemoteMessage
+import okhttp3.MediaType.Companion.toMediaType
 
-@AndroidEntryPoint
 class FCMService : FirebaseMessagingService() {
-    
-    @Inject
-    lateinit var authManager: AuthManager
 
     private val notificationTag = "devswipe_notification"
     private val notificationId = 1001
@@ -98,20 +91,44 @@ class FCMService : FirebaseMessagingService() {
     }
 
     private fun registerTokenWithBackend(token: String) {
-        // Only register token if user is logged in
-        if (authManager.isUserLoggedIn()) {
-            CoroutineScope(Dispatchers.IO).launch {
-                val success = authManager.registerFcmToken(token)
-                if (success) {
-                    Log.d("FCMService", "Token registered successfully with backend")
-                } else {
-                    Log.e("FCMService", "Failed to register token with backend")
+        // Get JWT token from SharedPreferences directly
+        val sharedPreferences = applicationContext.getSharedPreferences("auth_prefs", Context.MODE_PRIVATE)
+        val jwtToken = sharedPreferences.getString("jwt_token", null)
+
+        if (!jwtToken.isNullOrEmpty()) {
+            // Make API call directly using a temporary HTTP client
+            kotlinx.coroutines.CoroutineScope(kotlinx.coroutines.Dispatchers.IO).launch {
+                try {
+                    // Create a minimal HTTP client to make the API call
+                    val client = okhttp3.OkHttpClient()
+                    val json = org.json.JSONObject()
+                    json.put("token", token)
+
+                    val body = okhttp3.RequestBody.create(
+                        "application/json; charset=utf-8".toMediaType(),
+                        json.toString()
+                    )
+
+                    val request = okhttp3.Request.Builder()
+                        .url("http://10.0.2.2:8080/api/notifications/register-token") // Update if needed
+                        .post(body)
+                        .addHeader("Authorization", "Bearer $jwtToken")
+                        .addHeader("Content-Type", "application/json")
+                        .build()
+
+                    val response = client.newCall(request).execute()
+                    if (response.isSuccessful) {
+                        Log.d("FCMService", "Token registered successfully with backend")
+                    } else {
+                        Log.e("FCMService", "Failed to register token: ${response.code}")
+                    }
+                    response.close()
+                } catch (e: Exception) {
+                    Log.e("FCMService", "Error registering token with backend: ${e.message}")
                 }
             }
         } else {
             Log.d("FCMService", "User not logged in, deferring token registration until login")
-            // Store the token temporarily and register it after login
-            // In a real implementation, you might want to store this in SharedPreferences
         }
     }
 }
