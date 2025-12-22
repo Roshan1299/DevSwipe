@@ -1,5 +1,6 @@
 # DevSwipe 🚀
 
+[<img src="https://devin.ai/assets/deepwiki-badge.png" alt="Ask DeepWiki.com" height="20"/>](https://deepwiki.com/Roshan1299/DevSwipe)
 [![Kotlin](https://img.shields.io/badge/Kotlin-1.9.0-blueviolet?logo=kotlin)](https://kotlinlang.org)
 [![Platform](https://img.shields.io/badge/Android-13%2B-brightgreen?logo=android)](https://developer.android.com)
 [![License](https://img.shields.io/badge/License-MIT-blue?logo=opensourceinitiative)](https://opensource.org/licenses/MIT)
