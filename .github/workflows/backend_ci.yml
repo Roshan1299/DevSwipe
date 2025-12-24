@@ -86,7 +86,6 @@ jobs:
       run: cd backend && ./gradlew build -x test
       env:
         SPRING_PROFILES_ACTIVE: test
-        firebase.enabled: false
         DB_USERNAME: devswipe
         DB_PASSWORD: password
         SPRING_DATASOURCE_URL: jdbc:postgresql://localhost:5432/devswipe_db
@@ -98,7 +97,6 @@ jobs:
       run: cd backend && ./gradlew test
       env:
         SPRING_PROFILES_ACTIVE: test
-        firebase.enabled: false
         DB_USERNAME: devswipe
         DB_PASSWORD: password
         SPRING_DATASOURCE_URL: jdbc:postgresql://localhost:5432/devswipe_db
@@ -109,7 +107,7 @@ jobs:
     - name: Test Server Startup
       run: |
         cd backend
-        SPRING_PROFILES_ACTIVE=test firebase.enabled=false DB_USERNAME=devswipe DB_PASSWORD=password SPRING_DATASOURCE_URL=jdbc:postgresql://localhost:5432/devswipe_db SPRING_DATASOURCE_USERNAME=devswipe SPRING_DATASOURCE_PASSWORD=password timeout 30s ./gradlew bootRun &
+        timeout 30s ./gradlew bootRun --args='--spring.profiles.active=test --firebase.enabled=false --spring.datasource.username=devswipe --spring.datasource.password=password --spring.datasource.url=jdbc:postgresql://localhost:5432/devswipe_db' &
         SERVER_PID=$!
         sleep 15
         if ps -p $SERVER_PID > /dev/null; then
