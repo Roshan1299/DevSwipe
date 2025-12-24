@@ -107,7 +107,7 @@ jobs:
     - name: Test Server Startup
       run: |
         cd backend
-        timeout 30s ./gradlew bootRun --args='--spring.profiles.active=test --firebase.enabled=false --spring.datasource.username=devswipe --spring.datasource.password=password --spring.datasource.url=jdbc:postgresql://localhost:5432/devswipe_db' &
+        timeout 30s ./gradlew bootRun -Dspring.profiles.active=test -Dfirebase.enabled=false -Dspring.datasource.username=devswipe -Dspring.datasource.password=password -Dspring.datasource.url=jdbc:postgresql://localhost:5432/devswipe_db &
         SERVER_PID=$!
         sleep 15
         if ps -p $SERVER_PID > /dev/null; then
