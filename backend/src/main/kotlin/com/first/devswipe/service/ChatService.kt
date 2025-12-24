@@ -72,7 +72,8 @@ class ChatService(
                             messageContent = content
                         )
                     } catch (e: Exception) {
-                        logger.severe("Error sending notification: ${e.message}")
+                        logger.warning("Could not send notification (expected in CI): ${e.message}")
+                        // This is expected in CI environment where Firebase is not configured
                     }
                 }.start()
             }
