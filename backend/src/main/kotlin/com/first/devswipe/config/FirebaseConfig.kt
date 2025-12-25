@@ -7,6 +7,7 @@ import com.google.firebase.messaging.FirebaseMessaging
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
+import org.springframework.context.annotation.Profile
 import org.springframework.core.io.ClassPathResource
 import java.io.ByteArrayInputStream
 import java.nio.charset.StandardCharsets
@@ -15,15 +16,15 @@ import java.nio.charset.StandardCharsets
 class FirebaseConfig {
 
     @Bean
-    @ConditionalOnProperty(name = ["firebase.enabled"], havingValue = "true", matchIfMissing = false)
+    @Profile("!test")  // Only create this bean when NOT in test profile
     fun firebaseMessaging(): FirebaseMessaging {
-        // First try environment variable (use a GitHub secret), then fallback to classpath file
+        // Load credentials from environment variable or classpath file
         val envJson = System.getenv("FIREBASE_SERVICE_ACCOUNT_JSON")
         val resource = ClassPathResource("firebase-service-account.json")
         val inputStream = when {
             !envJson.isNullOrBlank() -> ByteArrayInputStream(envJson.toByteArray(StandardCharsets.UTF_8))
             resource.exists() -> resource.inputStream
-            else -> throw IllegalStateException("Firebase service account not found. Set firebase.enabled=false in CI or provide credentials.")
+            else -> throw IllegalStateException("Firebase service account not found. Provide credentials or use different profile.")
         }
 
         val options = FirebaseOptions.builder()
