@@ -30,6 +30,10 @@ jwt:
   expiration: 86400000 # 24 hours
   refresh-expiration: 604800000 # 7 days
 
+# Firebase Configuration
+firebase:
+  enabled: true  # Set to false in CI environment
+
 logging:
   level:
     com.first.devswipe: DEBUG

@@ -26,7 +26,7 @@ class ChatController(
             request.content,
             request.messageType
         )
-        
+
         return if (result.success) {
             ResponseEntity.ok(result)
         } else {

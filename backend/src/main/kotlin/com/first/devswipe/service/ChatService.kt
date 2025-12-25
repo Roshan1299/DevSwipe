@@ -21,8 +21,10 @@ import java.util.*
 class ChatService(
     private val messageRepository: MessageRepository,
     private val conversationRepository: ConversationRepository,
-    private val userRepository: UserRepository
+    private val userRepository: UserRepository,
+    private val notificationService: NotificationService
 ) {
+    private val logger = java.util.logging.Logger.getLogger(ChatService::class.java.name)
 
     fun sendMessage(sender: User, receiverId: UUID, content: String, messageType: MessageType): SendMessageResponse {
         try {
@@ -58,6 +60,23 @@ class ChatService(
 
             // Update or create conversation
             updateOrCreateConversation(sender, receiver, savedMessage)
+
+            // Send notification to receiver if they have an FCM token
+            if (receiver.fcmToken != null) {
+                // Run notification in a separate thread to not block the message sending
+                Thread {
+                    try {
+                        notificationService.sendNewMessageNotification(
+                            senderName = sender.displayName,
+                            recipientToken = receiver.fcmToken!!,
+                            messageContent = content
+                        )
+                    } catch (e: Exception) {
+                        logger.warning("Could not send notification (expected in CI): ${e.message}")
+                        // This is expected in CI environment where Firebase is not configured
+                    }
+                }.start()
+            }
 
             // Create response DTO
             val messageResponse = MessageResponse(

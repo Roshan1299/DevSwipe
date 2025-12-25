@@ -42,7 +42,10 @@ data class User(
     val bio: String? = null,
 
     @Column(name = "university")
-    val university: String? = null
+    val university: String? = null,
+
+    @Column(name = "fcm_token")
+    var fcmToken: String? = null
 ) : UserDetails {
     override fun getAuthorities(): Collection<GrantedAuthority> {
         return listOf(SimpleGrantedAuthority("ROLE_USER"))

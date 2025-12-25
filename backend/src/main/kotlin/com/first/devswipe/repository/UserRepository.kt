@@ -11,4 +11,5 @@ interface UserRepository : JpaRepository<User, UUID> {
     fun findByDisplayName(displayName: String): User?
     fun existsByDisplayName(displayName: String): Boolean
     fun existsByEmail(email: String): Boolean
+    fun findByFcmToken(fcmToken: String): User?
 }

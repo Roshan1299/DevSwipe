@@ -7,6 +7,6 @@ spring:
     enabled: false
   datasource:
     url: jdbc:postgresql://localhost:5432/devswipe_db
-    username: devswipe
-    password: password
+    username: ${DB_USERNAME:devswipe}
+    password: ${DB_PASSWORD:password}
     driver-class-name: org.postgresql.Driver
