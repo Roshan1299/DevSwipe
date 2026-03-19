@@ -65,6 +65,8 @@ class ChatFragment : Fragment() {
         viewLifecycleOwner.lifecycleScope.launch {
             viewModel.conversations.collect { conversations ->
                 conversationAdapter.submitList(conversations)
+                binding.emptyStateLayout.visibility = if (conversations.isEmpty()) View.VISIBLE else View.GONE
+                binding.recyclerView.visibility = if (conversations.isEmpty()) View.GONE else View.VISIBLE
             }
         }
 

@@ -8,13 +8,13 @@ import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.lifecycleScope
 import kotlinx.coroutines.launch
+import androidx.navigation.fragment.findNavController
 import androidx.navigation.fragment.navArgs
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.first.projectswipe.databinding.FragmentIndividualChatBinding
 import com.first.projectswipe.presentation.adapters.MessageAdapter
 import com.first.projectswipe.presentation.ui.auth.AuthManager
 import dagger.hilt.android.AndroidEntryPoint
-import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 @AndroidEntryPoint
@@ -49,6 +49,11 @@ class IndividualChatFragment : Fragment() {
 
         // Extract other user ID from arguments
         otherUserId = args.otherUserId ?: ""
+
+        // Wire up back button
+        binding.toolbar.setNavigationOnClickListener {
+            findNavController().navigateUp()
+        }
 
         // Setup recycler view for messages
         setupRecyclerView()

@@ -1,20 +1,24 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.constraintlayout.widget.ConstraintLayout 
+<androidx.constraintlayout.widget.ConstraintLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@color/white">
+    android:background="#F5F5F5">
 
-    <!-- Toolbar with back button and user info -->
+    <!-- Toolbar -->
     <com.google.android.material.appbar.MaterialToolbar
         android:id="@+id/toolbar"
         android:layout_width="match_parent"
         android:layout_height="?attr/actionBarSize"
         android:background="?attr/colorPrimary"
+        android:elevation="4dp"
         app:navigationIcon="@drawable/ic_back"
-        app:layout_constraintTop_toTopOf="parent">
+        app:navigationIconTint="@color/white"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent">
 
         <LinearLayout
             android:layout_width="wrap_content"
@@ -24,9 +28,9 @@
 
             <ImageView
                 android:id="@+id/profileImageView"
-                android:layout_width="32dp"
-                android:layout_height="32dp"
-                android:layout_marginEnd="8dp"
+                android:layout_width="38dp"
+                android:layout_height="38dp"
+                android:layout_marginEnd="10dp"
                 android:background="@drawable/circle_background"
                 android:scaleType="centerCrop"
                 tools:src="@drawable/ic_profile_placeholder"
@@ -52,7 +56,7 @@
                     android:layout_height="wrap_content"
                     android:textColor="@color/white"
                     android:textSize="12sp"
-                    android:alpha="0.8"
+                    android:alpha="0.75"
                     tools:text="Online" />
 
             </LinearLayout>
@@ -66,7 +70,11 @@
         android:id="@+id/messagesRecyclerView"
         android:layout_width="0dp"
         android:layout_height="0dp"
-        android:padding="8dp"
+        android:paddingTop="8dp"
+        android:paddingBottom="8dp"
+        android:paddingStart="8dp"
+        android:paddingEnd="8dp"
+        android:clipToPadding="false"
         app:layout_constraintTop_toBottomOf="@id/toolbar"
         app:layout_constraintBottom_toTopOf="@id/messageInputLayout"
         app:layout_constraintStart_toStartOf="parent"
@@ -78,30 +86,44 @@
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:orientation="horizontal"
-        android:padding="8dp"
+        android:paddingStart="8dp"
+        android:paddingEnd="8dp"
+        android:paddingTop="8dp"
+        android:paddingBottom="8dp"
         android:background="@color/white"
-        android:layout_margin="8dp"
+        android:gravity="center_vertical"
+        android:elevation="4dp"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent">
 
-        <com.google.android.material.textfield.TextInputEditText
+        <EditText
             android:id="@+id/messageEditText"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_weight="1"
             android:hint="Type a message..."
             android:background="@drawable/edit_text_background"
-            android:padding="12dp"
-            android:layout_marginEnd="8dp" />
+            android:paddingStart="14dp"
+            android:paddingEnd="14dp"
+            android:paddingTop="10dp"
+            android:paddingBottom="10dp"
+            android:layout_marginEnd="8dp"
+            android:maxLines="4"
+            android:inputType="textMultiLine|textCapSentences"
+            android:textColor="#000000"
+            android:textColorHint="#888888"
+            android:textSize="15sp" />
 
-        <com.google.android.material.floatingactionbutton.FloatingActionButton
+        <ImageButton
             android:id="@+id/sendButton"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
+            android:layout_width="44dp"
+            android:layout_height="44dp"
             android:src="@drawable/ic_send"
-            app:tint="@color/white"
-            android:contentDescription="Send message" />
+            android:background="@drawable/circle_blue_background"
+            android:padding="10dp"
+            android:contentDescription="Send message"
+            app:tint="@color/white" />
 
     </LinearLayout>
 
