@@ -40,6 +40,10 @@ local.properties
 *.jks
 *.keystore
 
+# Firebase service account credentials (sensitive)
+**/firebase-service-account.json
+**/*firebase-adminsdk*.json
+
 # ========================================
 # Spring Boot / Kotlin backend specific (backend/)
 # ========================================

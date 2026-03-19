@@ -40,8 +40,8 @@ class SharedPreferencesTokenProvider @Inject constructor(
 @InstallIn(SingletonComponent::class)
 object NetworkModule {
 
-    private const val BASE_URL = "http://10.0.2.2:8080/" // Emulator
-    // private const val BASE_URL = "http://127.0.0.1:8080/" // For real device
+    // private const val BASE_URL = "http://10.0.2.2:8080/" // Emulator
+    private const val BASE_URL = "http://localhost:8080/" // Real device via ADB reverse
     // For real device use: "http://YOUR_LOCAL_IP:8080/"
     // For production use: "https://your-backend-domain.com/"
 
