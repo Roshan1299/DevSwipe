@@ -43,5 +43,6 @@ data class UserDto(
     val email: String,
     val firstName: String?,
     val lastName: String?,
-    val university: String?
+    val university: String?,
+    val profileImageUrl: String? = null
 )
