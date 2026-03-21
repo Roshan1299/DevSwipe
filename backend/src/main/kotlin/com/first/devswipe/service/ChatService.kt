@@ -11,6 +11,7 @@ import com.first.devswipe.repository.UserRepository
 import org.springframework.data.domain.PageRequest
 import org.springframework.data.domain.Pageable
 import org.springframework.data.repository.findByIdOrNull
+import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
 import java.time.LocalDateTime
@@ -21,9 +22,10 @@ import java.util.*
 class ChatService(
     private val messageRepository: MessageRepository,
     private val conversationRepository: ConversationRepository,
-    private val userRepository: UserRepository,
-    private val notificationService: NotificationService
+    private val userRepository: UserRepository
 ) {
+    @Autowired(required = false)
+    private var notificationService: NotificationService? = null
     private val logger = java.util.logging.Logger.getLogger(ChatService::class.java.name)
 
     fun sendMessage(sender: User, receiverId: UUID, content: String, messageType: MessageType): SendMessageResponse {
@@ -62,11 +64,11 @@ class ChatService(
             updateOrCreateConversation(sender, receiver, savedMessage)
 
             // Send notification to receiver if they have an FCM token
-            if (receiver.fcmToken != null) {
+            if (receiver.fcmToken != null && notificationService != null) {
                 // Run notification in a separate thread to not block the message sending
                 Thread {
                     try {
-                        notificationService.sendNewMessageNotification(
+                        notificationService?.sendNewMessageNotification(
                             senderName = sender.displayName,
                             recipientToken = receiver.fcmToken!!,
                             messageContent = content

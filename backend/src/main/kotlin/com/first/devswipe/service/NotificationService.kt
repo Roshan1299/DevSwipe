@@ -4,10 +4,12 @@ import com.first.devswipe.dto.NotificationRequest
 import com.first.devswipe.dto.NotificationResponse
 import com.first.devswipe.repository.UserRepository
 import com.google.firebase.messaging.*
+import org.springframework.boot.autoconfigure.condition.ConditionalOnBean
 import org.springframework.stereotype.Service
 import java.util.logging.Logger
 
 @Service
+@ConditionalOnBean(FirebaseMessaging::class)
 class NotificationService(
     private val firebaseMessaging: FirebaseMessaging,
     private val userRepository: UserRepository
