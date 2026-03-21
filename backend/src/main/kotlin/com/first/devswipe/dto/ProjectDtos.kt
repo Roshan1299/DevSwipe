@@ -60,3 +60,13 @@ data class UpdateCollaborationRequest(
     val timeCommitment: String? = null,
     val teamSize: Int? = null
 )
+
+data class CollabApplicationResponse(
+    val id: UUID,
+    val collabPostId: UUID,
+    val collabPostTitle: String,
+    val applicant: UserDto,
+    val applicantSkills: List<String>,
+    val status: String,
+    val createdAt: Long
+)

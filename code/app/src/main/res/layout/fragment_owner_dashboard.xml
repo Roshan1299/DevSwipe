@@ -7,22 +7,20 @@
     android:layout_height="match_parent"
     android:background="#F5F5F5">
 
-    <!-- Toolbar -->
     <com.google.android.material.appbar.MaterialToolbar
         android:id="@+id/toolbar"
         android:layout_width="match_parent"
         android:layout_height="?attr/actionBarSize"
         android:background="?attr/colorPrimary"
         android:elevation="4dp"
-        app:title="Messages"
+        app:title="Owner Dashboard"
         app:titleTextColor="@color/white"
-        app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintEnd_toEndOf="parent" />
+        app:navigationIcon="@drawable/ic_back"
+        app:navigationIconTint="@color/white"
+        app:layout_constraintTop_toTopOf="parent" />
 
-    <!-- Chat List -->
     <androidx.recyclerview.widget.RecyclerView
-        android:id="@+id/recyclerView"
+        android:id="@+id/postsRecyclerView"
         android:layout_width="0dp"
         android:layout_height="0dp"
         android:paddingTop="8dp"
@@ -31,10 +29,8 @@
         app:layout_constraintTop_toBottomOf="@id/toolbar"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        tools:listitem="@layout/item_conversation" />
+        app:layout_constraintEnd_toEndOf="parent" />
 
-    <!-- Empty state -->
     <LinearLayout
         android:id="@+id/emptyStateLayout"
         android:layout_width="wrap_content"
@@ -45,13 +41,12 @@
         app:layout_constraintTop_toBottomOf="@id/toolbar"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        tools:visibility="gone">
+        app:layout_constraintEnd_toEndOf="parent">
 
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="No messages yet"
+            android:text="No collaboration posts yet"
             android:textSize="18sp"
             android:textStyle="bold"
             android:textColor="@color/black"
@@ -60,14 +55,13 @@
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="Match with someone to start chatting"
+            android:text="Create a collaboration post to find teammates"
             android:textSize="14sp"
             android:textColor="@color/gray_500"
             android:gravity="center" />
 
     </LinearLayout>
 
-    <!-- Loading indicator -->
     <ProgressBar
         android:id="@+id/progressBar"
         android:layout_width="wrap_content"

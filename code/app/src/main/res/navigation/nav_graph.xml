@@ -69,6 +69,12 @@
         <action
             android:id="@+id/action_ideasFragment_to_profileFragment"
             app:destination="@id/profileFragment" />
+        <action
+            android:id="@+id/action_homeFragment_to_ownerDashboardFragment"
+            app:destination="@id/ownerDashboardFragment" />
+        <action
+            android:id="@+id/action_homeFragment_to_myApplicationsFragment"
+            app:destination="@id/myApplicationsFragment" />
     </fragment>
 
     <!-- Profile Fragment -->
@@ -168,7 +174,31 @@
         <action
             android:id="@+id/action_collaborateFragment_to_profileFragment"
             app:destination="@id/profileFragment" />
+        <action
+            android:id="@+id/action_collaborateFragment_to_ownerDashboardFragment"
+            app:destination="@id/ownerDashboardFragment" />
+        <action
+            android:id="@+id/action_collaborateFragment_to_myApplicationsFragment"
+            app:destination="@id/myApplicationsFragment" />
     </fragment>
+
+    <!-- Owner Dashboard -->
+    <fragment
+        android:id="@+id/ownerDashboardFragment"
+        android:name="com.first.projectswipe.presentation.ui.collaboration.OwnerDashboardFragment"
+        android:label="Owner Dashboard"
+        tools:layout="@layout/fragment_owner_dashboard">
+        <action
+            android:id="@+id/action_ownerDashboardFragment_to_profileFragment"
+            app:destination="@id/profileFragment" />
+    </fragment>
+
+    <!-- My Applications -->
+    <fragment
+        android:id="@+id/myApplicationsFragment"
+        android:name="com.first.projectswipe.presentation.ui.collaboration.MyApplicationsFragment"
+        android:label="My Applications"
+        tools:layout="@layout/fragment_my_applications" />
 
     <!-- Chat -->
     <fragment

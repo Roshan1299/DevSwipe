@@ -96,6 +96,22 @@ interface ApiService {
     @GET("api/collaborations")
     suspend fun getCollaborations(): Response<List<CollaborationResponse>>
 
+    // Collaboration application endpoints
+    @POST("api/collaborations/{postId}/apply")
+    suspend fun applyToCollabPost(@Path("postId") postId: String): Response<Map<String, String>>
+
+    @GET("api/collaborations/{postId}/applicants")
+    suspend fun getCollabApplicants(@Path("postId") postId: String): Response<List<CollabApplicationResponse>>
+
+    @PUT("api/collaborations/{postId}/applicants/{applicantId}/accept")
+    suspend fun acceptApplicant(@Path("postId") postId: String, @Path("applicantId") applicantId: String): Response<Map<String, String>>
+
+    @PUT("api/collaborations/{postId}/applicants/{applicantId}/decline")
+    suspend fun declineApplicant(@Path("postId") postId: String, @Path("applicantId") applicantId: String): Response<Map<String, String>>
+
+    @GET("api/collaborations/my-applications")
+    suspend fun getMyApplications(): Response<List<CollabApplicationResponse>>
+
     // Chat endpoints
     @POST("api/chat/messages")
     suspend fun sendMessage(@Body request: MessageRequest): Response<SendMessageResponse>

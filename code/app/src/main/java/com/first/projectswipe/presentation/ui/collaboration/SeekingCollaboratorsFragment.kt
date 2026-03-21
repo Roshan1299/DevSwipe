@@ -87,8 +87,13 @@ class SeekingCollaboratorsFragment : Fragment() {
         navigationView.setNavigationItemSelectedListener { menuItem ->
             when (menuItem.itemId) {
                 R.id.nav_profile -> {
-                    Log.d("Drawer", "Profile selected")
-                    // TODO: Navigate to profile when implemented
+                    findNavController().navigate(R.id.action_collaborateFragment_to_profileFragment)
+                }
+                R.id.nav_owner_dashboard -> {
+                    findNavController().navigate(R.id.action_collaborateFragment_to_ownerDashboardFragment)
+                }
+                R.id.nav_applications -> {
+                    findNavController().navigate(R.id.action_collaborateFragment_to_myApplicationsFragment)
                 }
                 R.id.nav_logout -> {
                     logout()
@@ -147,6 +152,7 @@ class SeekingCollaboratorsFragment : Fragment() {
             apiService = apiService,
             fragment = this,
             startingIndex = startingIndex,
+            currentUserId = authManager.getCurrentUserId(),
             onCardSwiped = { _, _ ->
                 saveSwipePosition(cardStackManager?.currentTopIndex ?: 0)
             }

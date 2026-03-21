@@ -303,6 +303,21 @@ Solution: Use 10.0.2.2:8080 instead of localhost:8080 for Android emulator
 For physical device, use your computer's local IP address
 ```
 
+**Issue**: `Network error. Please try again.` on physical device
+```
+The app uses ADB reverse port forwarding to tunnel traffic from the physical
+device to your local backend. This resets every time you unplug the USB cable
+or restart ADB.
+
+Fix: Re-run this command each time you reconnect your device:
+    adb reverse tcp:8080 tcp:8080
+
+The BASE_URL in NetworkModule.kt should be set to:
+    private const val BASE_URL = "http://localhost:8080/"
+
+Your device must remain plugged in via USB while testing.
+```
+
 #### Build Errors
 
 **Issue**: `Failed to resolve: com.squareup.retrofit2:...`
