@@ -1,0 +1,83 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="horizontal"
+    android:padding="10dp"
+    android:gravity="center_vertical"
+    android:background="@color/background_light">
+
+    <!-- Profile Image -->
+    <ImageView
+        android:id="@+id/profileImageView"
+        android:layout_width="40dp"
+        android:layout_height="40dp"
+        android:layout_marginEnd="10dp"
+        android:scaleType="centerCrop"
+        android:background="@drawable/circle_background"
+        android:src="@drawable/ic_profile_placeholder"
+        tools:ignore="ContentDescription" />
+
+    <!-- Info -->
+    <LinearLayout
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_weight="1"
+        android:orientation="vertical">
+
+        <TextView
+            android:id="@+id/nameTextView"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textSize="14sp"
+            android:textStyle="bold"
+            android:textColor="@color/black"
+            tools:text="Jane Smith" />
+
+        <TextView
+            android:id="@+id/universityTextView"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textSize="12sp"
+            android:textColor="@color/gray_600"
+            tools:text="University of Alberta" />
+
+        <TextView
+            android:id="@+id/skillsTextView"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="2dp"
+            android:textSize="11sp"
+            android:textColor="@color/gray_500"
+            android:maxLines="1"
+            android:ellipsize="end"
+            tools:text="Python, ML, React" />
+
+    </LinearLayout>
+
+    <!-- Accept button -->
+    <ImageButton
+        android:id="@+id/acceptButton"
+        android:layout_width="36dp"
+        android:layout_height="36dp"
+        android:layout_marginEnd="6dp"
+        android:src="@drawable/ic_check"
+        android:background="@drawable/circle_blue_background"
+        android:padding="8dp"
+        android:contentDescription="Accept"
+        android:tint="@color/white" />
+
+    <!-- Decline button -->
+    <ImageButton
+        android:id="@+id/declineButton"
+        android:layout_width="36dp"
+        android:layout_height="36dp"
+        android:src="@drawable/ic_close"
+        android:background="@drawable/unread_count_background"
+        android:padding="8dp"
+        android:contentDescription="Decline"
+        android:tint="@color/white" />
+
+</LinearLayout>
