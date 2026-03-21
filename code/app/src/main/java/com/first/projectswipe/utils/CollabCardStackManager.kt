@@ -1,14 +1,18 @@
 package com.first.projectswipe.utils
 
 import android.content.Context
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.animation.OvershootInterpolator
 import android.widget.FrameLayout
+import android.widget.Toast
 import com.first.projectswipe.R
 import com.first.projectswipe.data.models.CollabPost
-
 import com.first.projectswipe.network.ApiService
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
 
 class CollabCardStackManager(
     private val context: Context,
@@ -17,6 +21,7 @@ class CollabCardStackManager(
     private val apiService: ApiService,
     private val fragment: androidx.fragment.app.Fragment,
     private val startingIndex: Int = 0,
+    private val currentUserId: String? = null,
     private val onCardSwiped: (CollabPost, Int) -> Unit
 ) {
     private val maxVisible = 3
@@ -66,6 +71,11 @@ class CollabCardStackManager(
     }
 
     private fun handleCardSwipe(card: View, collabPost: CollabPost, direction: Int) {
+        // direction > 0 means swipe right = apply
+        if (direction > 0 && currentUserId != null && collabPost.createdBy.id != currentUserId) {
+            applyToPost(collabPost)
+        }
+
         container.removeView(card)
         currentTopIndex++
 
@@ -78,6 +88,23 @@ class CollabCardStackManager(
         addCardAt(maxVisible - 1)
         restack()
         onCardSwiped(collabPost, direction)
+    }
+
+    private fun applyToPost(collabPost: CollabPost) {
+        CoroutineScope(Dispatchers.Main).launch {
+            try {
+                val response = apiService.applyToCollabPost(collabPost.id.toString())
+                if (response.isSuccessful) {
+                    Toast.makeText(context, "Applied to ${collabPost.projectTitle}!", Toast.LENGTH_SHORT).show()
+                } else {
+                    val errorBody = response.errorBody()?.string() ?: "Unknown error"
+                    Log.e("CollabStack", "Apply failed: $errorBody")
+                    Toast.makeText(context, "Already applied or unavailable", Toast.LENGTH_SHORT).show()
+                }
+            } catch (e: Exception) {
+                Log.e("CollabStack", "Apply error: ${e.message}", e)
+            }
+        }
     }
 
     private fun restack() {
