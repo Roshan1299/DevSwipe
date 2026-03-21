@@ -2,6 +2,7 @@
     <group android:checkableBehavior="none">
         <item android:id="@+id/nav_profile" android:title="My Profile" android:icon="@drawable/ic_profile"/>
         <item android:id="@+id/nav_saved" android:title="Saved Projects" android:icon="@drawable/ic_bookmark"/>
+        <item android:id="@+id/nav_owner_dashboard" android:title="Owner Dashboard" android:icon="@drawable/ic_dashboard"/>
         <item android:id="@+id/nav_applications" android:title="My Applications" android:icon="@drawable/ic_apply"/>
         <item android:id="@+id/nav_notifications" android:title="Notifications" android:icon="@drawable/ic_notifications"/>
         <item android:id="@+id/nav_subscribe" android:title="Manage Subscription" android:icon="@drawable/ic_subscription"/>

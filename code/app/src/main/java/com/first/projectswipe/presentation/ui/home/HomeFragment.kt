@@ -298,8 +298,13 @@ class HomeFragment : Fragment() {
         navigationView.setNavigationItemSelectedListener { menuItem ->
             when (menuItem.itemId) {
                 R.id.nav_profile -> {
-                    Log.d("Drawer", "Profile selected")
-                    // TODO: Navigate to profile when implemented
+                    findNavController().navigate(R.id.action_ideasFragment_to_profileFragment)
+                }
+                R.id.nav_owner_dashboard -> {
+                    findNavController().navigate(R.id.action_homeFragment_to_ownerDashboardFragment)
+                }
+                R.id.nav_applications -> {
+                    findNavController().navigate(R.id.action_homeFragment_to_myApplicationsFragment)
                 }
                 R.id.nav_logout -> {
                     logout()
