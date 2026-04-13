@@ -15,6 +15,10 @@ data class UserProfileResponse(
     val university: String? = null,
     @JsonProperty("profileImageUrl")
     val profileImageUrl: String? = null,
+    @JsonProperty("githubUrl")
+    val githubUrl: String? = null,
+    @JsonProperty("linkedinUrl")
+    val linkedinUrl: String? = null,
     @JsonProperty("onboardingCompleted")
     val onboardingCompleted: Boolean = false,
     @JsonProperty("createdAt")
@@ -34,6 +38,8 @@ fun UserProfile.toUserProfileResponse(): UserProfileResponse {
         interests = this.interests?.toList() ?: emptyList(),
         university = this.university,
         profileImageUrl = this.profileImageUrl,
+        githubUrl = this.githubUrl,
+        linkedinUrl = this.linkedinUrl,
         onboardingCompleted = this.onboardingCompleted,
         createdAt = this.createdAt.format(DateTimeFormatter.ISO_LOCAL_DATE_TIME),
         updatedAt = this.updatedAt.format(DateTimeFormatter.ISO_LOCAL_DATE_TIME)
