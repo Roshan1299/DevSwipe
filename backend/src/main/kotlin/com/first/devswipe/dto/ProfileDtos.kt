@@ -7,5 +7,7 @@ data class UpdateProfileRequest(
     val interests: List<String>? = null,
     val university: String? = null,
     val profileImageUrl: String? = null,
+    val githubUrl: String? = null,
+    val linkedinUrl: String? = null,
     val onboardingCompleted: Boolean? = null
 )

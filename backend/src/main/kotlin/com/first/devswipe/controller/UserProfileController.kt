@@ -63,6 +63,8 @@ class UserProfileController(
             interests = request.interests?.toTypedArray() ?: existingProfile.interests,
             university = request.university ?: existingProfile.university,
             profileImageUrl = request.profileImageUrl ?: existingProfile.profileImageUrl,
+            githubUrl = request.githubUrl ?: existingProfile.githubUrl,
+            linkedinUrl = request.linkedinUrl ?: existingProfile.linkedinUrl,
             onboardingCompleted = request.onboardingCompleted ?: existingProfile.onboardingCompleted,
             updatedAt = LocalDateTime.now()
         ) ?: UserProfile(
@@ -73,6 +75,8 @@ class UserProfileController(
             interests = request.interests?.toTypedArray(),
             university = request.university,
             profileImageUrl = request.profileImageUrl,
+            githubUrl = request.githubUrl,
+            linkedinUrl = request.linkedinUrl,
             onboardingCompleted = request.onboardingCompleted ?: false
         )
 

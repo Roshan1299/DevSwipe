@@ -17,6 +17,10 @@ data class UserProfileResponse(
     val university: String? = null,
     @SerializedName("profileImageUrl")
     val profileImageUrl: String? = null,
+    @SerializedName("githubUrl")
+    val githubUrl: String? = null,
+    @SerializedName("linkedinUrl")
+    val linkedinUrl: String? = null,
     @SerializedName("onboardingCompleted")
     val onboardingCompleted: Boolean = false,
     @SerializedName("createdAt")
@@ -37,6 +41,10 @@ data class UpdateUserRequest(
     val university: String? = null,
     @SerializedName("profileImageUrl")
     val profileImageUrl: String? = null,
+    @SerializedName("githubUrl")
+    val githubUrl: String? = null,
+    @SerializedName("linkedinUrl")
+    val linkedinUrl: String? = null,
     @SerializedName("onboardingCompleted")
     val onboardingCompleted: Boolean? = null
 )

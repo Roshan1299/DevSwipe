@@ -1,5 +1,7 @@
 package com.first.projectswipe.presentation.adapters
 
+import android.content.res.ColorStateList
+import android.graphics.Color
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
@@ -22,6 +24,8 @@ class ProfilePostAdapter(
 
     class ViewHolder(view: View) : RecyclerView.ViewHolder(view) {
         val titleView: TextView = view.findViewById(R.id.projectTitleTextView)
+        val descriptionView: TextView = view.findViewById(R.id.projectDescriptionTextView)
+        val difficultyBadge: TextView = view.findViewById(R.id.difficultyBadge)
         val tagsChipGroup: ChipGroup = view.findViewById(R.id.skillsChipGroup)
         val optionsButton: ImageButton = view.findViewById(R.id.moreOptionsButton)
     }
@@ -34,16 +38,45 @@ class ProfilePostAdapter(
 
     override fun onBindViewHolder(holder: ViewHolder, position: Int) {
         val project = projects[position]
-        holder.titleView.text = project.title
-
-        holder.tagsChipGroup.removeAllViews()
         val context = holder.itemView.context
-        project.tags.forEach { tag ->
+
+        holder.titleView.text = project.title
+        holder.descriptionView.text = project.previewDescription
+
+        // Difficulty badge
+        val difficulty = project.difficulty.uppercase()
+        holder.difficultyBadge.text = difficulty
+        when {
+            difficulty.contains("EASY") || difficulty.contains("BEGINNER") -> {
+                holder.difficultyBadge.setBackgroundResource(R.drawable.difficulty_badge_easy)
+                holder.difficultyBadge.setTextColor(Color.parseColor("#2E7D32"))
+            }
+            difficulty.contains("MEDIUM") || difficulty.contains("INTERMEDIATE") -> {
+                holder.difficultyBadge.setBackgroundResource(R.drawable.difficulty_badge_medium)
+                holder.difficultyBadge.setTextColor(Color.parseColor("#E65100"))
+            }
+            difficulty.contains("HARD") || difficulty.contains("ADVANCED") -> {
+                holder.difficultyBadge.setBackgroundResource(R.drawable.difficulty_badge_hard)
+                holder.difficultyBadge.setTextColor(Color.parseColor("#C62828"))
+            }
+            else -> {
+                holder.difficultyBadge.setBackgroundResource(R.drawable.difficulty_badge_easy)
+                holder.difficultyBadge.setTextColor(Color.parseColor("#2E7D32"))
+            }
+        }
+
+        // Tags as styled chips
+        holder.tagsChipGroup.removeAllViews()
+        project.tags.take(3).forEach { tag ->
             val chip = Chip(context).apply {
                 text = tag
                 isClickable = false
                 isCheckable = false
-                setTextColor(context.getColor(android.R.color.black))
+                setTextColor(Color.parseColor("#007AFF"))
+                chipBackgroundColor = ColorStateList.valueOf(Color.parseColor("#E8F2FF"))
+                chipStrokeWidth = 0f
+                setEnsureMinTouchTargetSize(false)
+                textSize = 11f
             }
             holder.tagsChipGroup.addView(chip)
         }
@@ -54,7 +87,7 @@ class ProfilePostAdapter(
             popup.setOnMenuItemClickListener { item ->
                 when (item.itemId) {
                     R.id.action_delete_project -> {
-                        deleteProject(project, position, v)
+                        onProjectDeleted(project, position)
                         true
                     }
                     R.id.action_edit_project -> {
@@ -69,11 +102,6 @@ class ProfilePostAdapter(
     }
 
     override fun getItemCount(): Int = projects.size
-
-    private fun deleteProject(project: ProjectIdea, position: Int, view: View) {
-        // Call the callback to handle deletion in the fragment
-        onProjectDeleted(project, position)
-    }
 
     private fun editProject(view: View, project: ProjectIdea) {
         val bundle = Bundle().apply {

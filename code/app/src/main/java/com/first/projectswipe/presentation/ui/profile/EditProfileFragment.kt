@@ -2,6 +2,8 @@ package com.first.projectswipe.presentation.ui.profile
 
 import android.app.Activity
 import android.content.Intent
+import android.content.res.ColorStateList
+import android.graphics.Color
 import android.net.Uri
 import android.os.Bundle
 import android.view.LayoutInflater
@@ -9,21 +11,19 @@ import android.view.View
 import android.view.ViewGroup
 import android.view.inputmethod.EditorInfo
 import android.widget.Toast
-import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.Observer
 import androidx.navigation.fragment.findNavController
-import com.first.projectswipe.R
 import com.first.projectswipe.databinding.FragmentEditProfileBinding
 import com.first.projectswipe.network.dto.UpdateUserRequest
+import com.first.projectswipe.network.dto.UserProfileResponse
 import com.first.projectswipe.presentation.ui.auth.AuthManager
 import com.google.android.material.chip.Chip
 import com.squareup.picasso.Picasso
 import dagger.hilt.android.AndroidEntryPoint
 import java.io.File
 import javax.inject.Inject
-import com.first.projectswipe.network.dto.UserProfileResponse
 
 @AndroidEntryPoint
 class EditProfileFragment : Fragment() {
@@ -58,6 +58,7 @@ class EditProfileFragment : Fragment() {
         setupInputListeners()
         loadUserData()
         observeViewModel()
+        updateCounts()
     }
 
     private fun setupClickListeners() {
@@ -66,6 +67,10 @@ class EditProfileFragment : Fragment() {
         }
 
         binding.editImageButton.setOnClickListener {
+            pickImageFromGallery()
+        }
+
+        binding.editProfileImageView.setOnClickListener {
             pickImageFromGallery()
         }
 
@@ -120,15 +125,19 @@ class EditProfileFragment : Fragment() {
             val chip = Chip(requireContext()).apply {
                 text = skill
                 isCloseIconVisible = true
-                setTextColor(ContextCompat.getColor(requireContext(), android.R.color.white))
-                chipBackgroundColor = ContextCompat.getColorStateList(requireContext(), R.color.blue_2196F3)
-                closeIconTint = ContextCompat.getColorStateList(requireContext(), android.R.color.white)
+                setTextColor(Color.parseColor("#007AFF"))
+                chipBackgroundColor = ColorStateList.valueOf(Color.parseColor("#E8F2FF"))
+                closeIconTint = ColorStateList.valueOf(Color.parseColor("#007AFF"))
+                chipStrokeWidth = 0f
+                setEnsureMinTouchTargetSize(false)
                 setOnCloseIconClickListener {
                     skills.remove(skill)
                     binding.skillsChipGroup.removeView(this)
+                    updateCounts()
                 }
             }
             binding.skillsChipGroup.addView(chip)
+            updateCounts()
         }
     }
 
@@ -138,16 +147,25 @@ class EditProfileFragment : Fragment() {
             val chip = Chip(requireContext()).apply {
                 text = interest
                 isCloseIconVisible = true
-                setTextColor(ContextCompat.getColor(requireContext(), android.R.color.white))
-                chipBackgroundColor = ContextCompat.getColorStateList(requireContext(), R.color.blue_2196F3)
-                closeIconTint = ContextCompat.getColorStateList(requireContext(), android.R.color.white)
+                setTextColor(Color.parseColor("#34C759"))
+                chipBackgroundColor = ColorStateList.valueOf(Color.parseColor("#E8F8ED"))
+                closeIconTint = ColorStateList.valueOf(Color.parseColor("#34C759"))
+                chipStrokeWidth = 0f
+                setEnsureMinTouchTargetSize(false)
                 setOnCloseIconClickListener {
                     interests.remove(interest)
                     binding.interestsChipGroup.removeView(this)
+                    updateCounts()
                 }
             }
             binding.interestsChipGroup.addView(chip)
+            updateCounts()
         }
+    }
+
+    private fun updateCounts() {
+        binding.skillsCountLabel.text = "${skills.size} added"
+        binding.interestsCountLabel.text = "${interests.size} added"
     }
 
     private fun pickImageFromGallery() {
@@ -184,9 +202,19 @@ class EditProfileFragment : Fragment() {
                 binding.nameInput.setText(user.name)
                 binding.universityInput.setText(user.university)
                 binding.bioInput.setText(user.bio)
+                binding.githubInput.setText(user.githubUrl)
+                binding.linkedinInput.setText(user.linkedinUrl)
+
                 if (!user.profileImageUrl.isNullOrEmpty()) {
                     Picasso.get().load(user.profileImageUrl).into(binding.editProfileImageView)
                 }
+
+                // Clear existing chips before adding
+                skills.clear()
+                interests.clear()
+                binding.skillsChipGroup.removeAllViews()
+                binding.interestsChipGroup.removeAllViews()
+
                 user.skills?.forEach { addSkillChip(it) }
                 user.interests?.forEach { addInterestChip(it) }
             }
@@ -200,21 +228,30 @@ class EditProfileFragment : Fragment() {
     }
 
     private fun saveProfile() {
-        val name = binding.nameInput.text.toString()
-        val university = binding.universityInput.text.toString()
-        val bio = binding.bioInput.text.toString()
+        val name = binding.nameInput.text.toString().trim()
+        val university = binding.universityInput.text.toString().trim()
+        val bio = binding.bioInput.text.toString().trim()
+        val github = binding.githubInput.text.toString().trim()
+        val linkedin = binding.linkedinInput.text.toString().trim()
+
+        if (name.isEmpty()) {
+            Toast.makeText(context, "Name is required", Toast.LENGTH_SHORT).show()
+            return
+        }
 
         val updateUserRequest = UpdateUserRequest(
             name = name,
-            university = university,
-            bio = bio,
+            university = university.ifEmpty { null },
+            bio = bio.ifEmpty { null },
             profileImageUrl = newProfilePictureUrl ?: viewModel.userProfile.value?.profileImageUrl,
+            githubUrl = github.ifEmpty { null },
+            linkedinUrl = linkedin.ifEmpty { null },
             skills = skills,
             interests = interests
         )
 
         viewModel.updateUser(updateUserRequest)
-        Toast.makeText(context, "Profile updated successfully!", Toast.LENGTH_SHORT).show()
+        Toast.makeText(context, "Profile updated!", Toast.LENGTH_SHORT).show()
         findNavController().popBackStack()
     }
 

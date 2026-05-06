@@ -1,39 +1,80 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
-    android:padding="12dp"
+    android:layout_marginBottom="10dp"
+    android:padding="14dp"
     android:orientation="vertical"
-    android:background="@drawable/card_background">
+    android:background="@drawable/post_card_background"
+    android:elevation="1dp">
 
+    <!-- Title row with options button -->
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:orientation="horizontal">
+        android:orientation="horizontal"
+        android:gravity="center_vertical">
 
         <TextView
             android:id="@+id/projectTitleTextView"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_weight="1"
-            android:text="Project Title"
             android:textStyle="bold"
-            android:textSize="16sp" />
+            android:textSize="16sp"
+            android:textColor="@color/text_primary"
+            tools:text="DevSwipe Mobile App" />
 
         <ImageButton
             android:id="@+id/moreOptionsButton"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
+            android:layout_width="32dp"
+            android:layout_height="32dp"
             android:src="@drawable/ic_more_vert"
             android:background="?attr/selectableItemBackgroundBorderless"
             android:contentDescription="More Options" />
     </LinearLayout>
 
-    <com.google.android.material.chip.ChipGroup
-        android:id="@+id/skillsChipGroup"
+    <!-- Description preview -->
+    <TextView
+        android:id="@+id/projectDescriptionTextView"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        app:singleLine="false" />
+        android:layout_marginTop="6dp"
+        android:textSize="13sp"
+        android:textColor="@color/text_secondary"
+        android:maxLines="2"
+        android:ellipsize="end"
+        android:lineSpacingMultiplier="1.2"
+        tools:text="A Tinder-style swiping app for university students to discover project ideas..." />
+
+    <!-- Difficulty badge + tags row -->
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="10dp"
+        android:orientation="horizontal"
+        android:gravity="center_vertical">
+
+        <TextView
+            android:id="@+id/difficultyBadge"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:paddingHorizontal="10dp"
+            android:paddingVertical="4dp"
+            android:textSize="11sp"
+            android:textStyle="bold"
+            android:background="@drawable/difficulty_badge_easy"
+            tools:text="EASY" />
+
+        <com.google.android.material.chip.ChipGroup
+            android:id="@+id/skillsChipGroup"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:layout_marginStart="8dp"
+            app:singleLine="true" />
+    </LinearLayout>
 
 </LinearLayout>

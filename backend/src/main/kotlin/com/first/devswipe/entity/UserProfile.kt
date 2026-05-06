@@ -34,6 +34,12 @@ data class UserProfile(
 
     val university: String? = null,
 
+    @Column(name = "github_url", columnDefinition = "TEXT")
+    val githubUrl: String? = null,
+
+    @Column(name = "linkedin_url", columnDefinition = "TEXT")
+    val linkedinUrl: String? = null,
+
     @Column(name = "created_at")
     val createdAt: LocalDateTime = LocalDateTime.now(),
 
