@@ -41,7 +41,6 @@ class SharedPreferencesTokenProvider @Inject constructor(
 object NetworkModule {
 
     // private const val BASE_URL = "http://10.0.2.2:8080/" // Emulator
-    private const val BASE_URL = "http://localhost:8080/" // Real device via ADB reverse
     // For real device use: "http://YOUR_LOCAL_IP:8080/"
     // For production use: "https://your-backend-domain.com/"
 
@@ -95,7 +94,7 @@ object NetworkModule {
     @Singleton
     fun provideRetrofit(okHttpClient: OkHttpClient): Retrofit {
         return Retrofit.Builder()
-            .baseUrl(BASE_URL)
+            .baseUrl(RetrofitClient.BASE_URL)
             .client(okHttpClient)
             .addConverterFactory(GsonConverterFactory.create())
             .build()
