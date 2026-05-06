@@ -8,6 +8,7 @@ import androidx.lifecycle.MutableLiveData
 import com.first.projectswipe.data.models.User
 import com.first.projectswipe.network.ApiService
 import com.first.projectswipe.network.dto.*
+import com.first.projectswipe.notifications.FCMTokenManager
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import retrofit2.Response
@@ -79,6 +80,8 @@ class AuthManager @Inject constructor(
                     val authResponse = response.body()!!
                     saveUserSession(authResponse)
 
+                    FCMTokenManager.getFCMToken()?.let { fcmToken -> registerFcmToken(fcmToken) }
+
                     withContext(Dispatchers.Main) {
                         _isLoggedIn.value = true
                         _authState.value = AuthState.Success(getCurrentUser()!!)
@@ -125,6 +128,8 @@ class AuthManager @Inject constructor(
                 if (response.isSuccessful && response.body() != null) {
                     val authResponse = response.body()!!
                     saveUserSession(authResponse)
+
+                    FCMTokenManager.getFCMToken()?.let { fcmToken -> registerFcmToken(fcmToken) }
 
                     withContext(Dispatchers.Main) {
                         _isLoggedIn.value = true
