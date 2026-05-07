@@ -1,15 +1,23 @@
 // MainActivity.kt
 package com.first.projectswipe
 
+import android.Manifest
+import android.content.pm.PackageManager
+import android.os.Build
 import android.os.Bundle
 import android.view.View
 import androidx.appcompat.app.AppCompatActivity
+import androidx.core.app.ActivityCompat
+import androidx.core.content.ContextCompat
+import androidx.lifecycle.lifecycleScope
 import androidx.navigation.NavController
 import androidx.navigation.NavOptions
 import androidx.navigation.fragment.NavHostFragment
+import com.first.projectswipe.notifications.FCMTokenManager
 import com.first.projectswipe.presentation.ui.auth.AuthManager
 import com.first.projectswipe.databinding.ActivityMainBinding
 import dagger.hilt.android.AndroidEntryPoint
+import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 @AndroidEntryPoint
@@ -56,8 +64,28 @@ class MainActivity : AppCompatActivity() {
             }
         }
 
+        requestNotificationPermission()
+        syncFcmToken()
+
         // Check authentication status and navigate accordingly
         checkAuthenticationStatus(savedInstanceState)
+    }
+
+    private fun syncFcmToken() {
+        if (authManager.isUserLoggedIn()) {
+            lifecycleScope.launch {
+                FCMTokenManager.getFCMToken()?.let { token -> authManager.registerFcmToken(token) }
+            }
+        }
+    }
+
+    private fun requestNotificationPermission() {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+            if (ContextCompat.checkSelfPermission(this, Manifest.permission.POST_NOTIFICATIONS)
+                != PackageManager.PERMISSION_GRANTED) {
+                ActivityCompat.requestPermissions(this, arrayOf(Manifest.permission.POST_NOTIFICATIONS), 0)
+            }
+        }
     }
 
     private fun checkAuthenticationStatus(savedInstanceState: Bundle?) {

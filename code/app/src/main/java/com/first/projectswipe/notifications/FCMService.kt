@@ -110,7 +110,7 @@ class FCMService : FirebaseMessagingService() {
                     )
 
                     val request = okhttp3.Request.Builder()
-                        .url("http://10.0.2.2:8080/api/notifications/register-token") // Update if needed
+                        .url(com.first.projectswipe.network.RetrofitClient.BASE_URL + "api/notifications/register-token")
                         .post(body)
                         .addHeader("Authorization", "Bearer $jwtToken")
                         .addHeader("Content-Type", "application/json")
