@@ -210,6 +210,35 @@ class ProjectController(
         return ResponseEntity.ok(responses)
     }
 
+    @GetMapping("/feed")
+    fun getProjectFeed(
+        @AuthenticationPrincipal user: User,
+        @RequestParam(required = false) difficulty: String?
+    ): ResponseEntity<List<ProjectResponse>> {
+        val projects = projectService.getFeedForUser(user, difficulty)
+        val responses = projects.map { project ->
+            val userProfile = userProfileRepository.findByUserId(project.user.id!!)
+            ProjectResponse(
+                id = project.id,
+                title = project.title,
+                previewDescription = project.previewDescription,
+                fullDescription = project.fullDescription,
+                githubLink = project.githubLink,
+                tags = project.tags,
+                difficulty = project.difficulty,
+                createdBy = UserDto(
+                    id = project.user.id!!,
+                    username = project.user.displayName,
+                    email = project.user.email,
+                    firstName = project.user.firstName,
+                    lastName = project.user.lastName,
+                    university = userProfile?.university
+                )
+            )
+        }
+        return ResponseEntity.ok(responses)
+    }
+
     @DeleteMapping("/{projectId}")
     fun deleteProject(
         @PathVariable projectId: UUID,
