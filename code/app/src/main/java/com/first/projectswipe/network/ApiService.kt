@@ -71,6 +71,11 @@ interface ApiService {
     @GET("api/projects")
     suspend fun getProjects(): Response<List<ProjectResponse>>
 
+    @GET("api/projects/feed")
+    suspend fun getProjectFeed(
+        @Query("difficulty") difficulty: String? = null
+    ): Response<List<ProjectResponse>>
+
     @GET("api/projects/filter")
     suspend fun filterProjects(
         @Query("difficulty") difficulty: String?,
@@ -95,6 +100,9 @@ interface ApiService {
 
     @GET("api/collaborations")
     suspend fun getCollaborations(): Response<List<CollaborationResponse>>
+
+    @GET("api/collaborations/feed")
+    suspend fun getCollabFeed(): Response<List<CollaborationResponse>>
 
     // Collaboration application endpoints
     @POST("api/collaborations/{postId}/apply")
