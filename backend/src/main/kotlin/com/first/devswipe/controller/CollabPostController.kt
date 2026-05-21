@@ -202,6 +202,37 @@ class CollabPostController(
         return ResponseEntity.ok(responses)
     }
 
+    @GetMapping("/feed")
+    fun getCollabFeed(
+        @AuthenticationPrincipal user: User
+    ): ResponseEntity<List<CollaborationResponse>> {
+        val posts = collabPostService.getFeedForUser(user)
+        val responses = posts.map { collabPost ->
+            val userProfile = userProfileRepository.findByUserId(collabPost.user.id!!)
+            CollaborationResponse(
+                id = collabPost.id!!,
+                projectTitle = collabPost.projectTitle,
+                description = collabPost.description,
+                skillsNeeded = collabPost.skillsNeeded,
+                timeCommitment = collabPost.timeCommitment,
+                teamSize = collabPost.teamSize,
+                currentTeamSize = collabPost.currentTeamSize,
+                status = collabPost.status,
+                createdBy = UserDto(
+                    id = collabPost.user.id!!,
+                    username = collabPost.user.displayName,
+                    email = collabPost.user.email,
+                    firstName = collabPost.user.firstName,
+                    lastName = collabPost.user.lastName,
+                    university = userProfile?.university
+                ),
+                createdAt = collabPost.createdAt?.toEpochSecond(java.time.ZoneOffset.UTC) ?: 0,
+                updatedAt = collabPost.updatedAt?.toEpochSecond(java.time.ZoneOffset.UTC) ?: 0
+            )
+        }
+        return ResponseEntity.ok(responses)
+    }
+
     @DeleteMapping("/{postId}")
     fun deleteCollabPost(
         @PathVariable postId: UUID,

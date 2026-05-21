@@ -332,21 +332,18 @@ class HomeFragment : Fragment() {
         }
     }
 
-    /** Loads all project ideas from your REST API and shows the card stack. */
+    /** Loads ranked project feed from backend based on user's skills and interests. */
     private fun loadIdeas() {
         lifecycleScope.launch {
             try {
-                val response = apiService.getProjects()
+                val response = apiService.getProjectFeed(lastSelectedDifficulty)
                 if (response.isSuccessful) {
                     allIdeas = response.body()?.map { it.toProjectIdea() } ?: emptyList()
-                    Log.d("HomeFragment", "Loaded ${allIdeas.size} projects")
+                    Log.d("HomeFragment", "Loaded ${allIdeas.size} projects from feed")
 
                     if (allIdeas.isNotEmpty()) {
                         val startingIndex = requireContext().getSharedPreferences("SwipePrefs", Context.MODE_PRIVATE)
                             .getInt("swipe_index", 0)
-                        // On first load, reset filters selections so all are shown
-                        lastSelectedDifficulty = null
-                        lastSelectedTags = emptySet()
                         showCards(allIdeas, startingIndex)
                     } else {
                         showEmptyState()
@@ -384,39 +381,11 @@ class HomeFragment : Fragment() {
         saveSwipePosition(startingIndex)
     }
 
-    /** Applies difficulty/tags filters and shows filtered projects */
+    /** Re-fetches the ranked feed with the selected difficulty filter applied. */
     fun applyFilters(filters: Map<String, Any?>) {
-        lifecycleScope.launch {
-            try {
-                val difficulty = filters["difficulty"] as? String
-                val tags = filters["tags"] as? List<String>
-
-                val response = if (difficulty == null && (tags == null || tags.isEmpty())) {
-                    // No filters applied - get all projects
-                    apiService.getProjects()
-                } else {
-                    // Apply filters - Retrofit will handle the List<String> conversion to query parameters
-                    apiService.filterProjects(difficulty, tags)
-                }
-
-                if (response.isSuccessful) {
-                    val filteredIdeas = response.body()?.map { it.toProjectIdea() } ?: emptyList()
-                    if (filteredIdeas.isNotEmpty()) {
-                        showCards(filteredIdeas)
-                    } else {
-                        showEmptyState()
-                    }
-                } else {
-                    Toast.makeText(context, "Error filtering projects: ${response.message()}", Toast.LENGTH_SHORT).show()
-                    Log.e("HomeFragment", "Error filtering projects: ${response.code()} ${response.message()}")
-                    showEmptyState()
-                }
-            } catch (e: Exception) {
-                Toast.makeText(context, "Error filtering projects: ${e.message}", Toast.LENGTH_SHORT).show()
-                Log.e("HomeFragment", "Error filtering projects", e)
-                showEmptyState()
-            }
-        }
+        lastSelectedDifficulty = filters["difficulty"] as? String
+        lastSelectedTags = emptySet()
+        loadIdeas()
     }
 
     /** Shows the empty state view if there are no projects */

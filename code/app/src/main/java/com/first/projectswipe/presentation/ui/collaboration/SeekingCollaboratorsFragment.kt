@@ -113,11 +113,11 @@ class SeekingCollaboratorsFragment : Fragment() {
         }
     }
 
-    /** Loads all collaboration posts from your REST API and shows the card stack. */
+    /** Loads ranked collaboration feed based on user's skills. */
     private fun loadCollabPosts() {
         lifecycleScope.launch {
             try {
-                val response = apiService.getCollaborations()
+                val response = apiService.getCollabFeed()
                 if (response.isSuccessful) {
                     allCollabPosts = response.body()?.map { it.toCollabPost() } ?: emptyList()
                     Log.d("CollabFragment", "Loaded ${allCollabPosts.size} collaboration posts")

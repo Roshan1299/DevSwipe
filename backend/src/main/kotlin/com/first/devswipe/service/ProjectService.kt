@@ -2,7 +2,9 @@ package com.first.devswipe.service
 
 import com.first.devswipe.dto.ProjectCreateRequest
 import com.first.devswipe.entity.Project
+import com.first.devswipe.entity.User
 import com.first.devswipe.repository.ProjectRepository
+import com.first.devswipe.repository.UserProfileRepository
 import com.first.devswipe.repository.UserRepository
 import org.springframework.stereotype.Service
 import java.util.UUID
@@ -10,7 +12,8 @@ import java.util.UUID
 @Service
 class ProjectService(
     private val projectRepository: ProjectRepository,
-    private val userRepository: UserRepository
+    private val userRepository: UserRepository,
+    private val userProfileRepository: UserProfileRepository
 ) {
 
     fun createProject(userId: UUID, request: ProjectCreateRequest): Project {
@@ -73,5 +76,20 @@ class ProjectService(
             throw Exception("Project not found")
         }
         projectRepository.deleteById(projectId)
+    }
+
+    fun getFeedForUser(user: User, difficulty: String?): List<Project> {
+        val profile = userProfileRepository.findByUserId(user.id!!)
+        val userSkills = profile?.skills?.map { it.lowercase() } ?: emptyList()
+        val userInterests = profile?.interests?.map { it.lowercase() } ?: emptyList()
+
+        val projects = projectRepository.findAll()
+            .filter { it.user.id != user.id }
+            .let { list -> if (difficulty != null) list.filter { it.difficulty.equals(difficulty, ignoreCase = true) } else list }
+
+        return projects.sortedByDescending { project ->
+            val tags = project.tags.map { it.lowercase() }
+            tags.count { it in userSkills } + tags.count { it in userInterests }
+        }
     }
 }

@@ -5,6 +5,7 @@ import com.first.devswipe.dto.UpdateCollaborationRequest
 import com.first.devswipe.entity.CollabPost
 import com.first.devswipe.entity.User
 import com.first.devswipe.repository.CollabPostRepository
+import com.first.devswipe.repository.UserProfileRepository
 import com.first.devswipe.repository.UserRepository
 import org.springframework.stereotype.Service
 import java.util.*
@@ -12,7 +13,8 @@ import java.util.*
 @Service
 class CollabPostService(
     private val collabPostRepository: CollabPostRepository,
-    private val userRepository: UserRepository
+    private val userRepository: UserRepository,
+    private val userProfileRepository: UserProfileRepository
 ) {
     fun createCollabPost(userId: UUID, request: CollaborationCreateRequest): CollabPost {
         val user = userRepository.findById(userId)
@@ -59,7 +61,18 @@ class CollabPostService(
     fun deleteCollabPost(postId: UUID) {
         val collabPost = collabPostRepository.findById(postId)
             .orElseThrow { throw RuntimeException("Collab post not found with id: $postId") }
-        
+
         collabPostRepository.delete(collabPost)
+    }
+
+    fun getFeedForUser(user: User): List<CollabPost> {
+        val profile = userProfileRepository.findByUserId(user.id!!)
+        val userSkills = profile?.skills?.map { it.lowercase() } ?: emptyList()
+
+        return collabPostRepository.findAll()
+            .filter { it.user.id != user.id && it.status == "active" }
+            .sortedByDescending { post ->
+                post.skillsNeeded.map { it.lowercase() }.count { it in userSkills }
+            }
     }
 }
